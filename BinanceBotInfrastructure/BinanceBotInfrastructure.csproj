@@ -6,8 +6,16 @@
 
     <ItemGroup>
       <Folder Include="Libraries" />
-      <Folder Include="ServiceInterfaces" />
-      <Folder Include="Services" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\BinanceBotApp\BinanceBotApp.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="BinanceAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>Libraries\BinanceApi\BinanceAPI.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

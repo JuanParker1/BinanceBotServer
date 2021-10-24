@@ -12,4 +12,9 @@
       <Folder Include="wwwroot" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\BinanceBotApp\BinanceBotApp.csproj" />
+      <ProjectReference Include="..\BinanceBotInfrastructure\BinanceBotInfrastructure.csproj" />
+    </ItemGroup>
+
 </Project>
