@@ -1,5 +1,8 @@
 namespace BinanceBotApp.Data
 {
+    /// <summary>
+    /// Best ask/bid price for trading pair
+    /// </summary>
     public class CoinBestAskBidDto
     {
         public string Symbol { get; set; }

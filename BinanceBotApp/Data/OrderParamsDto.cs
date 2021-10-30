@@ -1,0 +1,70 @@
+using BinanceBotApp.Data.Enums;
+
+namespace BinanceBotApp.Data
+{
+    /// <summary>
+    /// New order creation params
+    /// </summary>
+    public class OrderParamsDto
+    {
+        /// <summary>
+        /// Trading pair name
+        /// </summary>
+        public string Symbol { get; set; }
+        /// <summary>
+        /// Buy/Sell
+        /// </summary>
+        public OrderSide Side { get; set; }
+        /// <summary>
+        /// Order type (LIMIT, MARKET, STOP_LOSS etc)
+        /// </summary>
+        public OrderType Type { get; set; }
+        /// <summary>
+        /// Order lifetime type depending on its fill (full/partial)
+        /// </summary>
+        public TimeInForce TimeInForce { get; set; }
+        /// <summary>
+        /// Specifies the amount of base asset user wants to
+        /// buy/sell. (E.g. for BTC/USDT: quantity 1 will buy/sell 1 BTC.)
+        /// </summary>
+        public decimal Quantity { get; set; }
+        /// <summary>
+        /// For "market" type orders. Specifies the amount of
+        /// asset user wants to buy/sell (E.g. for BTC/USDT: BUY side: the order will
+        /// buy as many BTC as quoteOrderQty USDT can. SELL side: the order will sell
+        /// as much BTC needed to receive quoteOrderQty USDT.)
+        /// </summary>
+        public decimal QuoteOrderQty { get; set; }
+        /// <summary>
+        /// Asset price
+        /// </summary>
+        public decimal Price { get; set; }
+        /// <summary>
+        /// A unique id among open orders. Automatically generated if not sent.
+        /// Orders with the same newClientOrderID can be accepted only when the previous one is filled,
+        /// otherwise the order will be rejected.
+        /// </summary>
+        public string NewClientOrderId { get; set; }
+        /// <summary>
+        /// Used with STOP_LOSS, STOP_LOSS_LIMIT, TAKE_PROFIT, and TAKE_PROFIT_LIMIT orders.
+        /// </summary>
+        public decimal StopPrice { get; set; }
+        /// <summary>
+        /// Used with LIMIT, STOP_LOSS_LIMIT, and TAKE_PROFIT_LIMIT to create an iceberg order.
+        /// </summary>
+        public decimal IcebergQty { get; set; }
+        /// <summary>
+        /// Set the response JSON. ACK, RESULT, or FULL; MARKET and LIMIT order types default to
+        /// FULL, all other orders default to ACK.
+        /// </summary>
+        public NewOrderResponseType NewOrderRespType { get; set; }
+        /// <summary>
+        /// Order lifetime in ms. Default is 5000, max is 60000
+        /// </summary>
+        public long RecvWindow { get; set; }
+        /// <summary>
+        /// Order creation time (Unix timestamp in ms)
+        /// </summary>
+        public long Timestamp { get; set; }
+    }
+}
