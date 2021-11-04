@@ -6,6 +6,7 @@ using BinanceBotApp.Services;
 using BinanceAPI.Endpoints;
 using BinanceAPI.Clients.Interfaces;
 using BinanceBotApp.Data;
+using BinanceBotApp.DataInternal;
 
 namespace BinanceBotInfrastructure.Services
 {
@@ -19,14 +20,15 @@ namespace BinanceBotInfrastructure.Services
             _responseService = responseService;
         }
         
-        public async Task<IEnumerable<string>> GetAllAsync(CancellationToken token = default)
+        public async Task<IEnumerable<string>> GetAllAsync(CancellationToken token)
         {
             var uri = MarketDataEndpoints.GetCoinsPricesEndpoint();
             var response = await _client.GetRequestAsync(uri,
                 null, token);
             
-            var coinPrices = await _responseService.HandleResponseAsync<IEnumerable<CoinPrice>>(response, 
-                token);
+            var coinPrices = await 
+                _responseService.HandleResponseAsync<IEnumerable<CoinPrice>>(response, 
+                    token);
             return coinPrices.Select(c => c.Symbol);
         }
         
@@ -40,8 +42,9 @@ namespace BinanceBotInfrastructure.Services
             };
             var response = await _client.GetRequestAsync(uri, qParams, token);
             
-            var coinInfo = await _responseService.HandleResponseAsync<CoinBestAskBidDto>(response, 
-                token);
+            var coinInfo = await 
+                _responseService.HandleResponseAsync<CoinBestAskBidDto>(response, 
+                    token);
             return coinInfo;
         }
     }

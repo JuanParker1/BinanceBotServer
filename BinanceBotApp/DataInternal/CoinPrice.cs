@@ -1,4 +1,4 @@
-namespace BinanceBotApp.Data
+namespace BinanceBotApp.DataInternal
 {
     public class CoinPrice
     {

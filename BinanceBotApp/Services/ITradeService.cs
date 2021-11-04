@@ -7,6 +7,6 @@ namespace BinanceBotApp.Services
     public interface ITradeService
     {
         Task<OrderInfoResultDto> CreateOrderAsync(OrderParamsDto orderParams,
-            CancellationToken token = default);
+            CancellationToken token);
     }
 }
