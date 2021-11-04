@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,16 +21,16 @@ namespace BinanceBotInfrastructure.Services
         }
 
         public async Task<OrderInfoResultDto> CreateOrderAsync(OrderParamsDto orderParams,
-            CancellationToken token = default)
+            CancellationToken token)
         {
             var uri = TradeEndpoints.GetOrderEndpoint();
             var qParams = ConvertToDictionary(orderParams);
-            var newOrderResponse = await _client.PostRequestAsync(uri, 
+            using var newOrderResponse = await _client.SignedPostRequestAsync(uri, 
                 qParams, token);
             
             var newOrderInfo = await _responseService.HandleResponseAsync<OrderInfoResultDto>(newOrderResponse, 
                 token);
-
+        
             return newOrderInfo;
         }
 
@@ -42,21 +43,45 @@ namespace BinanceBotInfrastructure.Services
         {
             var dict = new Dictionary<string, string>()
             {
-                { "symbol", qParams.Symbol },
-                { "side", $"{qParams.Side}" },
-                { "type", $"{qParams.Type}" },
-                { "timeInForce", $"{qParams.TimeInForce}" },
-                { "quantity", $"{qParams.Quantity}" },
-                { "quoteOrderQty", $"{qParams.QuoteOrderQty}" },
-                { "price", $"{qParams.Price}" },
-                { "newClientOrderID", $"{qParams.NewClientOrderId}" },
-                { "stopPrice", $"{qParams.StopPrice}" },
-                { "icebergQty", $"{qParams.IcebergQty}" },
-                { "newOrderRespType", $"{qParams.NewOrderRespType}" },
-                { "recvWindow", $"{qParams.RecvWindow}" },
-                { "timestamp", $"{qParams.Timestamp}" }
+                { "timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}" }
             };
-
+            
+            if(qParams.Symbol is not null)
+                dict.Add("symbol", qParams.Symbol.ToUpper());
+            
+            if(qParams.Side is not null)
+                dict.Add("side", qParams.Side);
+            
+            if(qParams.Type is not null)
+                dict.Add("type", qParams.Type);
+            
+            if(qParams.TimeInForce is not null)
+                dict.Add("timeInForce", qParams.TimeInForce);
+            
+            if(qParams.Quantity != default)
+                dict.Add("quantity", $"{qParams.Quantity}");
+            
+            if(qParams.QuoteOrderQty != default)
+                dict.Add("quoteOrderQty", $"{qParams.QuoteOrderQty}");
+            
+            if(qParams.Price != default)
+                dict.Add("price", $"{qParams.Price}");
+            
+            if(qParams.NewClientOrderId is not null)
+                dict.Add("newClientOrderID", qParams.NewClientOrderId);
+            
+            if(qParams.StopPrice != default)
+                dict.Add("stopPrice", $"{qParams.StopPrice}");
+            
+            if(qParams.IcebergQty != default)
+                dict.Add("icebergQty", $"{qParams.IcebergQty}");
+            
+            if(qParams.NewOrderRespType is not null)
+                dict.Add("newOrderRespType", qParams.NewOrderRespType);
+            
+            if(qParams.RecvWindow != default)
+                dict.Add("recvWindow", $"{qParams.RecvWindow}");
+            
             return dict;
         }
     }
