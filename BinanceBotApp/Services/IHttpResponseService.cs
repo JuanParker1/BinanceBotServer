@@ -6,7 +6,7 @@ namespace BinanceBotApp.Services
 {
     public interface IHttpResponseService
     {
-        Task<T> HandleResponseAsync<T>(HttpResponseMessage message,
+        Task<T> HandleResponseAsync<T>(HttpResponseMessage message, 
             CancellationToken token) where T : class;
     }
 }

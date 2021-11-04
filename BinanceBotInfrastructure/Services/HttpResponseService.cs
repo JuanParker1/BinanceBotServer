@@ -20,25 +20,17 @@ namespace BinanceBotInfrastructure.Services
         }
         
         public async Task<T> HandleResponseAsync<T>(HttpResponseMessage message, 
-            CancellationToken token = default) where T : class
+            CancellationToken token) where T : class
         {
             if (message is null) 
                 throw new ArgumentNullException("Message is null");
-            
-            if (!message.IsSuccessStatusCode) 
-                throw new Exception($"Request not successfull. " +
-                                    $"Error status code: {message.StatusCode}");
-            
+
             var messageJson = await message.Content.ReadAsStringAsync(token)
                 .ConfigureAwait(false);
 
             var messageObject = JsonSerializer.Deserialize<T>(messageJson, _jsonSerializerOptions);
-            if (messageObject is not null) 
-                return messageObject;
-            
-            var deserializeErrorMessage = "Unable to deserialize http message to: " +
-                                          $"{nameof(T)}.";
-            throw new Exception(deserializeErrorMessage);
+
+            return messageObject;
         }
     }
 }
