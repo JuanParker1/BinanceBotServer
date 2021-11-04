@@ -14,15 +14,15 @@ namespace BinanceBotApp.Data
         /// <summary>
         /// Buy/Sell
         /// </summary>
-        public OrderSide Side { get; set; }
+        public string Side { get; set; }
         /// <summary>
         /// Order type (LIMIT, MARKET, STOP_LOSS etc)
         /// </summary>
-        public OrderType Type { get; set; }
+        public string Type { get; set; }
         /// <summary>
         /// Order lifetime type depending on its fill (full/partial)
         /// </summary>
-        public TimeInForce TimeInForce { get; set; }
+        public string TimeInForce { get; set; }
         /// <summary>
         /// Specifies the amount of base asset user wants to
         /// buy/sell. (E.g. for BTC/USDT: quantity 1 will buy/sell 1 BTC.)
@@ -57,14 +57,10 @@ namespace BinanceBotApp.Data
         /// Set the response JSON. ACK, RESULT, or FULL; MARKET and LIMIT order types default to
         /// FULL, all other orders default to ACK.
         /// </summary>
-        public NewOrderResponseType NewOrderRespType { get; set; }
+        public string NewOrderRespType { get; set; }
         /// <summary>
         /// Order lifetime in ms. Default is 5000, max is 60000
         /// </summary>
         public long RecvWindow { get; set; }
-        /// <summary>
-        /// Order creation time (Unix timestamp in ms)
-        /// </summary>
-        public long Timestamp { get; set; }
     }
 }
