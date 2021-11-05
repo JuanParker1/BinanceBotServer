@@ -1,12 +1,16 @@
-using System.Net.Http;
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using BinanceBotApp.DataInternal.Enums;
 
 namespace BinanceBotApp.Services
 {
     public interface IHttpResponseService
     {
-        Task<T> HandleResponseAsync<T>(HttpResponseMessage message, 
-            CancellationToken token) where T : class;
+        Task<TResult> ProcessRequestAsync<TDto, TResult>(Uri uri, TDto dto, HttpMethods requestType,  
+            CancellationToken token) where TResult : class;
+        Task<TResult> ProcessRequestAsync<TResult>(Uri uri, IDictionary<string, string> qParams,
+            HttpMethods requestType, CancellationToken token) where TResult : class;
     }
 }
