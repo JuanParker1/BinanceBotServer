@@ -12,8 +12,8 @@ namespace BinanceBotApp.Services
         Task<OrderInfoResultDto> CreateOrderAsync(OrderParamsDto orderParams,
             CancellationToken token);
         Task<DeletedOrderInfoDto> DeleteOrderAsync(int idOrder, string symbol, 
-            int recvWindow = 5000, CancellationToken token = default);
+            int recvWindow, CancellationToken token);
         Task<IEnumerable<DeletedOrderInfoDto>> DeleteAllOrdersForPairAsync(string symbol, 
-            int recvWindow = 5000, CancellationToken token = default);
+            int recvWindow, CancellationToken token);
     }
 }

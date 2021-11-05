@@ -31,7 +31,7 @@ namespace BinanceBotWebApi.Controllers
         /// <returns> New test order info </returns>
         [HttpPost("test")]
         [ProducesResponseType(typeof(OrderInfoAckDto), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> CreateTestOrderAsync(OrderParamsDto orderParams, 
+        public async Task<IActionResult> CreateTestOrderAsync([FromBody]OrderParamsDto orderParams, 
             CancellationToken token = default)
         {
             var orderInfo = await _tradeService.CreateTestOrderAsync(orderParams, token);
@@ -47,7 +47,7 @@ namespace BinanceBotWebApi.Controllers
         /// <returns> New order info </returns>
         [HttpPost]
         [ProducesResponseType(typeof(OrderInfoAckDto), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> CreateOrderAsync(OrderParamsDto orderParams, 
+        public async Task<IActionResult> CreateOrderAsync([FromBody]OrderParamsDto orderParams, 
             CancellationToken token = default)
         {
             var orderInfo = await _tradeService.CreateOrderAsync(orderParams, token);
@@ -86,8 +86,9 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> DeleteAllOrderForPairAsync(string symbol,
             int recvWindow = 5000, CancellationToken token = default)
         {
-            var orderInfo = await _tradeService.DeleteAllOrdersForPairAsync(symbol, 
-                recvWindow, token);
+            var orderInfo = 
+                await _tradeService.DeleteAllOrdersForPairAsync(symbol, 
+                    recvWindow, token);
 
             return Ok(orderInfo);
         }
