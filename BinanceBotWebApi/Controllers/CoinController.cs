@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using BinanceBotApp.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BinanceBotApp.Services;
-using BinanceBotInfrastructure.Services;
 
 namespace BinanceBotWebApi.Controllers
 {
@@ -16,7 +13,7 @@ namespace BinanceBotWebApi.Controllers
     /// </summary>
     [Route("api/coins")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class CoinController : ControllerBase
     {
         private readonly ICoinService _coinService;
@@ -33,8 +30,7 @@ namespace BinanceBotWebApi.Controllers
         /// <returns>Список всех доступных торговых пар</returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<string>), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IEnumerable<string>> GetAllAsync(
-            CancellationToken token = default)
+        public async Task<IEnumerable<string>> GetAllAsync(CancellationToken token = default)
         {
             var allPairs = await _coinService.GetAllAsync(token);
             return allPairs;
@@ -54,18 +50,5 @@ namespace BinanceBotWebApi.Controllers
             var coinInfo = await _coinService.GetBestPriceAsync(symbol, token);
             return coinInfo;
         }
-        
-        // /// <summary>
-        // /// Возвращает информацию о торговой паре за период
-        // /// </summary>
-        // /// <param name="pair">Запрашиваемая торговая пара</param>
-        // /// <param name="token">Токен для отмены задачи</param>
-        // /// <returns>Информацию о торговой паре за период</returns>
-        // [HttpGet("{pair}/history")]
-        // [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        // public async Task<int> GetHistoryAsync(string pair, CancellationToken token = default)
-        // {
-        //     return 1;
-        // }
     }
 }

@@ -4,32 +4,28 @@ using System.Threading;
 using System.Threading.Tasks;
 using BinanceBotApp.Services;
 using BinanceAPI.Endpoints;
-using BinanceAPI.Clients.Interfaces;
 using BinanceBotApp.Data;
 using BinanceBotApp.DataInternal;
+using BinanceBotApp.DataInternal.Enums;
 
 namespace BinanceBotInfrastructure.Services
 {
     public class CoinService : ICoinService
     {
-        private readonly IBinanceHttpClient _client;
         private readonly IHttpResponseService _responseService;
-        public CoinService(IBinanceHttpClient client, IHttpResponseService responseService)
+        public CoinService(IHttpResponseService responseService)
         {
-            _client = client;
             _responseService = responseService;
         }
         
         public async Task<IEnumerable<string>> GetAllAsync(CancellationToken token)
         {
             var uri = MarketDataEndpoints.GetCoinsPricesEndpoint();
-            var response = await _client.GetRequestAsync(uri,
-                null, token);
+            var coinPricesInfo = 
+                await _responseService.ProcessRequestAsync<IEnumerable<CoinPrice>>(uri, 
+                    new Dictionary<string, string>(), HttpMethods.Get, token);
             
-            var coinPrices = await 
-                _responseService.HandleResponseAsync<IEnumerable<CoinPrice>>(response, 
-                    token);
-            return coinPrices.Select(c => c.Symbol);
+            return coinPricesInfo.Select(c => c.Symbol);
         }
         
         public async Task<CoinBestAskBidDto> GetBestPriceAsync(string symbol, 
@@ -40,12 +36,12 @@ namespace BinanceBotInfrastructure.Services
             {
                 {"symbol", symbol}
             };
-            var response = await _client.GetRequestAsync(uri, qParams, token);
             
-            var coinInfo = await 
-                _responseService.HandleResponseAsync<CoinBestAskBidDto>(response, 
-                    token);
-            return coinInfo;
+            var bestPricesInfo = 
+                await _responseService.ProcessRequestAsync<CoinBestAskBidDto>(uri, 
+                    qParams, HttpMethods.Get, token);
+
+            return bestPricesInfo;
         }
     }
 }
