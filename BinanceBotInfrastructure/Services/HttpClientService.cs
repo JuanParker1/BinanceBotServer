@@ -170,11 +170,24 @@ namespace BinanceBotInfrastructure.Services
             {
                 var camelCasedKey = char.ToLower(name[0]) + name[1..];
                 var value = dto.GetType()?.GetProperty(name)?.GetValue(dto);
+
+                if (value != default && IsValueNumericDefault(value))
+                    continue;
+
                 if(value != default)
                     resultDict.Add(camelCasedKey, $"{value}");
             }
             
             return resultDict;
+        }
+
+        private static bool IsValueNumericDefault(object value)
+        {
+            var intVal = 1;
+            var doubleVal = 1.0;
+
+            return (int.TryParse($"{value}", out intVal) || double.TryParse($"{value}", out doubleVal)) && 
+                   (intVal == default || doubleVal == default);
         }
         
         private async Task<TResult> HandleResponseAsync<TResult>(HttpResponseMessage message, 

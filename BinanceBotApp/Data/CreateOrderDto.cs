@@ -25,18 +25,18 @@ namespace BinanceBotApp.Data
         /// Specifies the amount of base asset user wants to
         /// buy/sell. (E.g. for BTC/USDT: quantity 1 will buy/sell 1 BTC.)
         /// </summary>
-        public string Quantity { get; set; }
+        public double Quantity { get; set; }
         /// <summary>
         /// For "market" type orders. Specifies the amount of
         /// asset user wants to buy/sell (E.g. for BTC/USDT: BUY side: the order will
         /// buy as many BTC as quoteOrderQty USDT can. SELL side: the order will sell
         /// as much BTC needed to receive quoteOrderQty USDT.)
         /// </summary>
-        public string QuoteOrderQty { get; set; }
+        public double QuoteOrderQty { get; set; }
         /// <summary>
         /// Asset price
         /// </summary>
-        public string Price { get; set; }
+        public double Price { get; set; }
         /// <summary>
         /// A unique id among open orders. Automatically generated if not sent.
         /// Orders with the same newClientOrderID can be accepted only when the previous one is filled,
@@ -46,11 +46,11 @@ namespace BinanceBotApp.Data
         /// <summary>
         /// Used with STOP_LOSS, STOP_LOSS_LIMIT, TAKE_PROFIT, and TAKE_PROFIT_LIMIT orders.
         /// </summary>
-        public string StopPrice { get; set; }
+        public double StopPrice { get; set; }
         /// <summary>
         /// Used with LIMIT, STOP_LOSS_LIMIT, and TAKE_PROFIT_LIMIT to create an iceberg order.
         /// </summary>
-        public string IcebergQty { get; set; }
+        public double IcebergQty { get; set; }
         /// <summary>
         /// Set the response JSON. ACK, RESULT, or FULL; MARKET and LIMIT order types default to
         /// FULL, all other orders default to ACK.
@@ -59,6 +59,6 @@ namespace BinanceBotApp.Data
         /// <summary>
         /// Order lifetime in ms. Default is 5000, max is 60000
         /// </summary>
-        public string RecvWindow { get; set; }
+        public int RecvWindow { get; set; }
     }
 }
