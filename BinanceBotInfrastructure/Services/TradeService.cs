@@ -71,8 +71,8 @@ namespace BinanceBotInfrastructure.Services
                 {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}
             };
             var deletedOrdersInfo = 
-                await _responseService.ProcessRequestAsync<IEnumerable<DeletedOrderInfoDto>>(uri, 
-                    qParams, HttpMethods.Delete, token);
+                await _responseService.ProcessRequestAsync<IEnumerable<DeletedOrderInfoDto>>(uri,
+                    qParams, HttpMethods.Delete, token); 
 
             return deletedOrdersInfo;
         }

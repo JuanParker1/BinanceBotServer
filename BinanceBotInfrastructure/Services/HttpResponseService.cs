@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using BinanceBotApp.Services;
+using BinanceBotApp.Data;
 using BinanceBotApp.DataInternal.Enums;
 using BinanceAPI.Clients.Interfaces;
 
@@ -31,7 +32,7 @@ namespace BinanceBotInfrastructure.Services
         {
             var qParams = ConvertToDictionary(dto);
 
-            TResult responseInfo = await ProcessRequestAsync<TResult>(uri, qParams, 
+            var responseInfo = await ProcessRequestAsync<TResult>(uri, qParams, 
                 requestType, token);
 
             return responseInfo;
@@ -148,18 +149,30 @@ namespace BinanceBotInfrastructure.Services
             return resultDict;
         }
         
-        private async Task<T> HandleResponseAsync<T>(HttpResponseMessage message, 
-            CancellationToken token) where T : class
+        private async Task<TResult> HandleResponseAsync<TResult>(HttpResponseMessage message, 
+            CancellationToken token) where TResult : class
         {
             if (message is null) 
                 throw new ArgumentNullException("Message is null");
-
+            
             var messageJson = await message.Content.ReadAsStringAsync(token)
                 .ConfigureAwait(false);
+            
+            if (!message.IsSuccessStatusCode)
+            {
+                var errorObj = JsonSerializer.Deserialize<ApiErrorDto>(messageJson, _jsonSerializerOptions) 
+                               ?? new ApiErrorDto();
 
-            var messageObject = JsonSerializer.Deserialize<T>(messageJson, _jsonSerializerOptions);
+                var errorMessage = $"Http status code: {(int)message.StatusCode} \n" +
+                                   $"Binance error code: {errorObj.Code} \n" +
+                                   $"Binance error message: {errorObj.Msg}";
+                
+                throw new InvalidOperationException(errorMessage);
+            }
 
-            return messageObject;
+            var resultDto = JsonSerializer.Deserialize<TResult>(messageJson, _jsonSerializerOptions);
+
+            return resultDto;
         }
     }
 }

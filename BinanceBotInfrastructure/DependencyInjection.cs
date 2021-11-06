@@ -22,7 +22,8 @@ namespace BinanceBotInfrastructure
 
             services.AddTransient<ICoinService, CoinService>();
             services.AddTransient<ITradeService, TradeService>();
-            services.AddTransient<IBinanceHttpClient, BinanceHttpClient>();
+            services.AddTransient<IBinanceHttpClient>(s => new BinanceHttpClient("RICK4hQQ82ClQxuxFEhcYP0KY3057uioNKwdnwpxUVce96fRYFwh4ApK80U0vhQq",
+                "YeVKxVSiGtdu6cDawkn8f6kwgvRaYRN5qkXeU169lNwSM749pb8KCTzJGArLGtqd"));
             services.AddTransient<IHttpResponseService, HttpResponseService>();
 
             return services;
