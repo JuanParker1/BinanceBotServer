@@ -11,7 +11,7 @@ namespace BinanceBotWebApi.Controllers
     /// <summary>
     /// Контроллер управления ордерами
     /// </summary>
-    [Route("api/trade")]
+    [Route("api/orders")]
     [ApiController]
     //[Authorize]
     public class TradeController : ControllerBase
@@ -24,17 +24,69 @@ namespace BinanceBotWebApi.Controllers
         }
         
         /// <summary>
+        /// Gets info about requested order
+        /// </summary>
+        /// <param name="idOrder"> Requested order id </param>
+        /// <param name="symbol"> Requested trading pair </param>
+        /// <param name="recvWindow"> Request lifetime in ms </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns> Info about requested order </returns>
+        [HttpGet("{idOrder}")]
+        [ProducesResponseType(typeof(OrderInfoDto), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> GetOrderAsync([FromRoute]int idOrder, [FromQuery]string symbol, 
+            int recvWindow = 5000,  CancellationToken token = default)
+        {
+            var orderInfo = await _tradeService.GetOrderAsync(idOrder, symbol, 
+                recvWindow, token);
+
+            return Ok(orderInfo);
+        }
+        
+        /// <summary>
+        /// Gets all orders for requested symbol info
+        /// </summary>
+        /// <param name="symbol"> Requested trading pair </param>
+        /// <param name="recvWindow"> Request lifetime in ms </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns> Info about requested orders for trading pair </returns>
+        [HttpGet("{symbol}")]
+        [ProducesResponseType(typeof(IEnumerable<OrderInfoDto>), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> GetOrdersForPairAsync([FromRoute]string symbol, 
+            int recvWindow = 5000,  CancellationToken token = default)
+        {
+            var ordersInfo = await _tradeService.GetOrdersForPairAsync(symbol, recvWindow, token);
+
+            return Ok(ordersInfo);
+        }
+        
+        /// <summary>
+        /// Gets all opened orders info
+        /// </summary>
+        /// <param name="recvWindow"> Request lifetime in ms </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns> All opened orders info </returns>
+        [HttpGet()]
+        [ProducesResponseType(typeof(IEnumerable<OrderInfoDto>), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> GetOrdersForPairAsync(int recvWindow = 5000,  
+            CancellationToken token = default)
+        {
+            var ordersInfo = await _tradeService.GetAllOrdersAsync(recvWindow, token);
+
+            return Ok(ordersInfo);
+        }
+        
+        /// <summary>
         /// Creates new test order (without sending it into the matching engine)
         /// </summary>
-        /// <param name="orderParams"> New order params </param>
+        /// <param name="createOrder"> New order params </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns> New test order info </returns>
         [HttpPost("test")]
-        [ProducesResponseType(typeof(OrderInfoAckDto), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> CreateTestOrderAsync([FromBody]OrderParamsDto orderParams, 
+        [ProducesResponseType(typeof(CreatedOrderAckDto), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> CreateTestOrderAsync([FromBody]CreateOrderDto createOrder, 
             CancellationToken token = default)
         {
-            var orderInfo = await _tradeService.CreateTestOrderAsync(orderParams, token);
+            var orderInfo = await _tradeService.CreateTestOrderAsync(createOrder, token);
 
             return Ok(orderInfo);
         }
@@ -42,15 +94,15 @@ namespace BinanceBotWebApi.Controllers
         /// <summary>
         /// Creates new order
         /// </summary>
-        /// <param name="orderParams"> New order params </param>
+        /// <param name="createOrder"> New order params </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns> New order info </returns>
         [HttpPost]
-        [ProducesResponseType(typeof(OrderInfoAckDto), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> CreateOrderAsync([FromBody]OrderParamsDto orderParams, 
+        [ProducesResponseType(typeof(CreatedOrderAckDto), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> CreateOrderAsync([FromBody]CreateOrderDto createOrder, 
             CancellationToken token = default)
         {
-            var orderInfo = await _tradeService.CreateOrderAsync(orderParams, token);
+            var orderInfo = await _tradeService.CreateOrderAsync(createOrder, token);
 
             return Ok(orderInfo);
         }
@@ -63,9 +115,9 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="recvWindow"> Request lifetime in ms </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns> Info about cancelled order </returns>
-        [HttpDelete]
-        [ProducesResponseType(typeof(DeletedOrderInfoDto), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> DeleteOrderAsync(int idOrder, string symbol,
+        [HttpDelete("{idOrder}")]
+        [ProducesResponseType(typeof(DeletedOrderDto), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> DeleteOrderAsync([FromRoute]int idOrder, string symbol,
             int recvWindow = 5000, CancellationToken token = default)
         {
             var orderInfo = await _tradeService.DeleteOrderAsync(idOrder, symbol, 
@@ -82,7 +134,7 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="token"> Task cancellation token </param>
         /// <returns> Info about cancelled order </returns>
         [HttpDelete]
-        [ProducesResponseType(typeof(IEnumerable<DeletedOrderInfoDto>), (int)System.Net.HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<DeletedOrderDto>), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> DeleteAllOrderForPairAsync(string symbol,
             int recvWindow = 5000, CancellationToken token = default)
         {

@@ -3,7 +3,7 @@ namespace BinanceBotApp.Data
     /// <summary>
     /// New order creation params
     /// </summary>
-    public class OrderParamsDto
+    public class CreateOrderDto
     {
         /// <summary>
         /// Trading pair name

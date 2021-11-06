@@ -1,6 +1,6 @@
 namespace BinanceBotApp.Data
 {
-    public class OrderInfoResultDto : OrderInfoAckDto
+    public class CreatedOrderResultDto : CreatedOrderAckDto
     {
         public string Price { get; set; }
         public string OrigQty { get; set; }

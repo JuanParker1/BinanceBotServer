@@ -170,7 +170,7 @@ namespace BinanceBotInfrastructure.Services
             {
                 var camelCasedKey = char.ToLower(name[0]) + name[1..];
                 var value = dto.GetType()?.GetProperty(name)?.GetValue(dto);
-                if(value is not null)
+                if(value != default)
                     resultDict.Add(camelCasedKey, $"{value}");
             }
             

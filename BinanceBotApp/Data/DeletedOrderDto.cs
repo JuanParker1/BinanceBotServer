@@ -1,6 +1,6 @@
 namespace BinanceBotApp.Data
 {
-    public class DeletedOrderInfoDto : OrderInfoResultDto
+    public class DeletedOrderDto : CreatedOrderResultDto
     {
         public string OrigClientOrderId { get; set; }
     }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace BinanceBotApp.Data
 {
-    public class OrderInfoFullDto : OrderInfoResultDto
+    public class CreatedOrderFullDto : CreatedOrderResultDto
     {
         public IEnumerable<OrderFillPartDto> FillParts { get; set; }
     }

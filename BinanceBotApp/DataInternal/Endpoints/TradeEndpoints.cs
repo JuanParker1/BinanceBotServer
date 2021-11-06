@@ -31,7 +31,7 @@ namespace BinanceBotApp.DataInternal.Endpoints
         /// order's status or cancel an active order. Weight: 1
         /// </summary>
         /// <returns>Endpoint data info object</returns>
-        public static Uri GetNewOrderEndpoint() =>
+        public static Uri GetOrderEndpoint() =>
             new ($"{GeneralInfo.ApiBaseUrl}/" +
                  $"{GeneralInfo.ApiVersion3}/order");
 
@@ -42,7 +42,7 @@ namespace BinanceBotApp.DataInternal.Endpoints
         /// DELETE request: cancels all active orders on a symbol. Weight: 1
         /// </summary>
         /// <returns>Endpoint data info object</returns>
-        public static Uri GetOpenOrdersStatusEndpoint() =>
+        public static Uri GetOpenOrdersEndpoint() =>
             new ($"{GeneralInfo.ApiBaseUrl}/" +
                  $"{GeneralInfo.ApiVersion3}/openOrders");
 
