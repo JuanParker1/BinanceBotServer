@@ -9,18 +9,17 @@ using System.Threading.Tasks;
 using BinanceBotApp.Services;
 using BinanceBotApp.Data;
 using BinanceBotApp.DataInternal.Enums;
-using BinanceAPI.Clients.Interfaces;
 
 namespace BinanceBotInfrastructure.Services
 {
     public class HttpResponseService : IHttpResponseService
     {
-        private readonly IBinanceHttpClient _client;
+        private readonly IHttpClientService _httpClientService;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
 
-        public HttpResponseService(IBinanceHttpClient client)
+        public HttpResponseService(IHttpClientService httpClientService)
         {
-            _client = client;
+            _httpClientService = httpClientService;
             _jsonSerializerOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -46,7 +45,7 @@ namespace BinanceBotInfrastructure.Services
             switch (requestType)
             {
                 case HttpMethods.Get:
-                    using (var newOrderResponse = await _client.GetRequestAsync(uri,
+                    using (var newOrderResponse = await _httpClientService.GetRequestAsync(uri,
                         qParams, token))
                     {
                         responseInfo = 
@@ -55,7 +54,7 @@ namespace BinanceBotInfrastructure.Services
                         break;
                     }
                 case HttpMethods.SignedGet:
-                    using (var newOrderResponse = await _client.SignedGetRequestAsync(uri,
+                    using (var newOrderResponse = await _httpClientService.SignedGetRequestAsync(uri,
                         qParams, token))
                     {
                         responseInfo = 
@@ -64,7 +63,7 @@ namespace BinanceBotInfrastructure.Services
                         break;
                     }
                 case HttpMethods.Post:
-                    using (var response = await _client.PostRequestAsync(uri,
+                    using (var response = await _httpClientService.PostRequestAsync(uri,
                         qParams, token))
                     {
                         responseInfo = 
@@ -73,7 +72,7 @@ namespace BinanceBotInfrastructure.Services
                         break;
                     }
                 case HttpMethods.SignedPost:
-                    using (var newOrderResponse = await _client.SignedPostRequestAsync(uri,
+                    using (var newOrderResponse = await _httpClientService.SignedPostRequestAsync(uri,
                         qParams, token))
                     {
                         responseInfo = 
@@ -82,7 +81,7 @@ namespace BinanceBotInfrastructure.Services
                         break;
                     }
                 case HttpMethods.Put:
-                    using (var newOrderResponse = await _client.PutRequestAsync(uri,
+                    using (var newOrderResponse = await _httpClientService.PutRequestAsync(uri,
                         qParams, token))
                     {
                         responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
@@ -90,7 +89,7 @@ namespace BinanceBotInfrastructure.Services
                         break;
                     }
                 case HttpMethods.SignedPut:
-                    using (var newOrderResponse = await _client.SignedPutRequestAsync(uri,
+                    using (var newOrderResponse = await _httpClientService.SignedPutRequestAsync(uri,
                         qParams, token))
                     {
                         responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
@@ -98,7 +97,7 @@ namespace BinanceBotInfrastructure.Services
                         break;
                     }
                 case HttpMethods.Delete:
-                    using (var newOrderResponse = await _client.DeleteRequestAsync(uri,
+                    using (var newOrderResponse = await _httpClientService.DeleteRequestAsync(uri,
                         qParams, token))
                     {
                         responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
@@ -106,7 +105,7 @@ namespace BinanceBotInfrastructure.Services
                         break;
                     }
                 case HttpMethods.SignedDelete:
-                    using (var newOrderResponse = await _client.SignedDeleteRequestAsync(uri,
+                    using (var newOrderResponse = await _httpClientService.SignedDeleteRequestAsync(uri,
                         qParams, token))
                     {
                         responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
@@ -114,7 +113,7 @@ namespace BinanceBotInfrastructure.Services
                         break;
                     }
                 default:
-                    using (var newOrderResponse = await _client.GetRequestAsync(uri,
+                    using (var newOrderResponse = await _httpClientService.GetRequestAsync(uri,
                         qParams, token))
                     {
                         responseInfo = 

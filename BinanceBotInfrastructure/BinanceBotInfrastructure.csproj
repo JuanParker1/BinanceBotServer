@@ -5,18 +5,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Libraries" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\BinanceBotApp\BinanceBotApp.csproj" />
       <ProjectReference Include="..\BinanceBotDb\BinanceBotDb.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="BinanceAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>Libraries\BinanceApi\BinanceAPI.dll</HintPath>
-      </Reference>
     </ItemGroup>
 
     <ItemGroup>

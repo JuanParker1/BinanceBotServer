@@ -7,12 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Reference Include="BinanceAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\..\..\BinanceAPI.NET\BinanceAPI.NET\BinanceAPI\bin\Debug\net5.0\BinanceAPI.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\BinanceBotApp\BinanceBotApp.csproj" />
       <ProjectReference Include="..\BinanceBotDb\BinanceBotDb.csproj" />
       <ProjectReference Include="..\BinanceBotInfrastructure\BinanceBotInfrastructure.csproj" />
