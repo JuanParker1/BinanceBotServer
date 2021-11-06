@@ -1,6 +1,6 @@
 using System;
 
-namespace BinanceBotApp.DataInternal.Extensions
+namespace BinanceBotInfrastructure.Extensions
 {
     public static class DateTimeExtensions
     {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Text;
 using BinanceBotApp.DataInternal.Endpoints;
-
+using BinanceBotApp.DataInternal.Enums;
 using BinanceBotApp.Services;
 
 namespace BinanceBotInfrastructure.Services
@@ -33,11 +33,12 @@ namespace BinanceBotInfrastructure.Services
         /// <returns>Listen key string</returns>
         public async Task<string> GetListenKey(CancellationToken token)
         {
-            var streamResponse = await _httpClientService.PostRequestAsync(
-                UserDataWebSocketEndpoints.GetUserDataWebSocketEndpoint(), null, token)
+            var streamResponse = await _httpClientService.ProcessRequestAsync<string>(
+                    UserDataWebSocketEndpoints.GetUserDataWebSocketEndpoint(), null, 
+                    HttpMethods.SignedPost,token)
                 .ConfigureAwait(false);
             
-            return await streamResponse.Content.ReadAsStringAsync(token).ConfigureAwait(false);
+            return streamResponse;
         }
         
         /// <summary>

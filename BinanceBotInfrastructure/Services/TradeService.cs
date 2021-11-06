@@ -11,11 +11,11 @@ namespace BinanceBotInfrastructure.Services
 {
     public class TradeService : ITradeService
     {
-        private readonly IHttpResponseService _responseService;
+        private readonly IHttpClientService _httpClientService;
 
-        public TradeService(IHttpResponseService responseService)
+        public TradeService(IHttpClientService httpClientService)
         {
-            _responseService = responseService;
+            _httpClientService = httpClientService;
         }
 
         public async Task<OrderInfoResultDto> CreateTestOrderAsync(OrderParamsDto orderParams,
@@ -24,7 +24,7 @@ namespace BinanceBotInfrastructure.Services
             var uri = TradeEndpoints.GetTestNewOrderEndpoint();
 
             var newOrderInfo = 
-                await _responseService.ProcessRequestAsync<OrderParamsDto, OrderInfoResultDto>(uri, 
+                await _httpClientService.ProcessRequestAsync<OrderParamsDto, OrderInfoResultDto>(uri, 
                 orderParams, HttpMethods.SignedPost, token);
 
             return newOrderInfo;
@@ -36,7 +36,7 @@ namespace BinanceBotInfrastructure.Services
             var uri = TradeEndpoints.GetNewOrderEndpoint();
 
             var newOrderInfo = 
-                await _responseService.ProcessRequestAsync<OrderParamsDto, OrderInfoResultDto>(uri, 
+                await _httpClientService.ProcessRequestAsync<OrderParamsDto, OrderInfoResultDto>(uri, 
                 orderParams, HttpMethods.SignedPost, token);
 
             return newOrderInfo;
@@ -54,7 +54,7 @@ namespace BinanceBotInfrastructure.Services
                 {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}
             };
             var deletedOrderInfo = 
-                await _responseService.ProcessRequestAsync<DeletedOrderInfoDto>(uri, 
+                await _httpClientService.ProcessRequestAsync<DeletedOrderInfoDto>(uri, 
                     qParams, HttpMethods.SignedDelete, token);
 
             return deletedOrderInfo;
@@ -71,7 +71,7 @@ namespace BinanceBotInfrastructure.Services
                 {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}
             };
             var deletedOrdersInfo = 
-                await _responseService.ProcessRequestAsync<IEnumerable<DeletedOrderInfoDto>>(uri,
+                await _httpClientService.ProcessRequestAsync<IEnumerable<DeletedOrderInfoDto>>(uri,
                     qParams, HttpMethods.Delete, token); 
 
             return deletedOrdersInfo;

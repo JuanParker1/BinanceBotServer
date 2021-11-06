@@ -12,17 +12,17 @@ namespace BinanceBotInfrastructure.Services
 {
     public class CoinService : ICoinService
     {
-        private readonly IHttpResponseService _responseService;
-        public CoinService(IHttpResponseService responseService)
+        private readonly IHttpClientService _httpClientService;
+        public CoinService(IHttpClientService httpClientService)
         {
-            _responseService = responseService;
+            _httpClientService = httpClientService;
         }
         
         public async Task<IEnumerable<string>> GetAllAsync(CancellationToken token)
         {
             var uri = MarketDataEndpoints.GetCoinsPricesEndpoint();
             var coinPricesInfo = 
-                await _responseService.ProcessRequestAsync<IEnumerable<CoinPrice>>(uri, 
+                await _httpClientService.ProcessRequestAsync<IEnumerable<CoinPrice>>(uri, 
                     new Dictionary<string, string>(), HttpMethods.Get, token);
             
             return coinPricesInfo.Select(c => c.Symbol);
@@ -38,7 +38,7 @@ namespace BinanceBotInfrastructure.Services
             };
             
             var bestPricesInfo = 
-                await _responseService.ProcessRequestAsync<CoinBestAskBidDto>(uri, 
+                await _httpClientService.ProcessRequestAsync<CoinBestAskBidDto>(uri, 
                     qParams, HttpMethods.Get, token);
 
             return bestPricesInfo;

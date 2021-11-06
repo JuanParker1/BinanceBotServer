@@ -1,12 +1,16 @@
 using System;
+using System.Text;
+using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using System.Text;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Threading;
+using BinanceBotApp.Data;
+using BinanceBotApp.DataInternal.Enums;
 using BinanceBotApp.Services;
 
 namespace BinanceBotInfrastructure.Services
@@ -19,6 +23,7 @@ namespace BinanceBotInfrastructure.Services
         private readonly HttpClient _httpClient;
         private const string _apiKeyHeader = "X-MBX-APIKEY";
         private readonly string _secretKey;
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
 
         public HttpClientService(string apiKey, string secretKey)
         {
@@ -28,61 +33,201 @@ namespace BinanceBotInfrastructure.Services
             _httpClient.DefaultRequestHeaders.Accept.Add(mt);
             _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(_apiKeyHeader, 
             new[] { apiKey });
+            _jsonSerializerOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
         }
-
+        
         /// <summary>
-        /// Create a simple GET request
+        /// Creates and handles HTTP request
         /// </summary>
-        /// <param name="endpoint"> Request endpoint </param>
-        /// <param name="qParams"> Query params </param>
+        /// <param name="uri"> Request endpoint </param>
+        /// <param name="dto"> Request params </param>
+        /// <param name="requestType"> Request HTTP method </param>
         /// <param name="token"> Task cancellation token </param>
-        /// <returns>Http response message</returns>
-        public Task<HttpResponseMessage> GetRequestAsync(Uri endpoint,
+        /// <returns> Deserialized response object </returns>
+        public async Task<TResult> ProcessRequestAsync<TDto, TResult>(Uri uri, TDto dto, HttpMethods requestType,  
+            CancellationToken token) where TResult : class
+        {
+            var qParams = ConvertToDictionary(dto);
+
+            var responseInfo = await ProcessRequestAsync<TResult>(uri, qParams, 
+                requestType, token);
+
+            return responseInfo;
+        }
+        
+        /// <summary>
+        /// Creates and handles HTTP request
+        /// </summary>
+        /// <param name="uri"> Request endpoint </param>
+        /// <param name="qParams"> Request params dictionary </param>
+        /// <param name="requestType"> Request HTTP method </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns> Deserialized response object </returns>
+        public async Task<TResult> ProcessRequestAsync<TResult>(Uri uri, IDictionary<string, string> qParams,
+            HttpMethods requestType, CancellationToken token) where TResult : class
+        {
+            TResult responseInfo;
+            
+            switch (requestType)
+            {
+                case HttpMethods.Get:
+                    using (var newOrderResponse = await GetRequestAsync(uri,
+                        qParams, token))
+                    {
+                        responseInfo = 
+                            await HandleResponseAsync<TResult>(newOrderResponse, 
+                            token);
+                        break;
+                    }
+                case HttpMethods.SignedGet:
+                    using (var newOrderResponse = await SignedGetRequestAsync(uri,
+                        qParams, token))
+                    {
+                        responseInfo = 
+                            await HandleResponseAsync<TResult>(newOrderResponse, 
+                            token);
+                        break;
+                    }
+                case HttpMethods.Post:
+                    using (var response = await PostRequestAsync(uri,
+                        qParams, token))
+                    {
+                        responseInfo = 
+                            await HandleResponseAsync<TResult>(response, 
+                            token);   
+                        break;
+                    }
+                case HttpMethods.SignedPost:
+                    using (var newOrderResponse = await SignedPostRequestAsync(uri,
+                        qParams, token))
+                    {
+                        responseInfo = 
+                            await HandleResponseAsync<TResult>(newOrderResponse, 
+                            token);   
+                        break;
+                    }
+                case HttpMethods.Put:
+                    using (var newOrderResponse = await PutRequestAsync(uri,
+                        qParams, token))
+                    {
+                        responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
+                            token);   
+                        break;
+                    }
+                case HttpMethods.SignedPut:
+                    using (var newOrderResponse = await SignedPutRequestAsync(uri,
+                        qParams, token))
+                    {
+                        responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
+                            token);   
+                        break;
+                    }
+                case HttpMethods.Delete:
+                    using (var newOrderResponse = await DeleteRequestAsync(uri,
+                        qParams, token))
+                    {
+                        responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
+                            token);   
+                        break;
+                    }
+                case HttpMethods.SignedDelete:
+                    using (var newOrderResponse = await SignedDeleteRequestAsync(uri,
+                        qParams, token))
+                    {
+                        responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
+                            token);   
+                        break;
+                    }
+                default:
+                    using (var newOrderResponse = await GetRequestAsync(uri,
+                        qParams, token))
+                    {
+                        responseInfo = 
+                            await HandleResponseAsync<TResult>(newOrderResponse, 
+                                token);
+                        break;
+                    }
+            }
+
+            return responseInfo;
+        }
+        
+        private static IDictionary<string, string> ConvertToDictionary<T>(T dto)
+        {
+            var resultDict = new Dictionary<string, string>()
+            {
+                {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}
+            };
+            
+            var typeFieldsNames = dto.GetType().GetMembers()
+                .Where(m => m.MemberType == MemberTypes.Property)
+                .Select(f => f.Name);
+
+            foreach (var name in typeFieldsNames)
+            {
+                var camelCasedKey = char.ToLower(name[0]) + name[1..];
+                var value = dto.GetType()?.GetProperty(name)?.GetValue(dto);
+                if(value is not null)
+                    resultDict.Add(camelCasedKey, $"{value}");
+            }
+            
+            return resultDict;
+        }
+        
+        private async Task<TResult> HandleResponseAsync<TResult>(HttpResponseMessage message, 
+            CancellationToken token) where TResult : class
+        {
+            if (message is null) 
+                throw new ArgumentNullException("Message is null");
+            
+            var messageJson = await message.Content.ReadAsStringAsync(token)
+                .ConfigureAwait(false);
+            
+            if (!message.IsSuccessStatusCode)
+            {
+                var errorObj = JsonSerializer.Deserialize<ApiErrorDto>(messageJson, _jsonSerializerOptions) 
+                               ?? new ApiErrorDto();
+
+                var errorMessage = $"Http status code: {(int)message.StatusCode} \n" +
+                                   $"Binance error code: {errorObj.Code} \n" +
+                                   $"Binance error message: {errorObj.Msg}";
+                
+                throw new InvalidOperationException(errorMessage);
+            }
+
+            var resultDto = JsonSerializer.Deserialize<TResult>(messageJson, _jsonSerializerOptions);
+
+            return resultDto;
+        }
+        
+        private Task<HttpResponseMessage> GetRequestAsync(Uri endpoint,
             IDictionary<string, string> qParams = default, 
             CancellationToken token = default)
         {
             var uri = CreateValidUri(endpoint, qParams);
             return _httpClient.GetAsync(uri, token);   
         }
-
-        /// <summary>
-        /// Creates a signed GET request
-        /// </summary>
-        /// <param name="endpoint"> Request endpoint </param>
-        /// <param name="qParams"> Query params </param>
-        /// <param name="token"> Task cancellation token </param>
-        /// <returns>Http response message</returns>
-        public Task<HttpResponseMessage> SignedGetRequestAsync(Uri endpoint, 
+        
+        private Task<HttpResponseMessage> SignedGetRequestAsync(Uri endpoint, 
             IDictionary<string, string> qParams = default, 
             CancellationToken token = default)
         {
             var signedUri = CreateValidSignedUri(endpoint, qParams);
             return _httpClient.GetAsync(signedUri, token);
         }
-
-        /// <summary>
-        /// Creates a simple POST request
-        /// </summary>
-        /// <param name="endpoint"> Request endpoint </param>
-        /// <param name="qParams"> Query params </param>
-        /// <param name="token"> Task cancellation token </param>
-        /// <returns>Http response message</returns>
-        public Task<HttpResponseMessage> PostRequestAsync(Uri endpoint,
+        
+        private Task<HttpResponseMessage> PostRequestAsync(Uri endpoint,
             IDictionary<string, string> qParams = default, 
             CancellationToken token = default)
         {
             var queryParams = MakeUrlEncodedContent(qParams);
             return _httpClient.PostAsync(endpoint, queryParams, token);
         }
-
-        /// <summary>
-        /// Creates a signed POST request
-        /// </summary>
-        /// <param name="endpoint"> Request endpoint </param>
-        /// <param name="qParams"> Query params </param>
-        /// <param name="token"> Task cancellation token </param>
-        /// <returns>Http response message</returns>
-        public Task<HttpResponseMessage> SignedPostRequestAsync(Uri endpoint, 
+        
+        private Task<HttpResponseMessage> SignedPostRequestAsync(Uri endpoint, 
             IDictionary<string, string> qParams = default, 
             CancellationToken token = default)
         {
@@ -91,30 +236,16 @@ namespace BinanceBotInfrastructure.Services
             
             return _httpClient.PostAsync(endpoint, queryParams, token);
         }
-
-        /// <summary>
-        /// Creates a simple PUT request
-        /// </summary>
-        /// <param name="endpoint"> Request endpoint </param>
-        /// <param name="qParams"> Query params </param>
-        /// <param name="token"> Task cancellation token </param>
-        /// <returns>Http response message</returns>
-        public Task<HttpResponseMessage> PutRequestAsync(Uri endpoint,
+        
+        private Task<HttpResponseMessage> PutRequestAsync(Uri endpoint,
             IDictionary<string, string> qParams = default, 
             CancellationToken token = default)
         {
             var queryParams = MakeUrlEncodedContent(qParams);
             return _httpClient.PutAsync(endpoint, queryParams, token);
         }
-
-        /// <summary>
-        /// Creates a signed PUT request
-        /// </summary>
-        /// <param name="endpoint"> Request endpoint </param>
-        /// <param name="qParams"> Query params </param>
-        /// <param name="token"> Task cancellation token </param>
-        /// <returns>Http response message</returns>
-        public Task<HttpResponseMessage> SignedPutRequestAsync(Uri endpoint, 
+        
+        private Task<HttpResponseMessage> SignedPutRequestAsync(Uri endpoint, 
             IDictionary<string, string> qParams = default, 
             CancellationToken token = default)
         {
@@ -123,36 +254,22 @@ namespace BinanceBotInfrastructure.Services
             
             return _httpClient.PutAsync(endpoint, queryParams, token);
         }
-
-        /// <summary>
-        /// Creates a simple DELETE request
-        /// </summary>
-        /// <param name="endpoint"> Request endpoint </param>
-        /// <param name="qParams"> Query params </param>
-        /// <param name="token"> Task cancellation token </param>
-        /// <returns>Http response message</returns>
-        public Task<HttpResponseMessage> DeleteRequestAsync(Uri endpoint,
+        
+        private Task<HttpResponseMessage> DeleteRequestAsync(Uri endpoint,
             IDictionary<string, string> qParams = default, CancellationToken token = default)
         {
             var uri = CreateValidUri(endpoint, qParams);
             return _httpClient.DeleteAsync(uri, token);   
         }
-
-        /// <summary>
-        /// Creates a signed DELETE request
-        /// </summary>
-        /// <param name="endpoint"> Request endpoint </param>
-        /// <param name="qParams"> Query params </param>
-        /// <param name="token"> Task cancellation token </param>
-        /// <returns>Http response message</returns>
-        public Task<HttpResponseMessage> SignedDeleteRequestAsync(Uri endpoint,
+        
+        private Task<HttpResponseMessage> SignedDeleteRequestAsync(Uri endpoint,
             IDictionary<string, string> qParams = default, 
             CancellationToken token = default)
         {
             var signedUri = CreateValidSignedUri(endpoint, qParams);
             return _httpClient.DeleteAsync(signedUri, token);
         }
-        
+
         private static FormUrlEncodedContent MakeUrlEncodedContent(
             IDictionary<string, string> qParams = default)
         {
