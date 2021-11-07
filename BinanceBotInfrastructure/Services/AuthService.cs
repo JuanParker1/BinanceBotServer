@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace BinanceBotInfrastructure.Services
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly IBinanceBotDbContext db;
 
