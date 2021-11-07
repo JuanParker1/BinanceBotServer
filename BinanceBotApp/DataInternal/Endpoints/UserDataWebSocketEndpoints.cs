@@ -32,24 +32,5 @@ namespace BinanceBotApp.DataInternal.Endpoints
 
             return new Uri(requestUrl);
         }
-
-        /// <summary>
-        /// Sets the Binance Listen Key. Send POST request
-        /// to start user stream. Weight: 1 for all requests.
-        /// POST request returns listen key (string).
-        /// PUT request with {listenKey} param will extend it's
-        /// validity for next 60 minutes (Recommended to refresh it
-        /// about every 30 minutes).
-        /// DELETE request with {listenKey} param will close
-        /// a user data stream.
-        /// </summary>
-        /// <returns>User data Websocket uri</returns>
-        public static Uri GetUserDataMarginWebSocketEndpoint()
-        {
-            var requestUri = $"{GeneralInfo.ApiBaseUrl}/" +
-                             $"{GeneralInfo.ApiVersion3}/userDataStream";
-
-            return new Uri(requestUri);
-        }
     }
 }

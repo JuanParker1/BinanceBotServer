@@ -83,9 +83,8 @@ namespace BinanceBotInfrastructure.Services
                 ms.Seek(0, SeekOrigin.Begin);
                 using var reader = new StreamReader(ms, Encoding.UTF8);
                 var response = await reader.ReadToEndAsync().ConfigureAwait(false);
-                responseHandler.Invoke(response);
+                responseHandler?.Invoke(response);
                 
-                //await Task.Delay(100, token).ConfigureAwait(false);     
             } while (!token.IsCancellationRequested);
         }
 
