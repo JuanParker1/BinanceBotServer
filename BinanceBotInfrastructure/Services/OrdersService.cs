@@ -9,11 +9,11 @@ using BinanceBotApp.Services;
 
 namespace BinanceBotInfrastructure.Services
 {
-    public class TradeService : ITradeService
+    public class OrdersService : IOrdersService
     {
         private readonly IHttpClientService _httpClientService;
 
-        public TradeService(IHttpClientService httpClientService)
+        public OrdersService(IHttpClientService httpClientService)
         {
             _httpClientService = httpClientService;
         }

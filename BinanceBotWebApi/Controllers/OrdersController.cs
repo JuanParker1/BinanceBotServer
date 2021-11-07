@@ -14,13 +14,13 @@ namespace BinanceBotWebApi.Controllers
     [Route("api/orders")]
     [ApiController]
     //[Authorize]
-    public class TradeController : ControllerBase
+    public class OrdersController : ControllerBase
     {
-        private readonly ITradeService _tradeService;
+        private readonly IOrdersService _ordersService;
 
-        public TradeController(ITradeService tradeService)
+        public OrdersController(IOrdersService ordersService)
         {
-            _tradeService = tradeService;
+            _ordersService = ordersService;
         }
         
         /// <summary>
@@ -36,7 +36,7 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> GetOrderAsync([FromRoute]int idOrder, [FromQuery]string symbol, 
             int recvWindow = 5000,  CancellationToken token = default)
         {
-            var orderInfo = await _tradeService.GetOrderAsync(idOrder, symbol, 
+            var orderInfo = await _ordersService.GetOrderAsync(idOrder, symbol, 
                 recvWindow, token);
 
             return Ok(orderInfo);
@@ -54,7 +54,7 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> GetOrdersForPairAsync([FromRoute]string symbol, 
             int recvWindow = 5000,  CancellationToken token = default)
         {
-            var ordersInfo = await _tradeService.GetOrdersForPairAsync(symbol, recvWindow, token);
+            var ordersInfo = await _ordersService.GetOrdersForPairAsync(symbol, recvWindow, token);
 
             return Ok(ordersInfo);
         }
@@ -70,7 +70,7 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> GetOrdersForPairAsync(int recvWindow = 5000,  
             CancellationToken token = default)
         {
-            var ordersInfo = await _tradeService.GetAllOrdersAsync(recvWindow, token);
+            var ordersInfo = await _ordersService.GetAllOrdersAsync(recvWindow, token);
 
             return Ok(ordersInfo);
         }
@@ -86,7 +86,7 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> CreateTestOrderAsync([FromBody]CreateOrderDto createOrder, 
             CancellationToken token = default)
         {
-            var orderInfo = await _tradeService.CreateTestOrderAsync(createOrder, token);
+            var orderInfo = await _ordersService.CreateTestOrderAsync(createOrder, token);
 
             return Ok(orderInfo);
         }
@@ -102,7 +102,7 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> CreateOrderAsync([FromBody]CreateOrderDto createOrder, 
             CancellationToken token = default)
         {
-            var orderInfo = await _tradeService.CreateOrderAsync(createOrder, token);
+            var orderInfo = await _ordersService.CreateOrderAsync(createOrder, token);
 
             return Ok(orderInfo);
         }
@@ -120,7 +120,7 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> DeleteOrderAsync([FromRoute]int idOrder, string symbol,
             int recvWindow = 5000, CancellationToken token = default)
         {
-            var orderInfo = await _tradeService.DeleteOrderAsync(idOrder, symbol, 
+            var orderInfo = await _ordersService.DeleteOrderAsync(idOrder, symbol, 
                 recvWindow, token);
 
             return Ok(orderInfo);
@@ -139,7 +139,7 @@ namespace BinanceBotWebApi.Controllers
             int recvWindow = 5000, CancellationToken token = default)
         {
             var orderInfo = 
-                await _tradeService.DeleteAllOrdersForPairAsync(symbol, 
+                await _ordersService.DeleteAllOrdersForPairAsync(symbol, 
                     recvWindow, token);
 
             return Ok(orderInfo);
