@@ -36,7 +36,7 @@ namespace BinanceBotInfrastructure.Services
         {
             var data = $"{{\"method\": \"LIST_SUBSCRIPTIONS\",\"id\": 1}}";
             
-            await _wsClientService.ConnectToWebSocketAsync(new Uri("wss://stream.binance.com:9443/ws"),
+            await _wsClientService.ConnectToWebSocketAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
                 data, Console.WriteLine, token );
         }
         
@@ -45,7 +45,7 @@ namespace BinanceBotInfrastructure.Services
         {
             var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[\"{pair}@bookTicker\"],\"id\": 1}}";
             
-            await _wsClientService.ConnectToWebSocketAsync(new Uri("wss://stream.binance.com:9443/ws"),
+            await _wsClientService.ConnectToWebSocketAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
                 data, Console.WriteLine, token );
         }
         
@@ -55,7 +55,7 @@ namespace BinanceBotInfrastructure.Services
             var pairsString = string.Join(",", pairs.Collection.Select(p => $"\"{p}@bookTicker\""));
             var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[{pairsString}],\"id\": 1}}";
             
-            await _wsClientService.ConnectToWebSocketAsync(new Uri("wss://stream.binance.com:9443/ws"),
+            await _wsClientService.ConnectToWebSocketAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
                 data, Console.WriteLine, token);
         }
 
@@ -63,7 +63,7 @@ namespace BinanceBotInfrastructure.Services
         {
             var data = $"{{\"method\": \"UNSUBSCRIBE\",\"params\":[\"{pair}@bookTicker\"],\"id\": 1}}";
             
-            await _wsClientService.ConnectToWebSocketAsync(new Uri("wss://stream.binance.com:9443/ws"),
+            await _wsClientService.ConnectToWebSocketAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
                 data, null, token);
         }
     }

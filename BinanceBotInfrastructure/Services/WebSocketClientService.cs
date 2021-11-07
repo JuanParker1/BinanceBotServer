@@ -75,7 +75,7 @@ namespace BinanceBotInfrastructure.Services
                 {
                     result = await webSocket.ReceiveAsync(buffer, CancellationToken.None)
                         .ConfigureAwait(false);
-                    ms.Write(buffer.Array, buffer.Offset, result.Count);
+                    ms.Write(buffer.Array ?? Array.Empty<byte>(), buffer.Offset, result.Count);
                 } while (!result.EndOfMessage);
 
                 if (result.MessageType == WebSocketMessageType.Close)

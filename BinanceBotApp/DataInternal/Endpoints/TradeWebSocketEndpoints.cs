@@ -18,6 +18,13 @@ namespace BinanceBotApp.DataInternal.Endpoints
     public static class TradeWebSocketEndpoints
     {
         /// <summary>
+        /// Gets base websocket uri
+        /// </summary>
+        /// <returns> Base websocket uri </returns>
+        public static Uri GetMainWebSocketEndpoint() =>
+            new ($"{GeneralInfo.BaseWebsocketUri}");
+        
+        /// <summary>
         /// Get any update to the best bid or asks price or quantity in
         /// real-time for a specified symbol.
         /// Update Speed: Real-time
