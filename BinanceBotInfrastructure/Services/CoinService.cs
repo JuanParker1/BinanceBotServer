@@ -22,7 +22,7 @@ namespace BinanceBotInfrastructure.Services
             _wsClientService = wsClientService;
         }
         
-        public async Task<IEnumerable<string>> GetAllAsync(CancellationToken token)
+        public async Task<IEnumerable<string>> GetTradingPairsAsync(CancellationToken token)
         {
             var uri = MarketDataEndpoints.GetCoinsPricesEndpoint();
             var coinPricesInfo = 
@@ -31,8 +31,16 @@ namespace BinanceBotInfrastructure.Services
             
             return coinPricesInfo.Select(c => c.Symbol);
         }
+
+        public async Task GetSubscriptionsListAsync(CancellationToken token)
+        {
+            var data = $"{{\"method\": \"LIST_SUBSCRIPTIONS\",\"id\": 1}}";
+            
+            await _wsClientService.ConnectToWebSocketAsync(new Uri("wss://stream.binance.com:9443/ws"),
+                data, Console.WriteLine, token );
+        }
         
-        public async Task GetPairBestPriceAsync(string pair, Action<string> responseHandler, 
+        public async Task SubscribeForStreamAsync(string pair, Action<string> responseHandler, 
             CancellationToken token)
         {
             var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[\"{pair}@bookTicker\"],\"id\": 1}}";
@@ -41,7 +49,7 @@ namespace BinanceBotInfrastructure.Services
                 data, Console.WriteLine, token );
         }
         
-        public async Task GetPairsBestPricesAsync(GenericCollectionDto<string> pairs, 
+        public async Task SubscribeForCombinedStreamAsync(GenericCollectionDto<string> pairs, 
             Action<string> responseHandler, CancellationToken token)
         {
             var pairsString = string.Join(",", pairs.Collection.Select(p => $"\"{p}@bookTicker\""));
@@ -49,6 +57,14 @@ namespace BinanceBotInfrastructure.Services
             
             await _wsClientService.ConnectToWebSocketAsync(new Uri("wss://stream.binance.com:9443/ws"),
                 data, Console.WriteLine, token);
+        }
+
+        public async Task UnsubscribeFromStreamAsync(string pair, CancellationToken token)
+        {
+            var data = $"{{\"method\": \"UNSUBSCRIBE\",\"params\":[\"{pair}@bookTicker\"],\"id\": 1}}";
+            
+            await _wsClientService.ConnectToWebSocketAsync(new Uri("wss://stream.binance.com:9443/ws"),
+                data, null, token);
         }
     }
 }
