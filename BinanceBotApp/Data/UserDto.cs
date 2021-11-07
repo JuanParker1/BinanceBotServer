@@ -1,5 +1,8 @@
 namespace BinanceBotApp.Data
 {
+    /// <summary>
+    /// User info
+    /// </summary>
     public class UserDto : UserBaseDto
     {
         public int Id { get; set; }

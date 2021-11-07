@@ -1,5 +1,8 @@
 namespace BinanceBotApp.Data
 {
+    /// <summary>
+    /// User JWT authentication token
+    /// </summary>
     public class UserTokenDto : UserBaseDto
     {
         public int Id { get; set; }
