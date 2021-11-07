@@ -10,7 +10,7 @@ using BinanceBotApp.Services;
 namespace BinanceBotWebApi.Controllers
 {
     /// <summary>
-    /// Coin info retrieving controller
+    /// Coin info controller
     /// </summary>
     [Route("api/coins")]
     [ApiController]

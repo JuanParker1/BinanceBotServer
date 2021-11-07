@@ -9,7 +9,7 @@ using BinanceBotApp.Services;
 namespace BinanceBotWebApi.Controllers
 {
     /// <summary>
-    /// Контроллер управления ордерами
+    /// Order info controller
     /// </summary>
     [Route("api/orders")]
     [ApiController]
