@@ -28,7 +28,7 @@ namespace BinanceBotApp.DataInternal.Endpoints
         /// <summary> 
         /// Base WebSocket URI for Binance API
         /// </summary>
-        public const string BaseWebsocketUri = "wss://stream.binance.com:9443/ws/";
+        public const string BaseWebsocketUri = "wss://stream.binance.com:9443/ws";
 
         /// <summary>
         /// Combined WebSocket URI for Binance API

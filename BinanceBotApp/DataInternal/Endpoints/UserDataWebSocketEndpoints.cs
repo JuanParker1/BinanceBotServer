@@ -25,12 +25,18 @@ namespace BinanceBotApp.DataInternal.Endpoints
         /// a user data stream.
         /// </summary>
         /// <returns>User data Websocket uri</returns>
-        public static Uri GetUserDataWebSocketEndpoint()
+        public static Uri GetListenKeyEndpoint()
         {
             var requestUrl = $"{GeneralInfo.ApiBaseUrl}/" +
                              $"{GeneralInfo.ApiVersion3}/userDataStream";
 
             return new Uri(requestUrl);
         }
+        
+        /// <summary>
+        /// User data websocket stream connection uri.
+        /// </summary>    
+        public static Uri GetUserDataStreamEndpoint(string listenKey) =>
+            new Uri($"{GeneralInfo.BaseWebsocketUri}/{listenKey}");
     }
 }

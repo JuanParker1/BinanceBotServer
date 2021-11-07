@@ -34,7 +34,7 @@ namespace BinanceBotInfrastructure.Services
         public async Task<string> GetListenKey(CancellationToken token)
         {
             var streamResponse = await _httpClientService.ProcessRequestAsync<string>(
-                    UserDataWebSocketEndpoints.GetUserDataWebSocketEndpoint(), null, 
+                    UserDataWebSocketEndpoints.GetListenKeyEndpoint(), null, 
                     HttpMethods.SignedPost,token)
                 .ConfigureAwait(false);
             
@@ -61,9 +61,10 @@ namespace BinanceBotInfrastructure.Services
             _activeWebSockets.Add(_idWebSocket, webSocket);
             _idWebSocket++;
             
-            await webSocket.SendAsync(Encoding.UTF8.GetBytes(data), 
-                WebSocketMessageType.Text, true, token)
-                .ConfigureAwait(false);
+            if(!string.IsNullOrEmpty(data))
+                await webSocket.SendAsync(Encoding.UTF8.GetBytes(data), 
+                    WebSocketMessageType.Text, true, token)
+                    .ConfigureAwait(false);
             
             var buffer = new ArraySegment<byte>(new byte[2048]);
             do

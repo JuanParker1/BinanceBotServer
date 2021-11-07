@@ -1,7 +1,9 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using BinanceBotApp.Data;
 using BinanceBotApp.Services;
 
 namespace BinanceBotWebApi.Controllers
@@ -27,12 +29,12 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="token"> Task cancellation token </param>
         /// <returns> User data streams listen key </returns>
         [HttpPost("listenKey")]
-        [ProducesResponseType(typeof(string), (int)System.Net.HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ListenKeyDto), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetListenKeyAsync(CancellationToken token = default)
         {
-            var listenKey = await _userDataService.GetListenKey(token);
+            var response = await _userDataService.GetListenKey(token);
             
-            return Ok(listenKey);
+            return Ok(response);
         }
         
         /// <summary>
@@ -63,6 +65,23 @@ namespace BinanceBotWebApi.Controllers
             CancellationToken token = default)
         {
             await _userDataService.DeleteListenKey(listenKey, token);
+            
+            return Ok();
+        }
+        
+        /// <summary>
+        /// Gets user data
+        /// </summary>
+        /// <param name="listenKey"> User listen key </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns> User data </returns>
+        [HttpGet("data")]
+        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> SubscribeForStreamAsync(string listenKey, 
+            CancellationToken token = default)
+        {
+            await _userDataService.SubscribeForStreamAsync(listenKey, 
+                Console.WriteLine, token);
             
             return Ok();
         }
