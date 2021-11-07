@@ -49,7 +49,7 @@ namespace BinanceBotInfrastructure.Services
         /// <param name="responseHandler">Method to handle stream response</param>
         /// <param name="token">Current task cancellation token</param>
         /// <returns></returns>
-        public async Task ConnectToBinanceWebSocketAsync(Uri endpoint, string data,
+        public async Task ConnectToWebSocketAsync(Uri endpoint, string data,
             Action<string> responseHandler, CancellationToken token)
         {
             using var webSocket = new ClientWebSocket();
@@ -85,7 +85,7 @@ namespace BinanceBotInfrastructure.Services
                 var response = await reader.ReadToEndAsync().ConfigureAwait(false);
                 responseHandler.Invoke(response);
                 
-                await Task.Delay(100, token).ConfigureAwait(false);     
+                //await Task.Delay(100, token).ConfigureAwait(false);     
             } while (!token.IsCancellationRequested);
         }
 

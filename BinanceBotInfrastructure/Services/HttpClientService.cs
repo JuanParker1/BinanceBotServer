@@ -171,7 +171,7 @@ namespace BinanceBotInfrastructure.Services
                 var camelCasedKey = char.ToLower(name[0]) + name[1..];
                 var value = dto.GetType()?.GetProperty(name)?.GetValue(dto);
 
-                if (value != default && IsValueNumericDefault(value))
+                if (value != default && IsNumericDefault(value))
                     continue;
 
                 if(value != default)
@@ -181,7 +181,7 @@ namespace BinanceBotInfrastructure.Services
             return resultDict;
         }
 
-        private static bool IsValueNumericDefault(object value)
+        private static bool IsNumericDefault(object value)
         {
             var intVal = 1;
             var doubleVal = 1.0;

@@ -10,5 +10,6 @@ namespace BinanceBotApp.Services
         Task<IEnumerable<string>> GetAllAsync(CancellationToken token = default);
         Task<CoinBestAskBidDto> GetBestPriceAsync(string symbol, 
             CancellationToken token = default);
+        Task ConnectToWebSocketAsync(CancellationToken token);
     }
 }

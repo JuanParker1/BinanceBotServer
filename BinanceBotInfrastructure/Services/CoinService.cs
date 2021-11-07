@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -13,9 +14,12 @@ namespace BinanceBotInfrastructure.Services
     public class CoinService : ICoinService
     {
         private readonly IHttpClientService _httpClientService;
-        public CoinService(IHttpClientService httpClientService)
+        private readonly IWebSocketClientService _wsClientService;
+        
+        public CoinService(IHttpClientService httpClientService, IWebSocketClientService wsClientService)
         {
             _httpClientService = httpClientService;
+            _wsClientService = wsClientService;
         }
         
         public async Task<IEnumerable<string>> GetAllAsync(CancellationToken token)
@@ -42,6 +46,13 @@ namespace BinanceBotInfrastructure.Services
                     qParams, HttpMethods.Get, token);
 
             return bestPricesInfo;
+        }
+        
+        public async Task ConnectToWebSocketAsync(CancellationToken token)
+        {
+            var data = "{\"method\": \"SUBSCRIBE\",\"params\":[\"btcusdt@ticker\"],\"id\": 1}";
+            await _wsClientService.ConnectToWebSocketAsync(new Uri("wss://stream.binance.com:9443/ws/btcusdt@ticker"),
+                data, Console.WriteLine, token );
         }
     }
 }

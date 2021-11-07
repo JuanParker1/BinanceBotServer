@@ -17,7 +17,7 @@ namespace BinanceBotWebApi.Controllers
     public class CoinController : ControllerBase
     {
         private readonly ICoinService _coinService;
-        
+
         public CoinController(ICoinService coinService)
         {
             _coinService = coinService;
@@ -49,6 +49,22 @@ namespace BinanceBotWebApi.Controllers
         {
             var coinInfo = await _coinService.GetBestPriceAsync(symbol, token);
             return coinInfo;
+        }
+        
+        /// <summary>
+        /// Gets info about requested order
+        /// </summary>
+        /// <param name="symbol"> Requested trading pair </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns> Info about requested order </returns>
+        [HttpGet("ws")]
+        [ProducesResponseType(typeof(OrderInfoDto), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> ConnetctToWebSocketAsync([FromQuery]string symbol, 
+            CancellationToken token = default)
+        {
+            await _coinService.ConnectToWebSocketAsync(token);
+
+            return Ok();
         }
     }
 }
