@@ -1,8 +1,3 @@
-using BinanceBotApp.Data;
-using BinanceBotApp.Services;
-using BinanceBotDb.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,6 +7,11 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using BinanceBotApp.Data;
+using BinanceBotApp.Services;
+using BinanceBotDb.Models;
 
 namespace BinanceBotInfrastructure.Services
 {
@@ -19,25 +19,25 @@ namespace BinanceBotInfrastructure.Services
     {
         private readonly IBinanceBotDbContext db;
 
-        public const string issuer = "a";
-        public const string audience = "a";
+        public const string Issuer = "a";
+        public const string Audience = "a";
         public static readonly SymmetricSecurityKey securityKey = 
-            new SymmetricSecurityKey(Encoding.ASCII.GetBytes("супер секретный ключ для шифрования"));
-        public const string algorithms = SecurityAlgorithms.HmacSha256;
-
-        private static readonly TimeSpan expiresTimespan = TimeSpan.FromDays(365.25);
-        private static readonly Encoding encoding = Encoding.UTF8;
-        private const int PasswordSaltLength = 5;
-        private const string claimIdUser = "id";
-        private const string claimNameidCompany = "idCompany";
-        private readonly HashAlgorithm hashAlgoritm;
-        private readonly Random rnd;
+            new (Encoding.ASCII.GetBytes("super secret encryption key"));
+        
+        private static string _algorithms = SecurityAlgorithms.HmacSha256;
+        private static readonly TimeSpan _expiresTimespan = TimeSpan.FromDays(365.25);
+        private static readonly Encoding _encoding = Encoding.UTF8;
+        private const int _passwordSaltLength = 5;
+        private const string _claimIdUser = "id";
+        private const string _claimNameidCompany = "idCompany";
+        private readonly HashAlgorithm _hashAlgoritm;
+        private readonly Random _rnd;
 
         public AuthService(IBinanceBotDbContext db)
         {
             this.db = db;
-            hashAlgoritm = SHA384.Create();
-            rnd = new Random((int)(DateTime.Now.Ticks % 2147480161));
+            _hashAlgoritm = SHA384.Create();
+            _rnd = new Random((int)(DateTime.Now.Ticks % 2147480161));
         }
 
         public async Task<UserTokenDto> LoginAsync(string login, string password,
@@ -64,7 +64,7 @@ namespace BinanceBotInfrastructure.Services
         public string Refresh(ClaimsPrincipal user) =>
             MakeToken(user.Claims);
 
-        public int Register(UserDto userDto)
+        public async Task<int> RegisterAsync(UserDto userDto, CancellationToken token)
         {
             if (userDto.Login is null || userDto.Login.Length is < 3 or > 50)
                 return -1;
@@ -96,7 +96,7 @@ namespace BinanceBotInfrastructure.Services
             db.Users.Add(newUser);
             try
             {
-                db.SaveChanges();
+                await db.SaveChangesAsync(token).ConfigureAwait(false);;
             }
             catch //(Exception ex)
             {
@@ -106,30 +106,34 @@ namespace BinanceBotInfrastructure.Services
             return 0;
         }
 
-        public int ChangePassword(string userLogin, string newPassword)
+        public async Task<int> ChangePasswordAsync(string userLogin, 
+            string newPassword, CancellationToken token)
         {
-            var user = db.Users.AsNoTracking()
-                .FirstOrDefault(u => u.Login == userLogin);
+            var user = await db.Users.AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Login == userLogin, token)
+                .ConfigureAwait(false);;
             
             if (user == null)
                 return -1;
 
             var salt = GenerateSalt();
             user.PasswordHash = salt + ComputeHash(salt, newPassword);
-            db.SaveChanges();
-            return 0;
+            
+            return await db.SaveChangesAsync(token).ConfigureAwait(false);;
         }
 
-        public int ChangePassword(int idUser, string newPassword)
+        public async Task<int> ChangePasswordAsync(int idUser, string newPassword,
+            CancellationToken token)
         {
-            var user = db.Users.FirstOrDefault(u => u.Id == idUser);
+            var user = await db.Users.FirstOrDefaultAsync(u => u.Id == idUser,
+                token).ConfigureAwait(false);;
+            
             if (user == null)
                 return -1;
 
             var salt = GenerateSalt();
             user.PasswordHash = salt + ComputeHash(salt, newPassword);
-            db.SaveChanges();
-            return 0;
+            return await db.SaveChangesAsync(token).ConfigureAwait(false);;
         }
 
         private static string MakeToken(IEnumerable<Claim> claims)
@@ -137,12 +141,12 @@ namespace BinanceBotInfrastructure.Services
             var now = DateTime.Now;
 
             var jwt = new JwtSecurityToken(
-                    issuer: issuer,
-                    audience: audience,
+                    issuer: Issuer,
+                    audience: Audience,
                     notBefore: now,
                     claims: claims,
-                    expires: now.Add(expiresTimespan),
-                    signingCredentials: new SigningCredentials(securityKey, algorithms));
+                    expires: now.Add(_expiresTimespan),
+                    signingCredentials: new SigningCredentials(securityKey, _algorithms));
 
             return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
@@ -164,44 +168,48 @@ namespace BinanceBotInfrastructure.Services
 
             var claims = new List<Claim>
                 {
-                    new Claim(claimIdUser, $"{user.Id}"),
+                    new Claim(_claimIdUser, $"{user.Id}"),
                     new Claim(ClaimsIdentity.DefaultNameClaimType, user.Login),
                     new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role?.Caption??"Guest")
                 };
             var claimsIdentity = new ClaimsIdentity(claims, "Token", 
                 ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+            
             return (claimsIdentity, user);
         }
 
         private bool CheckPassword(string passwordHash, string password)
         {
-            if (passwordHash.Length == 0 && password.Length == 0)
-                return true;
+            switch (passwordHash.Length)
+            {
+                case 0 when password.Length == 0:
+                    return true;
+                case < _passwordSaltLength:
+                    return false;
+            }
 
-            if (passwordHash.Length < PasswordSaltLength)
-                return false;
-
-            var salt = passwordHash[0..PasswordSaltLength];
-            var hashDb = passwordHash[PasswordSaltLength..];
+            var salt = passwordHash[0.._passwordSaltLength];
+            var hashDb = passwordHash[_passwordSaltLength..];
 
             return hashDb == ComputeHash(salt, password);
         }
 
         private string ComputeHash(string salt, string password)
         {
-            var hashBytes = hashAlgoritm.ComputeHash(encoding.GetBytes(salt + password));
+            var hashBytes = _hashAlgoritm.ComputeHash(_encoding.GetBytes(salt + password));
             var hashString = BitConverter.ToString(hashBytes)
                     .Replace("-", "")
                     .ToLower();
+            
             return hashString;
         }
 
-        public string GenerateSalt()
+        private string GenerateSalt()
         {
             const string saltChars = "sHwiaX7kZT1QRp0cPILGUuK2Sz=9q8lmejDNfoYCE3B_WtgyVv6M5OxAJ4Frbhnd";
             string salt = "";
-            for (int i = 0; i < PasswordSaltLength - 1; i++)
-                salt += saltChars[rnd.Next(0, saltChars.Length)];
+            for (int i = 0; i < _passwordSaltLength - 1; i++)
+                salt += saltChars[_rnd.Next(0, saltChars.Length)];
             salt += "|";
             return salt;
         }

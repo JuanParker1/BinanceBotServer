@@ -69,9 +69,9 @@ namespace BinanceBotWebApi
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
-                        ValidIssuer = AuthService.issuer,
+                        ValidIssuer = AuthService.Issuer,
                         ValidateAudience = true,
-                        ValidAudience = AuthService.audience,
+                        ValidAudience = AuthService.Audience,
                         ValidateLifetime = true,
                         IssuerSigningKey = AuthService.securityKey,
                         ValidateIssuerSigningKey = true,
