@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using BinanceBotApp.Data;
@@ -9,7 +10,7 @@ using BinanceBotApp.Services;
 namespace BinanceBotWebApi.Controllers
 {
     /// <summary>
-    /// Контроллер сбора информации о монетах на бирже
+    /// Coin info from exchange retrieving controller
     /// </summary>
     [Route("api/coins")]
     [ApiController]
@@ -24,10 +25,10 @@ namespace BinanceBotWebApi.Controllers
         }
         
         /// <summary>
-        /// Возвращает список всех торговых пар на бирже
+        /// Gets list of all trading pairs
         /// </summary>
-        /// <param name="token">Токен для отмены задачи</param>
-        /// <returns>Список всех доступных торговых пар</returns>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns> List of all trading pairs </returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<string>), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IEnumerable<string>> GetAllAsync(CancellationToken token = default)
@@ -37,33 +38,34 @@ namespace BinanceBotWebApi.Controllers
         }
         
         /// <summary>
-        /// Возвращает текущую информацию о торговой паре
+        /// Gets price info for requested trading pair
         /// </summary>
-        /// <param name="symbol">Запрашиваемая торговая пара</param>
-        /// <param name="token">Токен для отмены задачи</param>
-        /// <returns>Информацию по запрашиваемой торговой паре</returns>
-        [HttpGet("{symbol}/info")]
-        [ProducesResponseType(typeof(CoinBestAskBidDto), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<CoinBestAskBidDto> GetInfoAsync([FromRoute]string symbol, 
+        /// <param name="pair"> Trading pair name </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns> Price info for requested trading pair </returns>
+        [HttpGet("{pair}/info")]
+        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> GetInfoAsync([FromRoute]string pair, 
             CancellationToken token = default)
         {
-            var coinInfo = await _coinService.GetBestPriceAsync(symbol, token);
-            return coinInfo;
+            await _coinService.GetPairBestPriceAsync(pair, Console.WriteLine, token);
+            
+            return Ok();
         }
         
         /// <summary>
-        /// Gets info about requested order
+        /// Gets price info for requested trading pairs
         /// </summary>
-        /// <param name="symbol"> Requested trading pair </param>
+        /// <param name="pairNames"> Trading pairs names </param>
         /// <param name="token"> Task cancellation token </param>
-        /// <returns> Info about requested order </returns>
-        [HttpGet("ws")]
-        [ProducesResponseType(typeof(OrderInfoDto), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> ConnetctToWebSocketAsync([FromQuery]string symbol, 
+        /// <returns> Price info for requested trading pairs </returns>
+        [HttpGet("combined/info")]
+        [ProducesResponseType(typeof(OrderInfoDto), (int)System.Net.HttpStatusCode.OK)] //http://localhost:5000/api/coins/combined/info?collection=ethbtc&collection=btcusdt
+        public async Task<IActionResult> ConnectToWebSocketAsync([FromQuery]GenericCollectionDto<string> pairNames,
             CancellationToken token = default)
         {
-            await _coinService.ConnectToWebSocketAsync(token);
-
+            await _coinService.GetPairsBestPricesAsync(pairNames, Console.WriteLine, token);
+        
             return Ok();
         }
     }

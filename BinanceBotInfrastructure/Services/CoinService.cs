@@ -32,27 +32,23 @@ namespace BinanceBotInfrastructure.Services
             return coinPricesInfo.Select(c => c.Symbol);
         }
         
-        public async Task<CoinBestAskBidDto> GetBestPriceAsync(string symbol, 
-            CancellationToken token = default)
+        public async Task GetPairBestPriceAsync(string pair, Action<string> responseHandler, 
+            CancellationToken token)
         {
-            var uri = MarketDataEndpoints.GetBestAskBidPricesEndpoint();
-            var qParams = new Dictionary<string, string>()
-            {
-                {"symbol", symbol}
-            };
+            var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[\"{pair}@bookTicker\"],\"id\": 1}}";
             
-            var bestPricesInfo = 
-                await _httpClientService.ProcessRequestAsync<CoinBestAskBidDto>(uri, 
-                    qParams, HttpMethods.Get, token);
-
-            return bestPricesInfo;
+            await _wsClientService.ConnectToWebSocketAsync(new Uri("wss://stream.binance.com:9443/ws"),
+                data, Console.WriteLine, token );
         }
         
-        public async Task ConnectToWebSocketAsync(CancellationToken token)
+        public async Task GetPairsBestPricesAsync(GenericCollectionDto<string> pairs, 
+            Action<string> responseHandler, CancellationToken token)
         {
-            var data = "{\"method\": \"SUBSCRIBE\",\"params\":[\"btcusdt@ticker\"],\"id\": 1}";
-            await _wsClientService.ConnectToWebSocketAsync(new Uri("wss://stream.binance.com:9443/ws/btcusdt@ticker"),
-                data, Console.WriteLine, token );
+            var pairsString = string.Join(",", pairs.Collection.Select(p => $"\"{p}@bookTicker\""));
+            var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[{pairsString}],\"id\": 1}}";
+            
+            await _wsClientService.ConnectToWebSocketAsync(new Uri("wss://stream.binance.com:9443/ws"),
+                data, Console.WriteLine, token);
         }
     }
 }
