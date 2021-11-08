@@ -208,9 +208,9 @@ namespace BinanceBotInfrastructure.Services
         {
             const string saltChars = "sHwiaX7kZT1QRp0cPILGUuK2Sz=9q8lmejDNfoYCE3B_WtgyVv6M5OxAJ4Frbhnd";
             string salt = "";
-            for (int i = 0; i < _passwordSaltLength - 1; i++)
+            for (int i = 0; i < _passwordSaltLength; i++)
                 salt += saltChars[_rnd.Next(0, saltChars.Length)];
-            salt += "|";
+
             return salt;
         }
     }

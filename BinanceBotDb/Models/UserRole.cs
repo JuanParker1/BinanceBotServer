@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BinanceBotDb.Models
 {
-    [Table("t_user_role"), Comment("Роли пользователей")]
+    [Table("t_user_roles"), Comment("User roles")]
     public class UserRole
     {
         public UserRole()
@@ -17,7 +17,7 @@ namespace BinanceBotDb.Models
         [Column("id")]
         public int Id { get; set; }
 
-        [Column("caption"), Comment("Название")]
+        [Column("caption"), Comment("Caption")]
         [StringLength(255)]
         public string Caption { get; set; }
 

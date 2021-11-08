@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BinanceBotDb.Models
 {
-    [Table("t_user"), Comment("Пользователи")]
+    [Table("t_users"), Comment("Users")]
     public partial class User
     {
         [Key]
@@ -18,19 +18,19 @@ namespace BinanceBotDb.Models
         [StringLength(255)]
         public string Login { get; set; }
 
-        [Column("password_hash"), Comment("Соленый хэш пароля.\nПервые 5 символов - соль")]
+        [Column("password_hash"), Comment("Password hash")]
         [StringLength(255)]
         public string PasswordHash { get; set; }
 
-        [Column("name"), Comment("Имя")]
+        [Column("name"), Comment("Name")]
         [StringLength(255)]
         public string Name { get; set; }
 
-        [Column("surname"), Comment("фамилия")]
+        [Column("surname"), Comment("Surname")]
         [StringLength(255)]
         public string Surname { get; set; }
 
-        [Column("patronymic"), Comment("Отчество")]
+        [Column("patronymic"), Comment("Patronymic")]
         [StringLength(255)]
         public string Patronymic { get; set; }
 
