@@ -22,7 +22,14 @@ namespace BinanceBotWebApi
                     return $"{e.ActionDescriptor.RouteValues["action"]}";
                 });
 
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Binance trade bot web api", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "BinanceBotWebApi", 
+                    Version = "v1",
+                    Description = "Cryptocurrency trading bot. Allows to buy coins and automatically sell" +
+                                  "it according to pre-configured logic."
+                });
+                
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = @"JWT Authorization header using the Bearer scheme. 
