@@ -29,9 +29,6 @@ namespace BinanceBotDb.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // modelBuilder.HasPostgresExtension("adminpack")
-            //     .HasAnnotation("Relational:Collation", "ru_RU.utf8");
-
             modelBuilder.Entity<User>(entity => { entity.HasIndex(d => d.Login).IsUnique(); });
             
             FillData(modelBuilder);

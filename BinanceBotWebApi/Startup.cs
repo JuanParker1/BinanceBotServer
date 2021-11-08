@@ -51,6 +51,10 @@ namespace BinanceBotWebApi
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseHsts();   
+            }
             app.UseHttpsRedirection();
             app.UseDefaultFiles();
             app.UseStaticFiles();
