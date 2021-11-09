@@ -45,8 +45,11 @@ namespace BinanceBotWebApi
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", 
-                "BinanceBotWebApi v1"));
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "BinanceBotWebApi v1");
+                c.InjectStylesheet("/swagger-ui/SwaggerDark.css");
+            });
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
