@@ -59,7 +59,7 @@ namespace BinanceBotDb.Migrations
             migrationBuilder.InsertData(
                 table: "t_users",
                 columns: new[] { "id", "email", "id_role", "login", "name", "password_hash", "patronymic", "surname" },
-                values: new object[] { 1, null, 1, "dev", "Developer", "Vlcj|4fa529103dde7ff72cfe76185f344d4aa87931f8e1b2044e8a7739947c3d18923464eaad93843e4f809c5e126d013072", null, null });
+                values: new object[] { 1, null, 1, "dev", "Developer", "hs9qw7bf864323e5c894a9d031891ddbf8532a5b9eaf3efe7a1561403e6a6f1b3e680b7c37467e6cbfdce29ed6e9640842093", null, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_t_users_id_role",

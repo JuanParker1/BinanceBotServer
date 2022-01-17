@@ -15,6 +15,6 @@ namespace BinanceBotDb.Models
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
         DbSet<TEntity> Set<TEntity>(string name) where TEntity : class;
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
-        IQueryable<User> GetUsersByLogin(string login);
+        IQueryable<User> GetUserByLogin(string login);
     }
 }

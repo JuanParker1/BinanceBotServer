@@ -155,7 +155,7 @@ namespace BinanceBotInfrastructure.Services
             string password, CancellationToken token = default)
         {
             var user = await db
-                .GetUsersByLogin(login)
+                .GetUserByLogin(login)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(token)
                 .ConfigureAwait(false);

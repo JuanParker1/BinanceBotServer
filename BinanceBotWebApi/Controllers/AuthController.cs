@@ -37,7 +37,7 @@ namespace BinanceBotWebApi.Controllers
                 auth.Password, token).ConfigureAwait(false);
 
             if (userToken is null)
-                Forbid();
+                return Forbid();
 
             return Ok(userToken);
         }
