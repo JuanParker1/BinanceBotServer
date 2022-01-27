@@ -14,7 +14,7 @@ namespace BinanceBotWebApi
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
         
         public void ConfigureServices(IServiceCollection services)
         {
@@ -51,13 +51,10 @@ namespace BinanceBotWebApi
                 c.InjectStylesheet("/swagger-ui/SwaggerDark.css");
             });
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
             else
-            {
-                app.UseHsts();   
-            }
+                app.UseHsts();
+            
             app.UseHttpsRedirection();
             app.UseDefaultFiles();
             app.UseStaticFiles();
@@ -67,14 +64,10 @@ namespace BinanceBotWebApi
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-            
+                endpoints.MapControllers());
+
             app.UseSpa(spa =>
-            {
-                spa.Options.SourcePath = "wwwroot";
-            });
+                spa.Options.SourcePath = "wwwroot");
         }
     }
 }

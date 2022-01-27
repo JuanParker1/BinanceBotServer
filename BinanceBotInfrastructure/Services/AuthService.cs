@@ -54,7 +54,6 @@ namespace BinanceBotInfrastructure.Services
                 Id = user.Id,
                 Name = user.Name,
                 Login = user.Login,
-                Patronymic = user.Patronymic,
                 RoleName = user.Role.Caption,
                 Surname = user.Surname,
                 Token = MakeToken(identity.Claims),
@@ -64,21 +63,12 @@ namespace BinanceBotInfrastructure.Services
         public string Refresh(ClaimsPrincipal user) =>
             MakeToken(user.Claims);
 
-        public async Task<int> RegisterAsync(UserDto userDto, CancellationToken token)
+        public async Task<bool> RegisterAsync(UserDto userDto, CancellationToken token)
         {
-            if (userDto.Login is null || userDto.Login.Length is < 3 or > 50)
-                return -1;
-
-            if (userDto.Password is null || userDto.Password.Length is < 3 or > 50)
-                return -2;
-            
-            if (userDto.Email?.Length > 255)
-                return -3;
-
             var user = db.Users.FirstOrDefault(u => u.Login == userDto.Login);
             
             if(user is not null)
-                return -6;
+                return false;
 
             var salt = GenerateSalt();
 
@@ -87,23 +77,16 @@ namespace BinanceBotInfrastructure.Services
                 IdRole = userDto.IdRole ?? 2, // simple user
                 Name = userDto.Name,
                 Surname = userDto.Surname,
-                Patronymic = userDto.Patronymic,
                 Email = userDto.Email,
                 Login = userDto.Login,
                 PasswordHash = salt + ComputeHash(salt, userDto.Password),
             };
 
             db.Users.Add(newUser);
-            try
-            {
-                await db.SaveChangesAsync(token).ConfigureAwait(false);;
-            }
-            catch //(Exception ex)
-            {
-                return -7;
-            }
 
-            return 0;
+            await db.SaveChangesAsync(token).ConfigureAwait(false);
+
+            return true;
         }
 
         public async Task<int> ChangePasswordAsync(string userLogin, 

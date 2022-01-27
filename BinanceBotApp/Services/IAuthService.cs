@@ -12,6 +12,6 @@ namespace BinanceBotApp.Services
         Task<UserTokenDto> LoginAsync(string login, string password, 
             CancellationToken token);
         string Refresh(ClaimsPrincipal user);
-        Task<int> RegisterAsync(UserDto userDto, CancellationToken token);
+        Task<bool> RegisterAsync(UserDto userDto, CancellationToken token);
     }
 }

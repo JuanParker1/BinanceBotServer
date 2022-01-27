@@ -55,28 +55,26 @@ namespace BinanceBotWebApi.Controllers
         }
 
         /// <summary>
-        /// Register
+        /// Registers new user
         /// </summary>
         /// <param name="user"> New user info </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> Ок </returns>
-        [HttpPost]
+        [HttpPost("register")]
         [AllowAnonymous]
         public async Task<IActionResult> RegisterAsync(UserDto user,
             CancellationToken token = default)
         {
-            var code = await _authService.RegisterAsync(user, token)
+            var isNewUser = await _authService.RegisterAsync(user, token)
                 .ConfigureAwait(false);
+
+            if (!isNewUser) 
+                return Forbid();
             
-            return code switch
-            {
-                0 => Ok(),
-                -1 => BadRequest("Login should be more than 3 characters."),
-                -2 => BadRequest("Password should be more than 3 characters."),
-                -3 => BadRequest("Email should not be more than 255 characters."),
-                -4 => BadRequest("User already exists."),
-                _ => BadRequest(),
-            };
+            var userToken = await _authService.LoginAsync(user.Login,
+                user.Password, token).ConfigureAwait(false);
+            
+            return Ok(userToken);
         }
         
         /// <summary>

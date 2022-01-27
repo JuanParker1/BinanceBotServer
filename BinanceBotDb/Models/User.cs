@@ -30,10 +30,6 @@ namespace BinanceBotDb.Models
         [StringLength(255)]
         public string Surname { get; set; }
 
-        [Column("patronymic"), Comment("Patronymic")]
-        [StringLength(255)]
-        public string Patronymic { get; set; }
-
         [Column("email"), Comment("Email")]
         [StringLength(255)]
         public string Email { get; set; }
