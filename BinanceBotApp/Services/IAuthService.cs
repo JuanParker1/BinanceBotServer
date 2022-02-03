@@ -9,9 +9,9 @@ namespace BinanceBotApp.Services
     {
         Task<int> ChangePasswordAsync(int idUser, string newPassword,
             CancellationToken token);
-        Task<UserTokenDto> LoginAsync(string login, string password, 
+        Task<AuthUserInfoDto> LoginAsync(string login, string password, 
             CancellationToken token);
         string Refresh(ClaimsPrincipal user);
-        Task<bool> RegisterAsync(UserDto userDto, CancellationToken token);
+        Task<bool> RegisterAsync(RegisterDto registerDto, CancellationToken token);
     }
 }

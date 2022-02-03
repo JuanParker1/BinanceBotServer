@@ -1,12 +1,13 @@
 namespace BinanceBotApp.Data
 {
     /// <summary>
-    /// User JWT authentication token
+    /// Authenticated user info
     /// </summary>
-    public class UserTokenDto : UserBaseDto
+    public class AuthUserInfoDto : UserBaseDto
     {
         public int Id { get; set; }
         public string RoleName { get; set; }
         public string Token { get; set; }
+        public bool isApiKeysSet { get; set; }
     }
 }

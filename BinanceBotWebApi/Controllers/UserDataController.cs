@@ -9,18 +9,21 @@ using BinanceBotApp.Services;
 namespace BinanceBotWebApi.Controllers
 {
     /// <summary>
-    /// User info retrieving controller
+    /// User info controller
     /// </summary>
     [Route("api/user")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class UserDataController : ControllerBase
     {
         private readonly IUserDataService _userDataService;
+        private readonly ICoinService _coinService;
 
-        public UserDataController(IUserDataService userDataService)
+        public UserDataController(IUserDataService userDataService,
+            ICoinService coinService)
         {
             _userDataService = userDataService;
+            _coinService = coinService;
         }
         
         /// <summary>
@@ -82,6 +85,20 @@ namespace BinanceBotWebApi.Controllers
         {
             await _userDataService.SubscribeForStreamAsync(listenKey, 
                 Console.WriteLine, token);
+            
+            return Ok();
+        }
+        
+        /// <summary>
+        /// Gets all websocket connections list
+        /// </summary>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns> Price info for requested trading pair in real time </returns>
+        [HttpGet("subscriptions")]
+        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> GetSubscriptionsListAsync(CancellationToken token = default)
+        {
+            await _coinService.GetSubscriptionsListAsync(token);
             
             return Ok();
         }

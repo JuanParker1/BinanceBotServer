@@ -40,7 +40,7 @@ namespace BinanceBotInfrastructure.Services
             _rnd = new Random((int)(DateTime.Now.Ticks % 2147480161));
         }
 
-        public async Task<UserTokenDto> LoginAsync(string login, string password,
+        public async Task<AuthUserInfoDto> LoginAsync(string login, string password,
             CancellationToken token = default)
         {
             var (identity, user) = await GetClaimsUserAsync(login, password, token)
@@ -49,7 +49,7 @@ namespace BinanceBotInfrastructure.Services
             if (identity == default)
                 return null;
 
-            return new UserTokenDto
+            return new AuthUserInfoDto
             {
                 Id = user.Id,
                 Name = user.Name,
@@ -63,9 +63,9 @@ namespace BinanceBotInfrastructure.Services
         public string Refresh(ClaimsPrincipal user) =>
             MakeToken(user.Claims);
 
-        public async Task<bool> RegisterAsync(UserDto userDto, CancellationToken token)
+        public async Task<bool> RegisterAsync(RegisterDto registerDto, CancellationToken token)
         {
-            var user = db.Users.FirstOrDefault(u => u.Login == userDto.Login);
+            var user = db.Users.FirstOrDefault(u => u.Login == registerDto.Login);
             
             if(user is not null)
                 return false;
@@ -74,12 +74,12 @@ namespace BinanceBotInfrastructure.Services
 
             var newUser = new User
             {
-                IdRole = userDto.IdRole ?? 2, // simple user
-                Name = userDto.Name,
-                Surname = userDto.Surname,
-                Email = userDto.Email,
-                Login = userDto.Login,
-                PasswordHash = salt + ComputeHash(salt, userDto.Password),
+                IdRole = registerDto.IdRole ?? 2, // simple user
+                Name = registerDto.Name,
+                Surname = registerDto.Surname,
+                Email = registerDto.Email,
+                Login = registerDto.Login,
+                PasswordHash = salt + ComputeHash(salt, registerDto.Password),
             };
 
             db.Users.Add(newUser);

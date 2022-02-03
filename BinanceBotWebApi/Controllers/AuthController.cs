@@ -29,7 +29,7 @@ namespace BinanceBotWebApi.Controllers
         [HttpPost("login")]
         [AllowAnonymous]
         //[SwaggerOperation(OperationId = "login")]
-        [ProducesResponseType(typeof(UserTokenDto), (int)System.Net.HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(AuthUserInfoDto), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> LoginAsync([FromBody] AuthDto auth, 
             CancellationToken token = default)
         {
@@ -57,22 +57,22 @@ namespace BinanceBotWebApi.Controllers
         /// <summary>
         /// Registers new user
         /// </summary>
-        /// <param name="user"> New user info </param>
+        /// <param name="registerDto"> New user info </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> Ок </returns>
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<IActionResult> RegisterAsync(UserDto user,
+        public async Task<IActionResult> RegisterAsync(RegisterDto registerDto,
             CancellationToken token = default)
         {
-            var isNewUser = await _authService.RegisterAsync(user, token)
+            var isNewUser = await _authService.RegisterAsync(registerDto, token)
                 .ConfigureAwait(false);
 
             if (!isNewUser) 
                 return Forbid();
             
-            var userToken = await _authService.LoginAsync(user.Login,
-                user.Password, token).ConfigureAwait(false);
+            var userToken = await _authService.LoginAsync(registerDto.Login,
+                registerDto.Password, token).ConfigureAwait(false);
             
             return Ok(userToken);
         }
