@@ -68,7 +68,8 @@ namespace BinanceBotInfrastructure.Services
             var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
 
             var listenKey = await _httpClientService.ProcessRequestAsync<string>(uri,
-                null, HttpMethods.SignedPost, token);
+                null, HttpMethods.SignedPost, token)
+                .ConfigureAwait(false);
 
             return listenKey;
         }
@@ -78,7 +79,8 @@ namespace BinanceBotInfrastructure.Services
             var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
 
             await _httpClientService.ProcessRequestAsync<string>(uri,
-                new Dictionary<string, string>(), HttpMethods.SignedPut, token);
+                new Dictionary<string, string>(), HttpMethods.SignedPut, token)
+                .ConfigureAwait(false);
         }
         
         public async Task DeleteListenKey(string listenKey, CancellationToken token)
@@ -86,7 +88,8 @@ namespace BinanceBotInfrastructure.Services
             var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
 
             await _httpClientService.ProcessRequestAsync<string>(uri,
-                new Dictionary<string, string>(), HttpMethods.SignedDelete, token);
+                new Dictionary<string, string>(), HttpMethods.SignedDelete, token)
+                .ConfigureAwait(false);
         }
 
         public async Task GetUserDataStreamAsync(string listenKey, Action<string> handler,
@@ -94,7 +97,8 @@ namespace BinanceBotInfrastructure.Services
         {
             var uri = UserDataWebSocketEndpoints.GetUserDataStreamEndpoint(listenKey);
             
-            await _wsClientService.ConnectToWebSocketAsync(uri, "", Console.WriteLine, token );
+            await _wsClientService.ConnectToWebSocketAsync(uri, "", Console.WriteLine, token )
+                .ConfigureAwait(false);
         }
     }
 }

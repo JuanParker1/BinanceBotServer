@@ -16,7 +16,8 @@ namespace BinanceBotInfrastructure.Services
         private readonly IHttpClientService _httpClientService;
         private readonly IWebSocketClientService _wsClientService;
         
-        public CoinService(IHttpClientService httpClientService, IWebSocketClientService wsClientService)
+        public CoinService(IHttpClientService httpClientService, 
+            IWebSocketClientService wsClientService)
         {
             _httpClientService = httpClientService;
             _wsClientService = wsClientService;
@@ -27,7 +28,8 @@ namespace BinanceBotInfrastructure.Services
             var uri = MarketDataEndpoints.GetCoinsPricesEndpoint();
             var coinPricesInfo = 
                 await _httpClientService.ProcessRequestAsync<IEnumerable<CoinPrice>>(uri, 
-                    new Dictionary<string, string>(), HttpMethods.Get, token);
+                    new Dictionary<string, string>(), HttpMethods.Get, token)
+                    .ConfigureAwait(false);
             
             return coinPricesInfo.Select(c => c.Symbol);
         }
@@ -37,7 +39,7 @@ namespace BinanceBotInfrastructure.Services
             var data = $"{{\"method\": \"LIST_SUBSCRIPTIONS\",\"id\": 1}}";
             
             await _wsClientService.ConnectToWebSocketAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
-                data, Console.WriteLine, token ); // TODO: Handler надо принять из контроллера
+                data, Console.WriteLine, token ).ConfigureAwait(false); // TODO: Handler надо принять из контроллера
         }
         
         public async Task GetCoinPriceStreamAsync(string pair, Action<string> responseHandler, 
@@ -46,7 +48,7 @@ namespace BinanceBotInfrastructure.Services
             var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[\"{pair}@bookTicker\"],\"id\": 1}}";
             
             await _wsClientService.ConnectToWebSocketAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
-                data, Console.WriteLine, token );
+                data, Console.WriteLine, token ).ConfigureAwait(false);
         }
         
         public async Task GetCoinsListPriceStreamAsync(GenericCollectionDto<string> pairs, 
@@ -56,7 +58,7 @@ namespace BinanceBotInfrastructure.Services
             var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[{pairsString}],\"id\": 1}}";
             
             await _wsClientService.ConnectToWebSocketAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
-                data, Console.WriteLine, token);
+                data, Console.WriteLine, token).ConfigureAwait(false);
         }
 
         public async Task UnsubscribeCoinPriceStreamAsync(string pair, CancellationToken token)
@@ -64,7 +66,7 @@ namespace BinanceBotInfrastructure.Services
             var data = $"{{\"method\": \"UNSUBSCRIBE\",\"params\":[\"{pair}@bookTicker\"],\"id\": 1}}";
             
             await _wsClientService.ConnectToWebSocketAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
-                data, null, token);
+                data, null, token).ConfigureAwait(false);
         }
     }
 }

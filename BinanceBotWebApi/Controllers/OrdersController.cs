@@ -37,7 +37,7 @@ namespace BinanceBotWebApi.Controllers
             int recvWindow = 5000,  CancellationToken token = default)
         {
             var orderInfo = await _ordersService.GetOrderAsync(idOrder, symbol, 
-                recvWindow, token);
+                recvWindow, token).ConfigureAwait(false);
 
             return Ok(orderInfo);
         }
@@ -54,7 +54,8 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> GetOrdersForPairAsync([FromRoute]string symbol, 
             int recvWindow = 5000,  CancellationToken token = default)
         {
-            var ordersInfo = await _ordersService.GetOrdersForPairAsync(symbol, recvWindow, token);
+            var ordersInfo = await _ordersService.GetOrdersForPairAsync(symbol, 
+                recvWindow, token).ConfigureAwait(false);
 
             return Ok(ordersInfo);
         }
@@ -70,7 +71,8 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> GetOrdersForPairAsync(int recvWindow = 5000,  
             CancellationToken token = default)
         {
-            var ordersInfo = await _ordersService.GetAllOrdersAsync(recvWindow, token);
+            var ordersInfo = await _ordersService.GetAllOrdersAsync(recvWindow, token)
+                .ConfigureAwait(false);
 
             return Ok(ordersInfo);
         }
@@ -86,7 +88,8 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> CreateTestOrderAsync([FromBody]CreateOrderDto createOrder, 
             CancellationToken token = default)
         {
-            var orderInfo = await _ordersService.CreateTestOrderAsync(createOrder, token);
+            var orderInfo = await _ordersService.CreateTestOrderAsync(createOrder, token)
+                .ConfigureAwait(false);
 
             return Ok(orderInfo);
         }
@@ -102,7 +105,8 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> CreateOrderAsync([FromBody]CreateOrderDto createOrder, 
             CancellationToken token = default)
         {
-            var orderInfo = await _ordersService.CreateOrderAsync(createOrder, token);
+            var orderInfo = await _ordersService.CreateOrderAsync(createOrder, token)
+                .ConfigureAwait(false);
 
             return Ok(orderInfo);
         }
@@ -121,7 +125,7 @@ namespace BinanceBotWebApi.Controllers
             int recvWindow = 5000, CancellationToken token = default)
         {
             var orderInfo = await _ordersService.DeleteOrderAsync(idOrder, symbol, 
-                recvWindow, token);
+                recvWindow, token).ConfigureAwait(false);
 
             return Ok(orderInfo);
         }
@@ -140,7 +144,7 @@ namespace BinanceBotWebApi.Controllers
         {
             var orderInfo = 
                 await _ordersService.DeleteAllOrdersForPairAsync(symbol, 
-                    recvWindow, token);
+                    recvWindow, token).ConfigureAwait(false);
 
             return Ok(orderInfo);
         }

@@ -66,8 +66,9 @@ namespace BinanceBotInfrastructure.Services
         /// <param name="requestType"> Request HTTP method </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns> Deserialized response object </returns>
-        public async Task<TResult> ProcessRequestAsync<TResult>(Uri uri, IDictionary<string, string> qParams,
-            HttpMethods requestType, CancellationToken token) where TResult : class
+        public async Task<TResult> ProcessRequestAsync<TResult>(Uri uri, 
+            IDictionary<string, string> qParams, HttpMethods requestType, 
+            CancellationToken token) where TResult : class
         {
             TResult responseInfo;
             
@@ -75,7 +76,7 @@ namespace BinanceBotInfrastructure.Services
             {
                 case HttpMethods.Get:
                     using (var newOrderResponse = await GetRequestAsync(uri,
-                        qParams, token))
+                        qParams, token).ConfigureAwait(false))
                     {
                         responseInfo = 
                             await HandleResponseAsync<TResult>(newOrderResponse, 
@@ -84,7 +85,7 @@ namespace BinanceBotInfrastructure.Services
                     }
                 case HttpMethods.SignedGet:
                     using (var newOrderResponse = await SignedGetRequestAsync(uri,
-                        qParams, token))
+                        qParams, token).ConfigureAwait(false))
                     {
                         responseInfo = 
                             await HandleResponseAsync<TResult>(newOrderResponse, 
@@ -93,7 +94,7 @@ namespace BinanceBotInfrastructure.Services
                     }
                 case HttpMethods.Post:
                     using (var response = await PostRequestAsync(uri,
-                        qParams, token))
+                        qParams, token).ConfigureAwait(false))
                     {
                         responseInfo = 
                             await HandleResponseAsync<TResult>(response, 
@@ -102,7 +103,7 @@ namespace BinanceBotInfrastructure.Services
                     }
                 case HttpMethods.SignedPost:
                     using (var newOrderResponse = await SignedPostRequestAsync(uri,
-                        qParams, token))
+                        qParams, token).ConfigureAwait(false))
                     {
                         responseInfo = 
                             await HandleResponseAsync<TResult>(newOrderResponse, 
@@ -111,7 +112,7 @@ namespace BinanceBotInfrastructure.Services
                     }
                 case HttpMethods.Put:
                     using (var newOrderResponse = await PutRequestAsync(uri,
-                        qParams, token))
+                        qParams, token).ConfigureAwait(false))
                     {
                         responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
                             token);   
@@ -119,7 +120,7 @@ namespace BinanceBotInfrastructure.Services
                     }
                 case HttpMethods.SignedPut:
                     using (var newOrderResponse = await SignedPutRequestAsync(uri,
-                        qParams, token))
+                        qParams, token).ConfigureAwait(false))
                     {
                         responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
                             token);   
@@ -127,7 +128,7 @@ namespace BinanceBotInfrastructure.Services
                     }
                 case HttpMethods.Delete:
                     using (var newOrderResponse = await DeleteRequestAsync(uri,
-                        qParams, token))
+                        qParams, token).ConfigureAwait(false))
                     {
                         responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
                             token);   
@@ -135,7 +136,7 @@ namespace BinanceBotInfrastructure.Services
                     }
                 case HttpMethods.SignedDelete:
                     using (var newOrderResponse = await SignedDeleteRequestAsync(uri,
-                        qParams, token))
+                        qParams, token).ConfigureAwait(false))
                     {
                         responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
                             token);   
@@ -143,7 +144,7 @@ namespace BinanceBotInfrastructure.Services
                     }
                 default:
                     using (var newOrderResponse = await GetRequestAsync(uri,
-                        qParams, token))
+                        qParams, token).ConfigureAwait(false))
                     {
                         responseInfo = 
                             await HandleResponseAsync<TResult>(newOrderResponse, 

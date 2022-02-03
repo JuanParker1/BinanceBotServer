@@ -42,7 +42,8 @@ namespace BinanceBotWebApi.Controllers
             if (idUser is null || idUser != userDto.Id)
                 return Forbid();
             
-            var result = await _userService.UpdateUserInfoAsync(userDto, token);
+            var result = await _userService.UpdateUserInfoAsync(userDto, token)
+                .ConfigureAwait(false);
 
             return Ok(result);
         }

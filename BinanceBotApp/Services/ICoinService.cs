@@ -8,7 +8,7 @@ namespace BinanceBotApp.Services
 {
     public interface ICoinService
     {
-        Task<IEnumerable<string>> GetTradingPairsAsync(CancellationToken token = default);
+        Task<IEnumerable<string>> GetTradingPairsAsync(CancellationToken token);
         Task GetSubscriptionsListAsync(CancellationToken token);
         Task GetCoinPriceStreamAsync(string pair, Action<string> responseHandler, 
             CancellationToken token);

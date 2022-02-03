@@ -86,11 +86,11 @@ namespace BinanceBotWebApi.Controllers
         /// <returns code="200"> Ок </returns>
         [HttpPut("{idUser}/changePassword")]
         [Authorize]
-        public async Task<IActionResult> ChangePasswordAsync([FromRoute]int idUser, [FromBody]string newPassword,
-            CancellationToken token = default)
+        public async Task<IActionResult> ChangePasswordAsync([FromRoute]int idUser, 
+            [FromBody]string newPassword, CancellationToken token = default)
         {
             if (User.GetUserId() == idUser || User.IsInRole("Administrator"))
-                return Forbid($"You must be an Administrator or user with id:{idUser}.");
+                return Forbid();
 
             var code = await _authService.ChangePasswordAsync(idUser, newPassword, token)
                 .ConfigureAwait(false);
