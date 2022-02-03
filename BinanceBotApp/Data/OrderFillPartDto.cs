@@ -9,10 +9,12 @@ namespace BinanceBotApp.Data
         /// Coin price
         /// </summary>
         public string Price { get; set; }
+        
         /// <summary>
         /// Coin quantity
         /// </summary>
         public string Qty { get; set; }
+        
         /// <summary>
         /// Comission
         /// </summary>

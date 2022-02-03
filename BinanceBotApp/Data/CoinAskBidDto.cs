@@ -9,18 +9,22 @@ namespace BinanceBotApp.Data
         /// Trading pair name
         /// </summary>
         public string Symbol { get; set; }
+        
         /// <summary>
         /// Best sell price
         /// </summary>
         public string BidPrice { get; set; }
+        
         /// <summary>
         /// Sell quantity
         /// </summary>
         public string BidQty { get; set; }
+        
         /// <summary>
         /// Best ask price
         /// </summary>
         public string AskPrice { get; set; }
+        
         /// <summary>
         /// Ask quantity
         /// </summary>

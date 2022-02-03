@@ -9,6 +9,7 @@ namespace BinanceBotApp.Data
         /// Trading pair
         /// </summary>
         public string Symbol { get; set; }
+        
         /// <summary>
         /// Order id
         /// </summary>

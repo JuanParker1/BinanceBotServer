@@ -10,6 +10,7 @@ namespace BinanceBotApp.Data
         /// </summary>
         public double StopPrice { get; set; }
         public double IcebergQty { get; set; }
+        
         /// <summary>
         /// Order time
         /// </summary>

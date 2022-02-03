@@ -12,18 +12,22 @@ namespace BinanceBotApp.Data
         public string OrigQty { get; set; }
         public string ExecuteQty { get; set; }
         public string CummulativeQuoteQty { get; set; }
+        
         /// <summary>
         /// New order status
         /// </summary>
         public string Status { get; set; }
+        
         /// <summary>
         /// New order lifetime
         /// </summary>
         public string TimeInForce { get; set; }
+        
         /// <summary>
         /// New order market type (market/limit)
         /// </summary>
         public string Type { get; set; }
+        
         /// <summary>
         /// Order side (buy/sell)
         /// </summary>
