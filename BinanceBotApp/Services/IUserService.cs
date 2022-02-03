@@ -5,8 +5,10 @@ using BinanceBotApp.Data;
 
 namespace BinanceBotApp.Services
 {
-    public interface IUserDataService
+    public interface IUserService
     {
+        Task<int> SaveApiKeysAsync(ApiKeysDto apiKeysDto,
+            CancellationToken token);
         Task<ListenKeyDto> GetListenKey(CancellationToken token);
         Task ExtendListenKey(string listenKey, CancellationToken token);
         Task DeleteListenKey(string listenKey, CancellationToken token);
