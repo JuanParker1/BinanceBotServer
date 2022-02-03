@@ -10,11 +10,11 @@ using BinanceBotApp.Services;
 namespace BinanceBotWebApi.Controllers
 {
     /// <summary>
-    /// Coin info controller
+    /// Coins info controller
     /// </summary>
     [Route("api/coins")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class CoinController : ControllerBase
     {
         private readonly ICoinService _coinService;
@@ -31,26 +31,12 @@ namespace BinanceBotWebApi.Controllers
         /// <returns> List of all trading pairs </returns>
         [HttpGet("tradingPairs")]
         [ProducesResponseType(typeof(IEnumerable<string>), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IEnumerable<string>> GetTradingPairsAsync(CancellationToken token = default)
+        public async Task<IActionResult> GetTradingPairsAsync(CancellationToken token = default)
         {
             var allPairs = await _coinService.GetTradingPairsAsync(token);
-            return allPairs;
+            return Ok(allPairs);
         }
-        
-        /// <summary>
-        /// Gets all websocket connections list
-        /// </summary>
-        /// <param name="token"> Task cancellation token </param>
-        /// <returns> Price info for requested trading pair in real time </returns>
-        [HttpGet("subscriptions")]
-        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> GetSubscriptionsListAsync(CancellationToken token = default)
-        {
-            await _coinService.GetSubscriptionsListAsync(token);
-            
-            return Ok();
-        }
-        
+
         /// <summary>
         /// Gets price info for requested trading pair in real time
         /// </summary>
@@ -59,10 +45,10 @@ namespace BinanceBotWebApi.Controllers
         /// <returns> Price info for requested trading pair in real time </returns>
         [HttpGet("{pair}/info")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> SubscribeForStreamAsync([FromRoute]string pair, 
+        public async Task<IActionResult> GetCoinPriceStreamAsync([FromRoute]string pair, 
             CancellationToken token = default)
         {
-            await _coinService.SubscribeForStreamAsync(pair, Console.WriteLine, token);
+            await _coinService.GetCoinPriceStreamAsync(pair, Console.WriteLine, token);
             
             return Ok();
         }
@@ -75,10 +61,10 @@ namespace BinanceBotWebApi.Controllers
         /// <returns> Price info for requested trading pairs in real time </returns>
         [HttpGet("combined/info")]
         [ProducesResponseType(typeof(OrderInfoDto), (int)System.Net.HttpStatusCode.OK)] //http://localhost:5000/api/coins/combined/info?collection=ethbtc&collection=btcusdt
-        public async Task<IActionResult> SubscribeForCombinedStreamAsync([FromQuery]GenericCollectionDto<string> pairNames,
+        public async Task<IActionResult> GetCoinsListPriceStreamAsync([FromQuery]GenericCollectionDto<string> pairNames,
             CancellationToken token = default)
         {
-            await _coinService.SubscribeForCombinedStreamAsync(pairNames, Console.WriteLine, token);
+            await _coinService.GetCoinsListPriceStreamAsync(pairNames, Console.WriteLine, token);
         
             return Ok();
         }
@@ -91,10 +77,10 @@ namespace BinanceBotWebApi.Controllers
         /// <returns></returns>
         [HttpDelete("{pair}/info")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> UnsubscribeFromStreamAsync([FromRoute]string pair, 
+        public async Task<IActionResult> UnsubscribeCoinPriceStreamAsync([FromRoute]string pair, 
             CancellationToken token = default)
         {
-            await _coinService.UnsubscribeFromStreamAsync(pair, token);
+            await _coinService.UnsubscribeCoinPriceStreamAsync(pair, token);
             
             return Ok();
         }

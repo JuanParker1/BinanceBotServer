@@ -37,10 +37,10 @@ namespace BinanceBotInfrastructure.Services
             var data = $"{{\"method\": \"LIST_SUBSCRIPTIONS\",\"id\": 1}}";
             
             await _wsClientService.ConnectToWebSocketAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
-                data, Console.WriteLine, token );
+                data, Console.WriteLine, token ); // TODO: Handler надо принять из контроллера
         }
         
-        public async Task SubscribeForStreamAsync(string pair, Action<string> responseHandler, 
+        public async Task GetCoinPriceStreamAsync(string pair, Action<string> responseHandler, 
             CancellationToken token)
         {
             var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[\"{pair}@bookTicker\"],\"id\": 1}}";
@@ -49,7 +49,7 @@ namespace BinanceBotInfrastructure.Services
                 data, Console.WriteLine, token );
         }
         
-        public async Task SubscribeForCombinedStreamAsync(GenericCollectionDto<string> pairs, 
+        public async Task GetCoinsListPriceStreamAsync(GenericCollectionDto<string> pairs, 
             Action<string> responseHandler, CancellationToken token)
         {
             var pairsString = string.Join(",", pairs.Collection.Select(p => $"\"{p}@bookTicker\""));
@@ -59,7 +59,7 @@ namespace BinanceBotInfrastructure.Services
                 data, Console.WriteLine, token);
         }
 
-        public async Task UnsubscribeFromStreamAsync(string pair, CancellationToken token)
+        public async Task UnsubscribeCoinPriceStreamAsync(string pair, CancellationToken token)
         {
             var data = $"{{\"method\": \"UNSUBSCRIBE\",\"params\":[\"{pair}@bookTicker\"],\"id\": 1}}";
             
