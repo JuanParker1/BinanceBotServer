@@ -12,7 +12,7 @@ namespace BinanceBotApp.Services
         Task<ListenKeyDto> GetListenKey(CancellationToken token);
         Task ExtendListenKey(string listenKey, CancellationToken token);
         Task DeleteListenKey(string listenKey, CancellationToken token);
-        Task SubscribeForStreamAsync(string listenKey, Action<string> handler,
+        Task GetUserDataStreamAsync(string listenKey, Action<string> handler,
             CancellationToken token);
     }
 }

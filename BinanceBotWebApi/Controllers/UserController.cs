@@ -58,7 +58,7 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> GetUserDataStreamAsync(string listenKey, 
             CancellationToken token = default)
         {
-            await _userService.SubscribeForStreamAsync(listenKey, 
+            await _userService.GetUserDataStreamAsync(listenKey, 
                 Console.WriteLine, token);
             
             return Ok();

@@ -65,7 +65,7 @@ namespace BinanceBotInfrastructure.Services
                 new Dictionary<string, string>(), HttpMethods.SignedDelete, token);
         }
 
-        public async Task SubscribeForStreamAsync(string listenKey, Action<string> handler,
+        public async Task GetUserDataStreamAsync(string listenKey, Action<string> handler,
             CancellationToken token)
         {
             var uri = UserDataWebSocketEndpoints.GetUserDataStreamEndpoint(listenKey);
