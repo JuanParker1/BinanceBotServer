@@ -6,11 +6,6 @@ namespace BinanceBotApp.Data
     public class AuthUserInfoDto : UserBaseDto
     {
         /// <summary>
-        /// User id
-        /// </summary>
-        public int Id { get; set; }
-        
-        /// <summary>
         /// User roles' names
         /// </summary>
         public string RoleName { get; set; }
