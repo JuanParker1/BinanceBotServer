@@ -21,6 +21,7 @@ namespace BinanceBotDb.Models
         [StringLength(255)]
         public string Caption { get; set; }
 
+        
         [InverseProperty(nameof(User.Role))]
         public virtual ICollection<User> Users { get; set; }
     }

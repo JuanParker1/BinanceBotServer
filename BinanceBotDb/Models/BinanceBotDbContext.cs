@@ -8,10 +8,11 @@ namespace BinanceBotDb.Models
     {
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
+        public virtual DbSet<UserSettings> UserSettings { get; set; }
 
         public BinanceBotDbContext()
         {
-            Database.Migrate();
+            Database.Migrate(); // TODO: Убрать в единственный старт при старте приложения. А так при каждом запросе.
         }
 
         public BinanceBotDbContext(DbContextOptions<BinanceBotDbContext> options)

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BinanceBotDb.Models
 {
     [Table("t_users"), Comment("Users")]
-    public partial class User
+    public class User
     {
         [Key]
         [Column("id")]
@@ -38,5 +38,8 @@ namespace BinanceBotDb.Models
         [ForeignKey(nameof(IdRole))]
         [InverseProperty(nameof(UserRole.Users))]
         public virtual UserRole Role { get; set; }
+        
+        [InverseProperty(nameof(UserSettings.User))]
+        public virtual UserSettings Settings { get; set; }
     }
 }
