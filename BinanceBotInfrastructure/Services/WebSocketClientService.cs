@@ -16,39 +16,14 @@ namespace BinanceBotInfrastructure.Services
     /// </summary>
     public class WebSocketClientService : IWebSocketClientService
     {
-        private readonly IHttpClientService _httpClientService;
         private readonly Dictionary<int, WebSocket> _activeWebSockets;
         private int _idWebSocket = 0;
 
-        public WebSocketClientService(IHttpClientService httpClientService)
+        public WebSocketClientService()
         {
-            _httpClientService = httpClientService;
             _activeWebSockets = new Dictionary<int, WebSocket>();
         }
 
-        /// <summary>
-        /// Get stream listen key. Used to connect to Binance streams.
-        /// </summary>
-        /// <param name="token">Current task cancellation token</param>
-        /// <returns>Listen key string</returns>
-        public async Task<string> GetListenKey(CancellationToken token)
-        {
-            var streamResponse = await _httpClientService.ProcessRequestAsync<string>(
-                    UserDataWebSocketEndpoints.GetListenKeyEndpoint(), null, 
-                    HttpMethods.SignedPost,token)
-                .ConfigureAwait(false);
-            
-            return streamResponse;
-        }
-        
-        /// <summary>
-        /// Connects to Binance streams.
-        /// </summary>
-        /// <param name="endpoint">Endpoint to connect to</param>
-        /// <param name="data">Data to send</param>
-        /// <param name="responseHandler">Method to handle stream response</param>
-        /// <param name="token">Current task cancellation token</param>
-        /// <returns></returns>
         public async Task ConnectToWebSocketAsync(Uri endpoint, string data,
             Action<string> responseHandler, CancellationToken token)
         {
@@ -88,13 +63,7 @@ namespace BinanceBotInfrastructure.Services
                 
             } while (!token.IsCancellationRequested);
         }
-
-        /// <summary>
-        /// Close a specific WebSocket instance using the int provided on creation
-        /// </summary>
-        /// <param name="id">Connection id</param>
-        /// <param name="token">Current task cancellation token</param>
-        /// <returns>Connection was closed or not (bool)</returns>
+        
         public async Task<bool> CloseWebSocketInstance(int id,
             CancellationToken token)
         {
@@ -106,13 +75,7 @@ namespace BinanceBotInfrastructure.Services
                 .ConfigureAwait(false);
             return _activeWebSockets.Remove(id);
         }
-
-        /// <summary>
-        /// Checks whether a specific WebSocket instance is active or
-        /// not using the Guid provided on creation
-        /// </summary>
-        /// <param name="id">Connection id</param>
-        /// <returns>Connection is opened or not (bool)</returns>
+        
         public bool IsAlive(int id)
         {
             if (!_activeWebSockets.ContainsKey(id)) 
