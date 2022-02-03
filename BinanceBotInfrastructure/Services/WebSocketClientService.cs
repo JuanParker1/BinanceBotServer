@@ -5,24 +5,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text;
-using BinanceBotApp.DataInternal.Endpoints;
-using BinanceBotApp.DataInternal.Enums;
 using BinanceBotApp.Services;
 
 namespace BinanceBotInfrastructure.Services
 {
-    /// <summary>
-    /// Web socket client for Binance streams 
-    /// </summary>
     public class WebSocketClientService : IWebSocketClientService
     {
         private readonly Dictionary<int, WebSocket> _activeWebSockets;
         private int _idWebSocket = 0;
 
-        public WebSocketClientService()
-        {
+        public WebSocketClientService() =>
             _activeWebSockets = new Dictionary<int, WebSocket>();
-        }
+        
 
         public async Task ConnectToWebSocketAsync(Uri endpoint, string data,
             Action<string> responseHandler, CancellationToken token)

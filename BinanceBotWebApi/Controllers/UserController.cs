@@ -27,6 +27,27 @@ namespace BinanceBotWebApi.Controllers
         }
         
         /// <summary>
+        /// Updates user info
+        /// </summary>
+        /// <param name="userDto"> User info object </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns></returns>
+        [HttpPut]
+        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> UpdateUserInfoAsync(UserBaseDto userDto, 
+            CancellationToken token = default)
+        {
+            var idUser = User.GetUserId();
+
+            if (idUser is null || idUser != userDto.Id)
+                return Forbid();
+            
+            var result = await _userService.UpdateUserInfoAsync(userDto, token);
+
+            return Ok(result);
+        }
+        
+        /// <summary>
         /// Saves user's Binance api keys
         /// </summary>
         /// <param name="apiKeysDto"> Api keys info object </param>
@@ -42,7 +63,8 @@ namespace BinanceBotWebApi.Controllers
             if (idUser is null || idUser != apiKeysDto.IdUser)
                 return Forbid();
             
-            var result = await _userService.SaveApiKeysAsync(apiKeysDto, token);
+            var result = await _userService.SaveApiKeysAsync(apiKeysDto, token)
+                .ConfigureAwait(false);
 
             return Ok(result);
         }
@@ -59,7 +81,7 @@ namespace BinanceBotWebApi.Controllers
             CancellationToken token = default)
         {
             await _userService.GetUserDataStreamAsync(listenKey, 
-                Console.WriteLine, token);
+                Console.WriteLine, token).ConfigureAwait(false);
             
             return Ok();
         }
@@ -73,62 +95,10 @@ namespace BinanceBotWebApi.Controllers
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetSubscriptionsListAsync(CancellationToken token = default)
         {
-            await _coinService.GetSubscriptionsListAsync(token);
+            await _coinService.GetSubscriptionsListAsync(token)// TODO: Id user проверять везде!!!
+                .ConfigureAwait(false);
             
             return Ok();
         }
-        
-        
-        
-        
-        
-        
-        
-        // TODO: Это убрать. ListenKey не будет отправляться на фронт. Это просто сервис какой-нить WebSocket
-        // /// <summary>
-        // /// Gets user data streams listen key
-        // /// </summary>
-        // /// <param name="token"> Task cancellation token </param>
-        // /// <returns> User data streams listen key </returns>
-        // [HttpPost("listenKey")]
-        // [ProducesResponseType(typeof(ListenKeyDto), (int)System.Net.HttpStatusCode.OK)]
-        // public async Task<IActionResult> GetListenKeyAsync(CancellationToken token = default)
-        // {
-        //     var response = await _userDataService.GetListenKey(token);
-        //     
-        //     return Ok(response);
-        // }
-        //
-        // /// <summary>
-        // /// Extends user data streams listen key
-        // /// </summary>
-        // /// <param name="listenKey"> User listen key </param>
-        // /// <param name="token"> Task cancellation token </param>
-        // /// <returns></returns>
-        // [HttpPut("listenKey")]
-        // [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        // public async Task<IActionResult> ExtendListenKeyAsync(string listenKey, 
-        //     CancellationToken token = default)
-        // {
-        //     await _userDataService.ExtendListenKey(listenKey, token);
-        //     
-        //     return Ok();
-        // }
-        //
-        // /// <summary>
-        // /// Deletes user data streams listen key
-        // /// </summary>
-        // /// <param name="listenKey"> User listen key </param>
-        // /// <param name="token"> Task cancellation token </param>
-        // /// <returns></returns>
-        // [HttpDelete("listenKey")]
-        // [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        // public async Task<IActionResult> DeleteListenKeyAsync(string listenKey, 
-        //     CancellationToken token = default)
-        // {
-        //     await _userDataService.DeleteListenKey(listenKey, token);
-        //     
-        //     return Ok();
-        // }
     }
 }
