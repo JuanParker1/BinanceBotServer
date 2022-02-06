@@ -73,11 +73,12 @@ namespace BinanceBotInfrastructure.Services
             var newUser = new User
             {
                 IdRole = registerDto.IdRole ?? 2, // simple user
+                DateCreated = DateTime.Now,
                 Name = registerDto.Name,
                 Surname = registerDto.Surname,
                 Email = registerDto.Email,
                 Login = registerDto.Login,
-                PasswordHash = salt + ComputeHash(salt, registerDto.Password),
+                Password = salt + ComputeHash(salt, registerDto.Password),
             };
 
             db.Users.Add(newUser);
@@ -97,7 +98,7 @@ namespace BinanceBotInfrastructure.Services
                 return -1;
 
             var salt = GenerateSalt();
-            user.PasswordHash = salt + ComputeHash(salt, newPassword);
+            user.Password = salt + ComputeHash(salt, newPassword);
             
             return await db.SaveChangesAsync(token);
         }
@@ -112,7 +113,7 @@ namespace BinanceBotInfrastructure.Services
                 return -1;
 
             var salt = GenerateSalt();
-            user.PasswordHash = salt + ComputeHash(salt, newPassword);
+            user.Password = salt + ComputeHash(salt, newPassword);
             return await db.SaveChangesAsync(token);
         }
 
@@ -142,7 +143,7 @@ namespace BinanceBotInfrastructure.Services
             if (user is null)
                 return default;
 
-            if (!CheckPassword(user.PasswordHash, password))
+            if (!CheckPassword(user.Password, password))
                 return default;
 
             var claims = new List<Claim>

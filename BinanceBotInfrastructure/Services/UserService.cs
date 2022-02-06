@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using BinanceBotApp.Data;
 using BinanceBotApp.DataInternal.Endpoints;
-using BinanceBotApp.DataInternal.Enums;
 using BinanceBotApp.Services;
 using BinanceBotDb.Models;
 using Microsoft.EntityFrameworkCore;
