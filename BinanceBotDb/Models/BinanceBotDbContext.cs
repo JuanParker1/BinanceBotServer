@@ -8,7 +8,7 @@ namespace BinanceBotDb.Models
     {
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
-        public virtual DbSet<UserSettings> UserSettings { get; set; }
+        public virtual DbSet<Settings> UserSettings { get; set; }
 
         public BinanceBotDbContext()
         {
@@ -54,7 +54,7 @@ namespace BinanceBotDb.Models
                          Id = 1,
                          IdRole = 1,
                          Login = "dev",
-                         PasswordHash =
+                         Password =
                              "hs9qw7bf864323e5c894a9d031891ddbf8532a5b9eaf3efe7a1561403e6a6f1b3e680b7c37467e6cbfdce29ed6e9640842093",
                          Name = "Developer",
                      },
