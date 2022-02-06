@@ -89,7 +89,6 @@ namespace BinanceBotWebApi.Controllers
         /// Gets all websocket connections list
         /// </summary>
         /// <param name="token"> Task cancellation token </param>
-        /// <returns> Price info for requested trading pair in real time </returns>
         /// <returns></returns>
         [HttpGet("subscriptions")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
