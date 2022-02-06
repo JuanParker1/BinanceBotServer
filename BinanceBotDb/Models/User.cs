@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
@@ -11,16 +12,19 @@ namespace BinanceBotDb.Models
         [Column("id")]
         public int Id { get; set; }
 
-        [Column("id_role")]
-        public int? IdRole { get; set; }
-
         [Column("login")]
         [StringLength(255)]
         public string Login { get; set; }
 
-        [Column("password_hash"), Comment("Password hash")]
+        [Column("password"), Comment("Password hash")]
         [StringLength(255)]
-        public string PasswordHash { get; set; }
+        public string Password { get; set; }
+        
+        [Column("date_created")]
+        public DateTime DateCreated { get; set; }
+        
+        [Column("id_role")]
+        public int? IdRole { get; set; }
 
         [Column("name"), Comment("Name")]
         [StringLength(255)]
@@ -39,7 +43,7 @@ namespace BinanceBotDb.Models
         [InverseProperty(nameof(UserRole.Users))]
         public virtual UserRole Role { get; set; }
         
-        [InverseProperty(nameof(UserSettings.User))]
-        public virtual UserSettings Settings { get; set; }
+        [InverseProperty(nameof(Models.Settings.User))]
+        public virtual Settings Settings { get; set; }
     }
 }

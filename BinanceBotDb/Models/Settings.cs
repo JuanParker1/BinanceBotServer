@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BinanceBotDb.Models
 {
-    [Table("t_users_settings"), Comment("Users trade settings")]
-    public class UserSettings
+    [Table("t_settings"), Comment("Application trade settings")]
+    public class Settings
     {
         [Key]
         [Column("id")]
