@@ -32,7 +32,7 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="userDto"> User info object </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns></returns>
-        [HttpPut]
+        [HttpPut("userInfo")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> UpdateUserInfoAsync(UserBaseDto userDto, 
             CancellationToken token = default)
@@ -59,9 +59,9 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> SaveApiKeysAsync(ApiKeysDto apiKeysDto, 
             CancellationToken token = default)
         {
-            var idUser = User.GetUserId();
+            var idUser = User.GetUserId(); // TODO: Add .trim() where necessary
 
-            if (idUser is null || idUser != apiKeysDto.IdUser)
+            if (idUser is null || idUser != apiKeysDto.Id)
                 return Forbid();
             
             var result = await _userService.SaveApiKeysAsync(apiKeysDto, token)
@@ -92,11 +92,12 @@ namespace BinanceBotWebApi.Controllers
         /// </summary>
         /// <param name="token"> Task cancellation token </param>
         /// <returns> Price info for requested trading pair in real time </returns>
+        /// <returns></returns>
         [HttpGet("subscriptions")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetSubscriptionsListAsync(CancellationToken token = default)
         {
-            await _coinService.GetSubscriptionsListAsync(token)// TODO: Id user проверять везде!!!
+            await _coinService.GetSubscriptionsListAsync(token)
                 .ConfigureAwait(false);
             
             return Ok();

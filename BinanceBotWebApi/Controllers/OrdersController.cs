@@ -9,11 +9,11 @@ using BinanceBotApp.Services;
 namespace BinanceBotWebApi.Controllers
 {
     /// <summary>
-    /// Order info controller
+    /// Orders info controller
     /// </summary>
     [Route("api/orders")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class OrdersController : ControllerBase
     {
         private readonly IOrdersService _ordersService;

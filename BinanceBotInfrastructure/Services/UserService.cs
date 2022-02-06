@@ -30,8 +30,10 @@ namespace BinanceBotInfrastructure.Services
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userDto.Id, token)
                 .ConfigureAwait(false);
 
-            if (user is null)
+            if (user is null || string.IsNullOrEmpty(userDto.Login))
                 return 0;
+            
+            user.Login = userDto.Login;
 
             if (!string.IsNullOrEmpty(userDto.Name))
                 user.Name = userDto.Name;
@@ -41,9 +43,6 @@ namespace BinanceBotInfrastructure.Services
             
             if (!string.IsNullOrEmpty(userDto.Email))
                 user.Email = userDto.Email;
-            
-            if (!string.IsNullOrEmpty(userDto.Login))
-                user.Login = userDto.Login;
 
             return await _db.SaveChangesAsync(token).ConfigureAwait(false);
         }
@@ -51,7 +50,7 @@ namespace BinanceBotInfrastructure.Services
         public async Task<int> SaveApiKeysAsync(ApiKeysDto apiKeysDto,
             CancellationToken token)
         {
-            var userSettings = await _db.UserSettings.FirstOrDefaultAsync(s => s.IdUser == apiKeysDto.IdUser,
+            var userSettings = await _db.UserSettings.FirstOrDefaultAsync(s => s.IdUser == apiKeysDto.Id,
                     token).ConfigureAwait(false);
 
             if (userSettings is null)
