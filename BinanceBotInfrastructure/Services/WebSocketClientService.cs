@@ -22,7 +22,7 @@ namespace BinanceBotInfrastructure.Services
             Action<string> responseHandler, CancellationToken token)
         {
             using var webSocket = new ClientWebSocket();
-            await webSocket.ConnectAsync(endpoint, token).ConfigureAwait(false);
+            await webSocket.ConnectAsync(endpoint, token);
 
             if (webSocket.State != WebSocketState.Open)
                 throw new Exception("Connection was not opened.");
@@ -32,8 +32,7 @@ namespace BinanceBotInfrastructure.Services
             
             if(!string.IsNullOrEmpty(data))
                 await webSocket.SendAsync(Encoding.UTF8.GetBytes(data), 
-                    WebSocketMessageType.Text, true, token)
-                    .ConfigureAwait(false);
+                    WebSocketMessageType.Text, true, token);
             
             var buffer = new ArraySegment<byte>(new byte[2048]);
             do
@@ -42,8 +41,7 @@ namespace BinanceBotInfrastructure.Services
                 await using var ms = new MemoryStream();
                 do
                 {
-                    result = await webSocket.ReceiveAsync(buffer, CancellationToken.None)
-                        .ConfigureAwait(false);
+                    result = await webSocket.ReceiveAsync(buffer, CancellationToken.None);
                     ms.Write(buffer.Array ?? Array.Empty<byte>(), buffer.Offset, result.Count);
                 } while (!result.EndOfMessage);
 
@@ -52,7 +50,7 @@ namespace BinanceBotInfrastructure.Services
 
                 ms.Seek(0, SeekOrigin.Begin);
                 using var reader = new StreamReader(ms, Encoding.UTF8);
-                var response = await reader.ReadToEndAsync().ConfigureAwait(false);
+                var response = await reader.ReadToEndAsync();
                 responseHandler?.Invoke(response);
                 
             } while (!token.IsCancellationRequested);
@@ -65,8 +63,7 @@ namespace BinanceBotInfrastructure.Services
                 throw new Exception($"No Websocket exists with the Id {id}");
             
             var ws = _activeWebSockets[id];
-            await ws.CloseAsync(WebSocketCloseStatus.Empty, "", token)
-                .ConfigureAwait(false);
+            await ws.CloseAsync(WebSocketCloseStatus.Empty, "", token);
             return _activeWebSockets.Remove(id);
         }
         

@@ -42,8 +42,7 @@ namespace BinanceBotInfrastructure.Services
         public async Task<AuthUserInfoDto> LoginAsync(string login, string password,
             CancellationToken token = default)
         {
-            var (identity, user) = await GetClaimsUserAsync(login, password, token)
-                .ConfigureAwait(false);
+            var (identity, user) = await GetClaimsUserAsync(login, password, token);
 
             if (identity == default)
                 return null;
@@ -83,7 +82,7 @@ namespace BinanceBotInfrastructure.Services
 
             db.Users.Add(newUser);
 
-            await db.SaveChangesAsync(token).ConfigureAwait(false);
+            await db.SaveChangesAsync(token);
 
             return true;
         }
@@ -92,8 +91,7 @@ namespace BinanceBotInfrastructure.Services
             string newPassword, CancellationToken token)
         {
             var user = await db.Users.AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Login == userLogin, token)
-                .ConfigureAwait(false);;
+                .FirstOrDefaultAsync(u => u.Login == userLogin, token);;
             
             if (user == null)
                 return -1;
@@ -101,21 +99,21 @@ namespace BinanceBotInfrastructure.Services
             var salt = GenerateSalt();
             user.PasswordHash = salt + ComputeHash(salt, newPassword);
             
-            return await db.SaveChangesAsync(token).ConfigureAwait(false);;
+            return await db.SaveChangesAsync(token);
         }
 
         public async Task<int> ChangePasswordAsync(int idUser, string newPassword,
             CancellationToken token)
         {
             var user = await db.Users.FirstOrDefaultAsync(u => u.Id == idUser,
-                token).ConfigureAwait(false);;
+                token);
             
             if (user == null)
                 return -1;
 
             var salt = GenerateSalt();
             user.PasswordHash = salt + ComputeHash(salt, newPassword);
-            return await db.SaveChangesAsync(token).ConfigureAwait(false);;
+            return await db.SaveChangesAsync(token);
         }
 
         private static string MakeToken(IEnumerable<Claim> claims)
@@ -139,8 +137,7 @@ namespace BinanceBotInfrastructure.Services
             var user = await db
                 .GetUserByLogin(login)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(token)
-                .ConfigureAwait(false);
+                .FirstOrDefaultAsync(token);
 
             if (user is null)
                 return default;

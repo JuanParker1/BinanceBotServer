@@ -31,8 +31,7 @@ namespace BinanceBotInfrastructure.Services
             };
             
             var orderInfo = await _httpClientService.ProcessRequestAsync<OrderInfoDto>(uri, 
-                qParams, HttpMethods.SignedGet, token)
-                .ConfigureAwait(false);
+                qParams, HttpMethods.SignedGet, token);
 
             return orderInfo;
         }
@@ -50,8 +49,7 @@ namespace BinanceBotInfrastructure.Services
             
             var orderInfo = 
                 await _httpClientService.ProcessRequestAsync<IEnumerable<OrderInfoDto>>(uri, 
-                    qParams, HttpMethods.SignedGet, token)
-                    .ConfigureAwait(false);
+                    qParams, HttpMethods.SignedGet, token);
 
             return orderInfo;
         }
@@ -67,8 +65,7 @@ namespace BinanceBotInfrastructure.Services
             };
             
             var orderInfo = await _httpClientService.ProcessRequestAsync<IEnumerable<OrderInfoDto>>(uri, 
-                qParams, HttpMethods.SignedGet, token)
-                .ConfigureAwait(false);
+                qParams, HttpMethods.SignedGet, token);
 
             return orderInfo;
         }
@@ -79,8 +76,7 @@ namespace BinanceBotInfrastructure.Services
             var uri = TradeEndpoints.GetTestNewOrderEndpoint();
 
             var newOrderInfo = await _httpClientService.ProcessRequestAsync<CreateOrderDto, CreatedOrderResultDto>(uri, 
-                createOrder, HttpMethods.SignedPost, token)
-                .ConfigureAwait(false);
+                createOrder, HttpMethods.SignedPost, token);
 
             return newOrderInfo;
         }
@@ -91,8 +87,7 @@ namespace BinanceBotInfrastructure.Services
             var uri = TradeEndpoints.GetOrderEndpoint();
 
             var newOrderInfo = await _httpClientService.ProcessRequestAsync<CreateOrderDto, CreatedOrderResultDto>(uri, 
-                createOrder, HttpMethods.SignedPost, token)
-                .ConfigureAwait(false);
+                createOrder, HttpMethods.SignedPost, token);
 
             return newOrderInfo;
         }
@@ -109,8 +104,7 @@ namespace BinanceBotInfrastructure.Services
                 {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}
             };
             var deletedOrderInfo = await _httpClientService.ProcessRequestAsync<DeletedOrderDto>(uri, 
-                    qParams, HttpMethods.SignedDelete, token)
-                .ConfigureAwait(false);
+                    qParams, HttpMethods.SignedDelete, token);
 
             return deletedOrderInfo;
         }
@@ -126,8 +120,7 @@ namespace BinanceBotInfrastructure.Services
                 {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}
             };
             var deletedOrdersInfo = await _httpClientService.ProcessRequestAsync<IEnumerable<DeletedOrderDto>>(uri,
-                    qParams, HttpMethods.Delete, token)
-                .ConfigureAwait(false); 
+                    qParams, HttpMethods.Delete, token); 
 
             return deletedOrdersInfo;
         }

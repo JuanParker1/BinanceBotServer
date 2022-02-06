@@ -33,8 +33,7 @@ namespace BinanceBotWebApi.Controllers
         [ProducesResponseType(typeof(IEnumerable<string>), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetTradingPairsAsync(CancellationToken token = default)
         {
-            var allPairs = await _coinService.GetTradingPairsAsync(token)
-                .ConfigureAwait(false);
+            var allPairs = await _coinService.GetTradingPairsAsync(token);
             return Ok(allPairs);
         }
 
@@ -49,8 +48,7 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> GetCoinPriceStreamAsync([FromRoute]string pair, 
             CancellationToken token = default)
         {
-            await _coinService.GetCoinPriceStreamAsync(pair, Console.WriteLine, token)
-                .ConfigureAwait(false);
+            await _coinService.GetCoinPriceStreamAsync(pair, Console.WriteLine, token);
             
             return Ok();
         }
@@ -66,8 +64,7 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> GetCoinsListPriceStreamAsync([FromQuery]GenericCollectionDto<string> pairNames,
             CancellationToken token = default)
         {
-            await _coinService.GetCoinsListPriceStreamAsync(pairNames, Console.WriteLine, token)
-                .ConfigureAwait(false);
+            await _coinService.GetCoinsListPriceStreamAsync(pairNames, Console.WriteLine, token);
         
             return Ok();
         }
@@ -83,8 +80,7 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> UnsubscribeCoinPriceStreamAsync([FromRoute]string pair, 
             CancellationToken token = default)
         {
-            await _coinService.UnsubscribeCoinPriceStreamAsync(pair, token)
-                .ConfigureAwait(false);
+            await _coinService.UnsubscribeCoinPriceStreamAsync(pair, token);
             
             return Ok();
         }

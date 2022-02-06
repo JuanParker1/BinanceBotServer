@@ -34,7 +34,7 @@ namespace BinanceBotWebApi.Controllers
             CancellationToken token = default)
         {
             var userToken = await _authService.LoginAsync(auth.Login,
-                auth.Password, token).ConfigureAwait(false);
+                auth.Password, token);
 
             if (userToken is null)
                 return Forbid();
@@ -65,14 +65,13 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> RegisterAsync(RegisterDto registerDto,
             CancellationToken token = default)
         {
-            var isNewUser = await _authService.RegisterAsync(registerDto, token)
-                .ConfigureAwait(false);
+            var isNewUser = await _authService.RegisterAsync(registerDto, token);
 
             if (!isNewUser) 
                 return Forbid();
             
             var userToken = await _authService.LoginAsync(registerDto.Login,
-                registerDto.Password, token).ConfigureAwait(false);
+                registerDto.Password, token);
             
             return Ok(userToken);
         }
@@ -92,8 +91,7 @@ namespace BinanceBotWebApi.Controllers
             if (User.GetUserId() == idUser || User.IsInRole("Administrator"))
                 return Forbid();
 
-            var code = await _authService.ChangePasswordAsync(idUser, newPassword, token)
-                .ConfigureAwait(false);
+            var code = await _authService.ChangePasswordAsync(idUser, newPassword, token);
             
             return code switch
             {

@@ -42,8 +42,7 @@ namespace BinanceBotWebApi.Controllers
             if (idUser is null || idUser != userDto.Id)
                 return Forbid();
             
-            var result = await _userService.UpdateUserInfoAsync(userDto, token)
-                .ConfigureAwait(false);
+            var result = await _userService.UpdateUserInfoAsync(userDto, token);
 
             return Ok(result);
         }
@@ -64,8 +63,7 @@ namespace BinanceBotWebApi.Controllers
             if (idUser is null || idUser != apiKeysDto.Id)
                 return Forbid();
             
-            var result = await _userService.SaveApiKeysAsync(apiKeysDto, token)
-                .ConfigureAwait(false);
+            var result = await _userService.SaveApiKeysAsync(apiKeysDto, token);
 
             return Ok(result);
         }
@@ -82,7 +80,7 @@ namespace BinanceBotWebApi.Controllers
             CancellationToken token = default)
         {
             await _userService.GetUserDataStreamAsync(listenKey, 
-                Console.WriteLine, token).ConfigureAwait(false);
+                Console.WriteLine, token);
             
             return Ok();
         }
@@ -97,8 +95,7 @@ namespace BinanceBotWebApi.Controllers
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetSubscriptionsListAsync(CancellationToken token = default)
         {
-            await _coinService.GetSubscriptionsListAsync(token)
-                .ConfigureAwait(false);
+            await _coinService.GetSubscriptionsListAsync(token);
             
             return Ok();
         }
