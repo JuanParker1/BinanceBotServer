@@ -1,13 +1,13 @@
-using BinanceBotInfrastructure.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using BinanceBotInfrastructure.Services;
 
 namespace BinanceBotWebApi
 {
@@ -17,11 +17,9 @@ namespace BinanceBotWebApi
         {
             services.AddSwaggerGen(c =>
             {
-                c.CustomOperationIds(e =>
-                {
-                    return $"{e.ActionDescriptor.RouteValues["action"]}";
-                });
-
+                c.CustomOperationIds(e => 
+                    $"{e.ActionDescriptor.RouteValues["action"]}");
+        
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "BinanceBotWebApi", 
@@ -40,33 +38,33 @@ namespace BinanceBotWebApi
                     Type = SecuritySchemeType.ApiKey,
                     Scheme = "Bearer"
                 });
-
+        
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement()
-                  {
+                {
                     {
-                      new OpenApiSecurityScheme
-                      {
-                        Reference = new OpenApiReference
-                          {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                          },
-                          Scheme = "oauth2",
-                          Name = "Bearer",
-                          In = ParameterLocation.Header,
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            },
+                            Scheme = "oauth2",
+                            Name = "Bearer",
+                            In = ParameterLocation.Header,
 
                         },
                         new List<string>()
-                      }
-                    });
-
+                    }
+                });
+        
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
-
+        
             });
         }
-
+        
         public static void AddJWTAuthentication(this IServiceCollection services)
         {
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -80,26 +78,26 @@ namespace BinanceBotWebApi
                         ValidateAudience = true,
                         ValidAudience = AuthService.Audience,
                         ValidateLifetime = true,
-                        IssuerSigningKey = AuthService.securityKey,
+                        IssuerSigningKey = AuthService.SecurityKey,
                         ValidateIssuerSigningKey = true,
                     };
-
+        
                     options.Events = new JwtBearerEvents
                     {
                         OnMessageReceived = context =>
                         {
                             var accessToken = context.Request.Query["access_token"];
-
+        
                             var path = context.HttpContext.Request.Path;
+                            
                             if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
-                            {
                                 context.Token = accessToken;
-                            }
 
                             return Task.CompletedTask;
                         }
                     };
                 });
+            
         }
     }
 }

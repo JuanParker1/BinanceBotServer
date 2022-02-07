@@ -17,16 +17,16 @@ namespace BinanceBotInfrastructure.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly IBinanceBotDbContext db;
+        private readonly IBinanceBotDbContext _db;
 
         public const string Issuer = "a";
         public const string Audience = "a";
-        public static readonly SymmetricSecurityKey securityKey = 
+        public static readonly SymmetricSecurityKey SecurityKey = 
             new (Encoding.ASCII.GetBytes("super secret encryption key"));
         
         private static string _algorithms = SecurityAlgorithms.HmacSha256;
         private static readonly TimeSpan _expiresTimespan = TimeSpan.FromDays(365.25);
-        private static readonly Encoding _encoding = Encoding.UTF8;
+        private readonly Encoding _encoding = Encoding.UTF8;
         private const int _passwordSaltLength = 5;
         private const string _claimIdUser = "id";
         private readonly HashAlgorithm _hashAlgoritm;
@@ -34,7 +34,7 @@ namespace BinanceBotInfrastructure.Services
 
         public AuthService(IBinanceBotDbContext db)
         {
-            this.db = db;
+            _db = db;
             _hashAlgoritm = SHA384.Create();
             _rnd = new Random((int)(DateTime.Now.Ticks % 2147480161));
         }
@@ -63,7 +63,7 @@ namespace BinanceBotInfrastructure.Services
 
         public async Task<bool> RegisterAsync(RegisterDto registerDto, CancellationToken token)
         {
-            var user = db.Users.FirstOrDefault(u => u.Login == registerDto.Login);
+            var user = _db.Users.FirstOrDefault(u => u.Login == registerDto.Login);
             
             if(user is not null)
                 return false;
@@ -81,9 +81,9 @@ namespace BinanceBotInfrastructure.Services
                 Password = salt + ComputeHash(salt, registerDto.Password),
             };
 
-            db.Users.Add(newUser);
+            _db.Users.Add(newUser);
 
-            await db.SaveChangesAsync(token);
+            await _db.SaveChangesAsync(token);
 
             return true;
         }
@@ -91,7 +91,7 @@ namespace BinanceBotInfrastructure.Services
         public async Task<int> ChangePasswordAsync(string userLogin, 
             string newPassword, CancellationToken token)
         {
-            var user = await db.Users.AsNoTracking()
+            var user = await _db.Users.AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Login == userLogin, token);;
             
             if (user == null)
@@ -100,13 +100,13 @@ namespace BinanceBotInfrastructure.Services
             var salt = GenerateSalt();
             user.Password = salt + ComputeHash(salt, newPassword);
             
-            return await db.SaveChangesAsync(token);
+            return await _db.SaveChangesAsync(token);
         }
 
         public async Task<int> ChangePasswordAsync(int idUser, string newPassword,
             CancellationToken token)
         {
-            var user = await db.Users.FirstOrDefaultAsync(u => u.Id == idUser,
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == idUser,
                 token);
             
             if (user == null)
@@ -114,7 +114,7 @@ namespace BinanceBotInfrastructure.Services
 
             var salt = GenerateSalt();
             user.Password = salt + ComputeHash(salt, newPassword);
-            return await db.SaveChangesAsync(token);
+            return await _db.SaveChangesAsync(token);
         }
 
         private static string MakeToken(IEnumerable<Claim> claims)
@@ -127,7 +127,7 @@ namespace BinanceBotInfrastructure.Services
                     notBefore: now,
                     claims: claims,
                     expires: now.Add(_expiresTimespan),
-                    signingCredentials: new SigningCredentials(securityKey, _algorithms));
+                    signingCredentials: new SigningCredentials(SecurityKey, _algorithms));
 
             return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
@@ -135,7 +135,7 @@ namespace BinanceBotInfrastructure.Services
         private async Task<(ClaimsIdentity Identity, User User)> GetClaimsUserAsync(string login,
             string password, CancellationToken token = default)
         {
-            var user = await db
+            var user = await _db
                 .GetUserByLogin(login)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(token);
@@ -188,7 +188,7 @@ namespace BinanceBotInfrastructure.Services
         {
             const string saltChars = "sHwiaX7kZT1QRp0cPILGUuK2Sz=9q8lmejDNfoYCE3B_WtgyVv6M5OxAJ4Frbhnd";
             string salt = "";
-            for (int i = 0; i < _passwordSaltLength; i++)
+            for (int i = 0; i < _passwordSaltLength; i++) //TODO: Вернуть соль, замешаную в сам пароль
                 salt += saltChars[_rnd.Next(0, saltChars.Length)];
 
             return salt;

@@ -21,7 +21,8 @@ namespace BinanceBotInfrastructure
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<ICoinService, CoinService>();
             services.AddTransient<IOrdersService, OrdersService>();
-            services.AddTransient<IHttpClientService>(s => new HttpClientService("RICK4hQQ82ClQxuxFEhcYP0KY3057uioNKwdnwpxUVce96fRYFwh4ApK80U0vhQq",
+            services.AddTransient<IHttpClientService>(s => 
+                new HttpClientService("RICK4hQQ82ClQxuxFEhcYP0KY3057uioNKwdnwpxUVce96fRYFwh4ApK80U0vhQq", // TODO: Брать из кэша. Меня вместе с самим хттп клиентом
                 "YeVKxVSiGtdu6cDawkn8f6kwgvRaYRN5qkXeU169lNwSM749pb8KCTzJGArLGtqd"));
             services.AddTransient<IWebSocketClientService, WebSocketClientService>();
             services.AddTransient<IUserService, UserService>();

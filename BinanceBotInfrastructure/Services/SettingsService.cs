@@ -1,30 +1,31 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using BinanceBotApp.DataInternal.Endpoints;
 using BinanceBotApp.DataInternal.Enums;
 using BinanceBotApp.Services;
 using BinanceBotDb.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace BinanceBotInfrastructure.Services
 {
     public class SettingsService : ISettingsService
     {
         private readonly IBinanceBotDbContext _db;
-        private readonly IHttpClientService _httpClientService;
+        private readonly IHttpClientService _httpService;
         
-        public SettingsService(IBinanceBotDbContext db, IHttpClientService httpClientService)
+        public SettingsService(IBinanceBotDbContext db, 
+            IHttpClientService httpService)
         {
             _db = db;
-            _httpClientService = httpClientService;
+            _httpService = httpService;
         }
 
         public async Task<int> EnableTradeAsync(int idUser, bool isTradeEnabled, 
             CancellationToken token)
         {
-            var userSettings = await _db.UserSettings.FirstOrDefaultAsync(s => s.IdUser == idUser,
-                token);
+            var userSettings = await _db.UserSettings.FirstOrDefaultAsync(s => 
+                    s.IdUser == idUser, token);
 
             if (userSettings is null) 
                 return 0;
@@ -42,7 +43,7 @@ namespace BinanceBotInfrastructure.Services
         {
             var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
         
-            var listenKey = await _httpClientService.ProcessRequestAsync<string>(uri,
+            var listenKey = await _httpService.ProcessRequestAsync<string>(uri,
                 null, HttpMethods.SignedPost, token);
         
             return listenKey;
@@ -52,16 +53,18 @@ namespace BinanceBotInfrastructure.Services
         {
             var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
         
-            await _httpClientService.ProcessRequestAsync<string>(uri,
-                new Dictionary<string, string>(), HttpMethods.SignedPut, token);
+            await _httpService.ProcessRequestAsync<string>(uri,
+                new Dictionary<string, string>(), 
+                HttpMethods.SignedPut, token);
         }
         
         public async Task DeleteListenKey(string listenKey, CancellationToken token)
         {
             var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
         
-            await _httpClientService.ProcessRequestAsync<string>(uri,
-                new Dictionary<string, string>(), HttpMethods.SignedDelete, token);
+            await _httpService.ProcessRequestAsync<string>(uri,
+                new Dictionary<string, string>(), 
+                HttpMethods.SignedDelete, token);
         }
     }
 }

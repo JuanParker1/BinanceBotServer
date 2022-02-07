@@ -11,15 +11,15 @@ namespace BinanceBotInfrastructure.Services
 {
     public class OrdersService : IOrdersService
     {
-        private readonly IHttpClientService _httpClientService;
+        private readonly IHttpClientService _httpService;
 
-        public OrdersService(IHttpClientService httpClientService)
+        public OrdersService(IHttpClientService httpService)
         {
-            _httpClientService = httpClientService;
+            _httpService = httpService;
         }
 
-        public async Task<OrderInfoDto> GetOrderAsync(int idOrder, string symbol, int recvWindow,
-            CancellationToken token)
+        public async Task<OrderInfoDto> GetOrderAsync(int idOrder, string symbol, 
+            int recvWindow, CancellationToken token)
         {
             var uri = TradeEndpoints.GetOrderEndpoint();
             var qParams = new Dictionary<string, string>()
@@ -30,7 +30,7 @@ namespace BinanceBotInfrastructure.Services
                 {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}
             };
             
-            var orderInfo = await _httpClientService.ProcessRequestAsync<OrderInfoDto>(uri, 
+            var orderInfo = await _httpService.ProcessRequestAsync<OrderInfoDto>(uri, 
                 qParams, HttpMethods.SignedGet, token);
 
             return orderInfo;
@@ -47,8 +47,7 @@ namespace BinanceBotInfrastructure.Services
                 {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}
             };
             
-            var orderInfo = 
-                await _httpClientService.ProcessRequestAsync<IEnumerable<OrderInfoDto>>(uri, 
+            var orderInfo = await _httpService.ProcessRequestAsync<IEnumerable<OrderInfoDto>>(uri, 
                     qParams, HttpMethods.SignedGet, token);
 
             return orderInfo;
@@ -64,7 +63,7 @@ namespace BinanceBotInfrastructure.Services
                 {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}
             };
             
-            var orderInfo = await _httpClientService.ProcessRequestAsync<IEnumerable<OrderInfoDto>>(uri, 
+            var orderInfo = await _httpService.ProcessRequestAsync<IEnumerable<OrderInfoDto>>(uri, 
                 qParams, HttpMethods.SignedGet, token);
 
             return orderInfo;
@@ -75,7 +74,7 @@ namespace BinanceBotInfrastructure.Services
         {
             var uri = TradeEndpoints.GetTestNewOrderEndpoint();
 
-            var newOrderInfo = await _httpClientService.ProcessRequestAsync<CreateOrderDto, CreatedOrderResultDto>(uri, 
+            var newOrderInfo = await _httpService.ProcessRequestAsync<CreateOrderDto, CreatedOrderResultDto>(uri, 
                 createOrder, HttpMethods.SignedPost, token);
 
             return newOrderInfo;
@@ -86,7 +85,7 @@ namespace BinanceBotInfrastructure.Services
         {
             var uri = TradeEndpoints.GetOrderEndpoint();
 
-            var newOrderInfo = await _httpClientService.ProcessRequestAsync<CreateOrderDto, CreatedOrderResultDto>(uri, 
+            var newOrderInfo = await _httpService.ProcessRequestAsync<CreateOrderDto, CreatedOrderResultDto>(uri, 
                 createOrder, HttpMethods.SignedPost, token);
 
             return newOrderInfo;
@@ -103,7 +102,7 @@ namespace BinanceBotInfrastructure.Services
                 {"recvWindow", recvWindow == default ? null : $"{recvWindow}" },
                 {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}
             };
-            var deletedOrderInfo = await _httpClientService.ProcessRequestAsync<DeletedOrderDto>(uri, 
+            var deletedOrderInfo = await _httpService.ProcessRequestAsync<DeletedOrderDto>(uri, 
                     qParams, HttpMethods.SignedDelete, token);
 
             return deletedOrderInfo;
@@ -119,7 +118,7 @@ namespace BinanceBotInfrastructure.Services
                 {"recvWindow", recvWindow == default ? null : $"{recvWindow}" },
                 {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}
             };
-            var deletedOrdersInfo = await _httpClientService.ProcessRequestAsync<IEnumerable<DeletedOrderDto>>(uri,
+            var deletedOrdersInfo = await _httpService.ProcessRequestAsync<IEnumerable<DeletedOrderDto>>(uri,
                     qParams, HttpMethods.Delete, token); 
 
             return deletedOrdersInfo;

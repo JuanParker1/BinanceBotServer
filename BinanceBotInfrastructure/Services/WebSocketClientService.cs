@@ -14,10 +14,11 @@ namespace BinanceBotInfrastructure.Services
         private readonly Dictionary<int, WebSocket> _activeWebSockets;
         private int _idWebSocket = 0;
 
-        public WebSocketClientService() =>
+        public WebSocketClientService()
+        {
             _activeWebSockets = new Dictionary<int, WebSocket>();
+        }
         
-
         public async Task ConnectToWebSocketAsync(Uri endpoint, string data,
             Action<string> responseHandler, CancellationToken token)
         {
@@ -56,8 +57,7 @@ namespace BinanceBotInfrastructure.Services
             } while (!token.IsCancellationRequested);
         }
         
-        public async Task<bool> CloseWebSocketInstance(int id,
-            CancellationToken token)
+        public async Task<bool> CloseWebSocketInstance(int id, CancellationToken token)
         {
             if(!_activeWebSockets.ContainsKey(id))
                 throw new Exception($"No Websocket exists with the Id {id}");
