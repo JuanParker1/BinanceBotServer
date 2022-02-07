@@ -26,8 +26,8 @@ namespace BinanceBotWebApi
                 {
                     Title = "BinanceBotWebApi", 
                     Version = "v1",
-                    Description = "Cryptocurrency trading bot. Allows to buy coins and automatically sell" +
-                                  "it according to pre-configured logic."
+                    Description = "Cryptocurrency trading bot. Allows to buy coins and automatically sell " +
+                                  "them according to pre-configured logic."
                 });
                 
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

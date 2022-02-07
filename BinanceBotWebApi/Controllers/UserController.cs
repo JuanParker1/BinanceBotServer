@@ -31,7 +31,8 @@ namespace BinanceBotWebApi.Controllers
         /// </summary>
         /// <param name="userDto"> User info object </param>
         /// <param name="token"> Task cancellation token </param>
-        /// <returns></returns>
+        /// <returns code="200"> 0 - no changes. 1 - changes applied </returns>
+        /// <response code="403"> Wrong user id </response>
         [HttpPut("userInfo")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> UpdateUserInfoAsync(UserBaseDto userDto, 
@@ -52,15 +53,16 @@ namespace BinanceBotWebApi.Controllers
         /// </summary>
         /// <param name="apiKeysDto"> Api keys info object </param>
         /// <param name="token"> Task cancellation token </param>
-        /// <returns></returns>
+        /// <returns code="200"> 0 - no changes. 1 - changes applied </returns>
+        /// <response code="403"> Wrong user id </response>
         [HttpPost("apiKeys")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> SaveApiKeysAsync(ApiKeysDto apiKeysDto, 
             CancellationToken token = default)
         {
-            var idUser = User.GetUserId(); // TODO: Add .trim() where necessary
+            var authUserId = User.GetUserId(); // TODO: Add .trim() where necessary
 
-            if (idUser is null || idUser != apiKeysDto.Id)
+            if (authUserId is null || authUserId != apiKeysDto.Id)
                 return Forbid();
             
             var result = await _userService.SaveApiKeysAsync(apiKeysDto, token);
@@ -71,14 +73,21 @@ namespace BinanceBotWebApi.Controllers
         /// <summary>
         /// Gets user data
         /// </summary>
+        /// <param name="idUser"> User id </param>
         /// <param name="listenKey"> User listen key </param>
         /// <param name="token"> Task cancellation token </param>
-        /// <returns> User data </returns>
+        /// <returns code="200"> User data </returns>
+        /// <response code="403"> Wrong user id </response>
         [HttpGet("data")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> GetUserDataStreamAsync(string listenKey, 
-            CancellationToken token = default)
+        public async Task<IActionResult> GetUserDataStreamAsync(int idUser, 
+            string listenKey, CancellationToken token = default)
         {
+            var authUserId = User.GetUserId();
+
+            if (authUserId is null || authUserId != idUser)
+                return Forbid();
+            
             await _userService.GetUserDataStreamAsync(listenKey, 
                 Console.WriteLine, token);
             
@@ -88,12 +97,20 @@ namespace BinanceBotWebApi.Controllers
         /// <summary>
         /// Gets all websocket connections list
         /// </summary>
+        /// <param name="idUser"> User id </param>
         /// <param name="token"> Task cancellation token </param>
-        /// <returns></returns>
+        /// <returns code="200"> List with active websocket subscriptions </returns>
+        /// <response code="403"> Wrong user id </response>
         [HttpGet("subscriptions")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> GetSubscriptionsListAsync(CancellationToken token = default)
+        public async Task<IActionResult> GetSubscriptionsListAsync(int idUser, 
+            CancellationToken token = default)
         {
+            var authUserId = User.GetUserId();
+
+            if (authUserId is null || authUserId != idUser)
+                return Forbid();
+            
             await _coinService.GetSubscriptionsListAsync(token);
             
             return Ok();

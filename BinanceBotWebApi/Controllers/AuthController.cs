@@ -10,6 +10,7 @@ namespace BinanceBotWebApi.Controllers
 {
     [Route("api/auth")]
     [ApiController]
+    [Authorize]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -22,24 +23,23 @@ namespace BinanceBotWebApi.Controllers
         /// <summary>
         /// User authentication
         /// </summary>
-        /// <param name="auth"></param>
+        /// <param name="authDto"></param>
         /// <param name="token"> Task cancellation token </param>
-        /// <response code="200"> New token </response>
-        /// <response code="400"> Invalid login or password т</response>
+        /// <response code="200"> User info </response>
+        /// <response code="403"> Invalid login or password </response>
         [HttpPost("login")]
         [AllowAnonymous]
-        //[SwaggerOperation(OperationId = "login")]
         [ProducesResponseType(typeof(AuthUserInfoDto), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> LoginAsync([FromBody] AuthDto auth, 
+        public async Task<IActionResult> LoginAsync([FromBody] AuthDto authDto, 
             CancellationToken token = default)
         {
-            var userToken = await _authService.LoginAsync(auth.Login,
-                auth.Password, token);
+            var authUserInfo = await _authService.LoginAsync(authDto.Login,
+                authDto.Password, token);
 
-            if (userToken is null)
+            if (authUserInfo is null)
                 return Forbid();
 
-            return Ok(userToken);
+            return Ok(authUserInfo);
         }
         
         /// <summary>
@@ -47,8 +47,8 @@ namespace BinanceBotWebApi.Controllers
         /// </summary>
         /// <returns code="200"> New token </returns>
         [HttpGet("refresh")]
-        [Authorize]
-        public ActionResult Refresh()
+        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
+        public ActionResult Refresh() // TODO: Добавить обновление токена
         {
             var newToken = _authService.Refresh(User);
             return Ok(newToken);
@@ -59,34 +59,37 @@ namespace BinanceBotWebApi.Controllers
         /// </summary>
         /// <param name="registerDto"> New user info </param>
         /// <param name="token"> Task cancellation token </param>
-        /// <returns code="200"> Ок </returns>
+        /// <returns code="200"> User info </returns>
+        /// <response code="400"> User already exists </response>
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<IActionResult> RegisterAsync(RegisterDto registerDto,
+        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> RegisterAsync([FromBody] RegisterDto registerDto,
             CancellationToken token = default)
         {
             var isNewUser = await _authService.RegisterAsync(registerDto, token);
 
             if (!isNewUser) 
-                return Forbid();
+                return BadRequest("User with such login already exists");
             
-            var userToken = await _authService.LoginAsync(registerDto.Login,
+            var authUserInfo = await _authService.LoginAsync(registerDto.Login,
                 registerDto.Password, token);
             
-            return Ok(userToken);
+            return Ok(authUserInfo);
         }
         
         /// <summary>
-        /// Change user password
+        /// Changes user password
         /// </summary>
         /// <param name="idUser"> User id </param>
         /// <param name="newPassword"> New user password </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> Ок </returns>
-        [HttpPut("{idUser}/changePassword")]
-        [Authorize]
-        public async Task<IActionResult> ChangePasswordAsync([FromRoute]int idUser, 
-            [FromBody]string newPassword, CancellationToken token = default)
+        /// <response code="403"> Wrong user id or permissions </response>
+        [HttpPut("changePassword")]
+        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> ChangePasswordAsync(int idUser, string newPassword, 
+            CancellationToken token = default)
         {
             if (User.GetUserId() == idUser || User.IsInRole("Administrator"))
                 return Forbid();

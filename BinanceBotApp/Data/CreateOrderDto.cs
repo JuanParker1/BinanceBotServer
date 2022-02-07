@@ -6,6 +6,11 @@ namespace BinanceBotApp.Data
     public class CreateOrderDto
     {
         /// <summary>
+        /// Requested user id
+        /// </summary>
+        public int IdUser { get; set; }
+        
+        /// <summary>
         /// Trading pair name
         /// </summary>
         public string Symbol { get; set; }

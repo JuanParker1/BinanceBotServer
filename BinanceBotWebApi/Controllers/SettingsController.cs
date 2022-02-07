@@ -25,21 +25,22 @@ namespace BinanceBotWebApi.Controllers
         /// <summary>
         /// Enables/disables trade
         /// </summary>
+        /// <param name="idUser"> User id </param>
         /// <param name="isTradeEnabled"> User info object </param>
-        /// <param name="id"> User id </param>
         /// <param name="token"> Task cancellation token </param>
-        /// <returns></returns>
+        /// <returns code="200"> 0 - no changes. 1 - changes applied </returns>
+        /// <response code="403"> Wrong user id </response>
         [HttpPost("enableTrade")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> UpdateUserInfoAsync(bool isTradeEnabled, int id, 
+        public async Task<IActionResult> UpdateUserInfoAsync(bool isTradeEnabled, int idUser, 
             CancellationToken token = default)
         {
-            var idUser = User.GetUserId();
+            var authUserId = User.GetUserId();
 
-            if (idUser is null || idUser != id)
+            if (authUserId is null || authUserId != idUser)
                 return Forbid();
 
-            var result = await _settingsService.EnableTradeAsync(id, isTradeEnabled, token);
+            var result = await _settingsService.EnableTradeAsync(idUser, isTradeEnabled, token);
 
             return Ok(result);
         }
