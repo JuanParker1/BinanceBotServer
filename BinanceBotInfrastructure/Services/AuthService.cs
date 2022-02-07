@@ -42,7 +42,8 @@ namespace BinanceBotInfrastructure.Services
         public async Task<AuthUserInfoDto> LoginAsync(string login, string password,
             CancellationToken token = default)
         {
-            var (identity, user) = await GetClaimsUserAsync(login, password, token);
+            var (identity, user) = await GetClaimsUserAsync(login.Trim(), 
+                password.Trim(), token);
 
             if (identity == default)
                 return null;
@@ -63,7 +64,8 @@ namespace BinanceBotInfrastructure.Services
 
         public async Task<bool> RegisterAsync(RegisterDto registerDto, CancellationToken token)
         {
-            var user = _db.Users.FirstOrDefault(u => u.Login == registerDto.Login);
+            var user = _db.Users.FirstOrDefault(u => 
+                u.Login == registerDto.Login.Trim());
             
             if(user is not null)
                 return false;
@@ -74,11 +76,11 @@ namespace BinanceBotInfrastructure.Services
             {
                 IdRole = registerDto.IdRole ?? 2, // simple user
                 DateCreated = DateTime.Now,
-                Name = registerDto.Name,
-                Surname = registerDto.Surname,
-                Email = registerDto.Email,
-                Login = registerDto.Login,
-                Password = salt + ComputeHash(salt, registerDto.Password),
+                Name = registerDto.Name.Trim(),
+                Surname = registerDto.Surname.Trim(),
+                Email = registerDto.Email.Trim(),
+                Login = registerDto.Login.Trim(),
+                Password = salt + ComputeHash(salt, registerDto.Password.Trim()),
             };
 
             _db.Users.Add(newUser);
@@ -86,21 +88,6 @@ namespace BinanceBotInfrastructure.Services
             await _db.SaveChangesAsync(token);
 
             return true;
-        }
-
-        public async Task<int> ChangePasswordAsync(string userLogin, 
-            string newPassword, CancellationToken token)
-        {
-            var user = await _db.Users.AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Login == userLogin, token);;
-            
-            if (user == null)
-                return -1;
-
-            var salt = GenerateSalt();
-            user.Password = salt + ComputeHash(salt, newPassword);
-            
-            return await _db.SaveChangesAsync(token);
         }
 
         public async Task<int> ChangePasswordAsync(int idUser, string newPassword,
@@ -113,7 +100,7 @@ namespace BinanceBotInfrastructure.Services
                 return -1;
 
             var salt = GenerateSalt();
-            user.Password = salt + ComputeHash(salt, newPassword);
+            user.Password = salt + ComputeHash(salt, newPassword.Trim());
             return await _db.SaveChangesAsync(token);
         }
 
@@ -137,7 +124,7 @@ namespace BinanceBotInfrastructure.Services
         {
             var user = await _db
                 .GetUserByLogin(login)
-                .AsNoTracking()
+                .AsNoTracking() // TODO: Везде AsNoTracking(), где не надо отслеживать изменения
                 .FirstOrDefaultAsync(token);
 
             if (user is null)

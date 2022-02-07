@@ -28,19 +28,19 @@ namespace BinanceBotInfrastructure.Services
             var user = await _db.Users.FirstOrDefaultAsync(u => 
                 u.Id == userDto.Id, token);
 
-            if (user is null || string.IsNullOrEmpty(userDto.Login))
+            if (user is null || string.IsNullOrEmpty(userDto.Login.Trim()))
                 return 0;
             
-            user.Login = userDto.Login;
+            user.Login = userDto.Login.Trim();
 
-            if (!string.IsNullOrEmpty(userDto.Name))
-                user.Name = userDto.Name;
+            if (!string.IsNullOrEmpty(userDto.Name.Trim()))
+                user.Name = userDto.Name.Trim();
             
-            if (!string.IsNullOrEmpty(userDto.Surname))
-                user.Surname = userDto.Surname;
+            if (!string.IsNullOrEmpty(userDto.Surname.Trim()))
+                user.Surname = userDto.Surname.Trim();
             
-            if (!string.IsNullOrEmpty(userDto.Email))
-                user.Email = userDto.Email;
+            if (!string.IsNullOrEmpty(userDto.Email.Trim()))
+                user.Email = userDto.Email.Trim();
 
             return await _db.SaveChangesAsync(token);
         }
@@ -48,14 +48,18 @@ namespace BinanceBotInfrastructure.Services
         public async Task<int> SaveApiKeysAsync(ApiKeysDto apiKeysDto,
             CancellationToken token)
         {
+            if (string.IsNullOrEmpty(apiKeysDto.ApiKey) ||
+                string.IsNullOrEmpty(apiKeysDto.SecretKey))
+                return 0;
+            
             var userSettings = await _db.UserSettings.FirstOrDefaultAsync(s => 
                     s.IdUser == apiKeysDto.Id, token);
 
             if (userSettings is null)
                 return 0;
 
-            userSettings.ApiKey = apiKeysDto.ApiKey;
-            userSettings.SecretKey = apiKeysDto.SecretKey;
+            userSettings.ApiKey = apiKeysDto.ApiKey.Trim();
+            userSettings.SecretKey = apiKeysDto.SecretKey.Trim();
 
             return await _db.SaveChangesAsync(token);
         }
