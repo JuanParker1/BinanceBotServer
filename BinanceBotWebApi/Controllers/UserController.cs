@@ -60,7 +60,7 @@ namespace BinanceBotWebApi.Controllers
         public async Task<IActionResult> SaveApiKeysAsync(ApiKeysDto apiKeysDto, 
             CancellationToken token = default)
         {
-            var authUserId = User.GetUserId(); // TODO: Add .trim() where necessary
+            var authUserId = User.GetUserId();
 
             if (authUserId is null || authUserId != apiKeysDto.Id)
                 return Forbid();

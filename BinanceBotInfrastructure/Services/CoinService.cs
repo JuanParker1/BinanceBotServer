@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.SymbolStore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace BinanceBotInfrastructure.Services
         {
             var uri = MarketDataEndpoints.GetCoinsPricesEndpoint();
             var coinPricesInfo = 
-                await _httpService.ProcessRequestAsync<IEnumerable<CoinPrice>>(uri, 
+                await _httpService.ProcessRequestAsync<IEnumerable<(string Symbol, string Price)>>(uri, 
                     new Dictionary<string, string>(), HttpMethods.Get, token);
             
             return coinPricesInfo.Select(c => c.Symbol);
