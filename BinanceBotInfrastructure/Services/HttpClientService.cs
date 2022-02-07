@@ -31,7 +31,7 @@ namespace BinanceBotInfrastructure.Services
             _secretKey = secretKey;
             var mt = new MediaTypeWithQualityHeaderValue("application/json");
             _httpClient.DefaultRequestHeaders.Accept.Add(mt);
-            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(_apiKeyHeader, 
+            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(_apiKeyHeader, //TODO: Брать ключи из кэша при формировании запроса. Отдельным методом здесь же
             new[] { apiKey });
             _jsonSerializerOptions = new JsonSerializerOptions
             {
@@ -39,16 +39,8 @@ namespace BinanceBotInfrastructure.Services
             };
         }
         
-        /// <summary>
-        /// Creates and handles HTTP request
-        /// </summary>
-        /// <param name="uri"> Request endpoint </param>
-        /// <param name="dto"> Request params </param>
-        /// <param name="requestType"> Request HTTP method </param>
-        /// <param name="token"> Task cancellation token </param>
-        /// <returns> Deserialized response object </returns>
-        public async Task<TResult> ProcessRequestAsync<TDto, TResult>(Uri uri, TDto dto, HttpMethods requestType,  
-            CancellationToken token) where TResult : class
+        public async Task<TResult> ProcessRequestAsync<TDto, TResult>(Uri uri, 
+            TDto dto, HttpMethods requestType, CancellationToken token) where TResult : class
         {
             var qParams = ConvertToDictionary(dto);
 
@@ -58,100 +50,29 @@ namespace BinanceBotInfrastructure.Services
             return responseInfo;
         }
         
-        /// <summary>
-        /// Creates and handles HTTP request
-        /// </summary>
-        /// <param name="uri"> Request endpoint </param>
-        /// <param name="qParams"> Request params dictionary </param>
-        /// <param name="requestType"> Request HTTP method </param>
-        /// <param name="token"> Task cancellation token </param>
-        /// <returns> Deserialized response object </returns>
         public async Task<TResult> ProcessRequestAsync<TResult>(Uri uri, 
             IDictionary<string, string> qParams, HttpMethods requestType, 
             CancellationToken token) where TResult : class
         {
-            TResult responseInfo;
-            
-            switch (requestType)
-            {
-                case HttpMethods.Get:
-                    using (var newOrderResponse = await GetRequestAsync(uri,
-                        qParams, token))
+            Func<Uri, IDictionary<string, string>, CancellationToken, 
+                Task<HttpResponseMessage>> requestDelegate =
+                    requestType switch
                     {
-                        responseInfo = 
-                            await HandleResponseAsync<TResult>(newOrderResponse, 
-                            token);
-                        break;
-                    }
-                case HttpMethods.SignedGet:
-                    using (var newOrderResponse = await SignedGetRequestAsync(uri,
-                        qParams, token))
-                    {
-                        responseInfo = 
-                            await HandleResponseAsync<TResult>(newOrderResponse, 
-                            token);
-                        break;
-                    }
-                case HttpMethods.Post:
-                    using (var response = await PostRequestAsync(uri,
-                        qParams, token))
-                    {
-                        responseInfo = 
-                            await HandleResponseAsync<TResult>(response, 
-                            token);   
-                        break;
-                    }
-                case HttpMethods.SignedPost:
-                    using (var newOrderResponse = await SignedPostRequestAsync(uri,
-                        qParams, token))
-                    {
-                        responseInfo = 
-                            await HandleResponseAsync<TResult>(newOrderResponse, 
-                            token);   
-                        break;
-                    }
-                case HttpMethods.Put:
-                    using (var newOrderResponse = await PutRequestAsync(uri,
-                        qParams, token))
-                    {
-                        responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
-                            token);   
-                        break;
-                    }
-                case HttpMethods.SignedPut:
-                    using (var newOrderResponse = await SignedPutRequestAsync(uri,
-                        qParams, token))
-                    {
-                        responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
-                            token);   
-                        break;
-                    }
-                case HttpMethods.Delete:
-                    using (var newOrderResponse = await DeleteRequestAsync(uri,
-                        qParams, token))
-                    {
-                        responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
-                            token);   
-                        break;
-                    }
-                case HttpMethods.SignedDelete:
-                    using (var newOrderResponse = await SignedDeleteRequestAsync(uri,
-                        qParams, token))
-                    {
-                        responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
-                            token);   
-                        break;
-                    }
-                default:
-                    using (var newOrderResponse = await GetRequestAsync(uri,
-                        qParams, token))
-                    {
-                        responseInfo = 
-                            await HandleResponseAsync<TResult>(newOrderResponse, 
-                                token);
-                        break;
-                    }
-            }
+                        HttpMethods.Get => GetRequestAsync,
+                        HttpMethods.SignedGet => SignedGetRequestAsync,
+                        HttpMethods.Post => PostRequestAsync,
+                        HttpMethods.SignedPost => SignedPostRequestAsync,
+                        HttpMethods.Put => PutRequestAsync,
+                        HttpMethods.SignedPut => SignedPutRequestAsync,
+                        HttpMethods.Delete => DeleteRequestAsync,
+                        HttpMethods.SignedDelete => SignedDeleteRequestAsync,
+                        _ => SignedGetRequestAsync
+                    };
+
+            using var newOrderResponse = await requestDelegate(uri, qParams, token);
+                
+            var responseInfo = await HandleResponseAsync<TResult>(newOrderResponse, 
+                token);
 
             return responseInfo;
         }
@@ -187,7 +108,8 @@ namespace BinanceBotInfrastructure.Services
             var intVal = 1;
             var doubleVal = 1.0;
 
-            return (int.TryParse($"{value}", out intVal) || double.TryParse($"{value}", out doubleVal)) && 
+            return (int.TryParse($"{value}", out intVal) || 
+                    double.TryParse($"{value}", out doubleVal)) && 
                    (intVal == default || doubleVal == default);
         }
         
@@ -201,8 +123,8 @@ namespace BinanceBotInfrastructure.Services
             
             if (!message.IsSuccessStatusCode)
             {
-                var errorObj = JsonSerializer.Deserialize<ApiErrorDto>(messageJson, _jsonSerializerOptions) 
-                               ?? new ApiErrorDto();
+                var errorObj = JsonSerializer.Deserialize<ApiErrorDto>(messageJson, 
+                                   _jsonSerializerOptions) ?? new ApiErrorDto();
 
                 var errorMessage = $"Http status code: {(int)message.StatusCode} \n" +
                                    $"Binance error code: {errorObj.Code} \n" +
@@ -211,7 +133,8 @@ namespace BinanceBotInfrastructure.Services
                 throw new InvalidOperationException(errorMessage);
             }
 
-            var resultDto = JsonSerializer.Deserialize<TResult>(messageJson, _jsonSerializerOptions);
+            var resultDto = JsonSerializer.Deserialize<TResult>(messageJson, 
+                _jsonSerializerOptions);
 
             return resultDto;
         }
@@ -292,8 +215,7 @@ namespace BinanceBotInfrastructure.Services
             return content;
         }
                 
-        private static Uri CreateValidUri(Uri endpoint, 
-            IDictionary<string, string> qParams = default)
+        private static Uri CreateValidUri(Uri endpoint, IDictionary<string, string> qParams = default)
         {
             var queryString = ConvertToParamsString(qParams);
             var resultQueryString = $"{endpoint}";
@@ -305,8 +227,7 @@ namespace BinanceBotInfrastructure.Services
             return uri;
         }
 
-        private Uri CreateValidSignedUri(Uri endpoint,
-            IDictionary<string, string> qParams = default)
+        private Uri CreateValidSignedUri(Uri endpoint, IDictionary<string, string> qParams = default)
         {
             if (qParams == default)
                 return endpoint;
