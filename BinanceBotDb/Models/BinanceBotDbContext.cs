@@ -48,16 +48,32 @@ namespace BinanceBotDb.Models
             
              modelBuilder.Entity<User>(entity =>
              {
-                 entity.HasData(new List<User> {
+                 entity.HasData(new List<User> 
+                 {
                      new User
                      {
                          Id = 1,
                          IdRole = 1,
                          Login = "dev",
                          Password =
-                             "hs9qw7bf864323e5c894a9d031891ddbf8532a5b9eaf3efe7a1561403e6a6f1b3e680b7c37467e6cbfdce29ed6e9640842093",
+                             "VzwA|6a4e3df1193666839c57ac8dcafe549cfb00fab0fdd78a008261332ba5c1a326ab93b6993a913219c2f8e078103b8f91",
                          Name = "Developer",
                      },
+                 });
+             });
+
+             modelBuilder.Entity<Settings>(entity =>
+             {
+                 entity.HasData(new List<Settings>
+                 {
+                     new Settings
+                     {
+                         Id = 1,
+                         IdUser = 1,
+                         IsTradeEnabled = false,
+                         TradeMode = 0,
+                         LimitOrderRate = 25
+                    }
                  });
              });
         }
