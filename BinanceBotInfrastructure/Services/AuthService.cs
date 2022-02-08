@@ -12,12 +12,14 @@ using Microsoft.IdentityModel.Tokens;
 using BinanceBotApp.Data;
 using BinanceBotApp.Services;
 using BinanceBotDb.Models;
+using BinanceBotInfrastructure.Services.Cache;
 
 namespace BinanceBotInfrastructure.Services
 {
     public class AuthService : IAuthService
     {
         private readonly IBinanceBotDbContext _db;
+        private readonly CacheTable<Settings> _cacheUserSettings;
 
         public const string Issuer = "a";
         public const string Audience = "a";
@@ -32,9 +34,10 @@ namespace BinanceBotInfrastructure.Services
         private readonly HashAlgorithm _hashAlgoritm;
         private readonly Random _rnd;
 
-        public AuthService(IBinanceBotDbContext db)
+        public AuthService(IBinanceBotDbContext db, CacheDb cacheDb)
         {
             _db = db;
+            _cacheUserSettings = cacheDb.GetCachedTable<Settings>((BinanceBotDbContext)_db);
             _hashAlgoritm = SHA384.Create();
             _rnd = new Random((int)(DateTime.Now.Ticks % 2147480161));
         }
@@ -86,6 +89,16 @@ namespace BinanceBotInfrastructure.Services
             _db.Users.Add(newUser);
 
             await _db.SaveChangesAsync(token);
+
+            var userSettings = new Settings
+            {
+                IdUser = newUser.Id,
+                IsTradeEnabled = false,
+                TradeMode = 0,
+                LimitOrderRate = 25
+            };
+
+            await _cacheUserSettings.InsertAsync(userSettings, token);
 
             return true;
         }

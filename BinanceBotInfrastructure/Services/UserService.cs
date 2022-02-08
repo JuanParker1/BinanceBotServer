@@ -45,25 +45,6 @@ namespace BinanceBotInfrastructure.Services
             return await _db.SaveChangesAsync(token);
         }
 
-        public async Task<int> SaveApiKeysAsync(ApiKeysDto apiKeysDto,
-            CancellationToken token)
-        {
-            if (string.IsNullOrEmpty(apiKeysDto.ApiKey) ||
-                string.IsNullOrEmpty(apiKeysDto.SecretKey))
-                return 0;
-            
-            var userSettings = await _db.UserSettings.FirstOrDefaultAsync(s => 
-                    s.IdUser == apiKeysDto.Id, token);
-
-            if (userSettings is null)
-                return 0;
-
-            userSettings.ApiKey = apiKeysDto.ApiKey.Trim();
-            userSettings.SecretKey = apiKeysDto.SecretKey.Trim();
-
-            return await _db.SaveChangesAsync(token);
-        }
-
         public async Task GetUserDataStreamAsync(string listenKey, 
             Action<string> handler, CancellationToken token)
         {

@@ -26,17 +26,16 @@ namespace BinanceBotInfrastructure
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<IBinanceBotDbContext, BinanceBotDbContext>();
+            services.AddScoped<IHttpClientService, HttpClientService>();
             
             services.AddSingleton(new CacheDb());
             
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<ICoinService, CoinService>();
             services.AddTransient<IOrdersService, OrdersService>();
-            services.AddTransient<IHttpClientService>(s => 
-                new HttpClientService("RICK4hQQ82ClQxuxFEhcYP0KY3057uioNKwdnwpxUVce96fRYFwh4ApK80U0vhQq", // TODO: Брать из кэша. Меня вместе с самим хттп клиентом
-                "YeVKxVSiGtdu6cDawkn8f6kwgvRaYRN5qkXeU169lNwSM749pb8KCTzJGArLGtqd"));
-            services.AddTransient<IWebSocketClientService, WebSocketClientService>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<ISettingsService, SettingsService>();
+            services.AddTransient<IWebSocketClientService, WebSocketClientService>();
 
             return services;
         }

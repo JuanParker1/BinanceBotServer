@@ -45,8 +45,8 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            var orderInfo = await _ordersService.GetOrderAsync(idOrder, symbol, 
-                recvWindow, token);
+            var orderInfo = await _ordersService.GetOrderAsync(idUser, idOrder, 
+                symbol, recvWindow, token);
 
             return Ok(orderInfo);
         }
@@ -70,8 +70,8 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            var ordersInfo = await _ordersService.GetOrdersForPairAsync(symbol, 
-                recvWindow, token);
+            var ordersInfo = await _ordersService.GetOrdersForPairAsync(idUser, 
+                symbol, recvWindow, token);
 
             return Ok(ordersInfo);
         }
@@ -94,7 +94,8 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            var ordersInfo = await _ordersService.GetAllOrdersAsync(recvWindow, token);
+            var ordersInfo = await _ordersService.GetAllOrdersAsync(idUser, 
+                recvWindow, token);
 
             return Ok(ordersInfo);
         }
@@ -164,8 +165,8 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            var orderInfo = await _ordersService.DeleteOrderAsync(idOrder, symbol, 
-                recvWindow, token);
+            var orderInfo = await _ordersService.DeleteOrderAsync(idUser, 
+                idOrder, symbol, recvWindow, token);
 
             return Ok(orderInfo);
         }
@@ -190,7 +191,7 @@ namespace BinanceBotWebApi.Controllers
                 return Forbid();
             
             var orderInfo = 
-                await _ordersService.DeleteAllOrdersForPairAsync(symbol, 
+                await _ordersService.DeleteAllOrdersForPairAsync(idUser, symbol, 
                     recvWindow, token);
 
             return Ok(orderInfo);

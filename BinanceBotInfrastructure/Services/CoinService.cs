@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.SymbolStore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BinanceBotApp.Services;
 using BinanceBotApp.Data;
-using BinanceBotApp.DataInternal;
 using BinanceBotApp.DataInternal.Endpoints;
 using BinanceBotApp.DataInternal.Enums;
 
@@ -14,22 +12,29 @@ namespace BinanceBotInfrastructure.Services
 {
     public class CoinService : ICoinService
     {
+        private readonly ISettingsService _settingsService;
         private readonly IHttpClientService _httpService;
         private readonly IWebSocketClientService _wsService;
         
-        public CoinService(IHttpClientService httpService, 
+        public CoinService(ISettingsService settingsService, 
+            IHttpClientService httpService, 
             IWebSocketClientService wsService)
         {
+            _settingsService = settingsService;
             _httpService = httpService;
             _wsService = wsService;
         }
         
-        public async Task<IEnumerable<string>> GetTradingPairsAsync(CancellationToken token)
+        public async Task<IEnumerable<string>> GetTradingPairsAsync(int idUser, 
+            CancellationToken token)
         {
+            var keys = await _settingsService.GetApiKeysAsync(idUser,
+                token);
+
             var uri = MarketDataEndpoints.GetCoinsPricesEndpoint();
             var coinPricesInfo = 
                 await _httpService.ProcessRequestAsync<IEnumerable<(string Symbol, string Price)>>(uri, 
-                    new Dictionary<string, string>(), HttpMethods.Get, token);
+                    new Dictionary<string, string>(), keys,HttpMethods.Get, token);
             
             return coinPricesInfo.Select(c => c.Symbol);
         }

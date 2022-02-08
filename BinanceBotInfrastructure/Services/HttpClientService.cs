@@ -16,44 +16,66 @@ using BinanceBotApp.Services;
 namespace BinanceBotInfrastructure.Services
 {
     /// <summary>
-    /// Http client for Binance api
+    /// Http client for Binance api.
     /// </summary>
     public class HttpClientService : IHttpClientService
     {
         private readonly HttpClient _httpClient;
         private const string _apiKeyHeader = "X-MBX-APIKEY";
-        private readonly string _secretKey;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
 
-        public HttpClientService(string apiKey, string secretKey)
+        private string _secretKey;
+        public string SecretKey
+        {
+            set => _secretKey = value;
+        }
+        
+        private string _apiKey;
+        public string ApiKey
+        {
+            set
+            {
+                _apiKey = value;
+                
+                var mt = new MediaTypeWithQualityHeaderValue("application/json");
+                _httpClient.DefaultRequestHeaders.Accept.Add(mt);
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(_apiKeyHeader,
+                    new[] { value });
+            }
+        }
+        
+        public HttpClientService()
         {
             _httpClient = new HttpClient();
-            _secretKey = secretKey;
-            var mt = new MediaTypeWithQualityHeaderValue("application/json");
-            _httpClient.DefaultRequestHeaders.Accept.Add(mt);
-            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(_apiKeyHeader, //TODO: Брать ключи из кэша при формировании запроса. Отдельным методом здесь же
-            new[] { apiKey });
             _jsonSerializerOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             };
         }
         
-        public async Task<TResult> ProcessRequestAsync<TDto, TResult>(Uri uri, 
-            TDto dto, HttpMethods requestType, CancellationToken token) where TResult : class
+        public async Task<TResult> ProcessRequestAsync<TDto, TResult>(Uri uri, // TODO: Такой вариант точно нужен? Или хватит только который со словарем ниже?
+            TDto dto, (string apiKey, string secretKey) keys, HttpMethods requestType, 
+            CancellationToken token) where TResult : class
         {
+            _apiKey = keys.apiKey;
+            _secretKey = keys.secretKey;
+            
             var qParams = ConvertToDictionary(dto);
 
-            var responseInfo = await ProcessRequestAsync<TResult>(uri, qParams, 
-                requestType, token);
+            var responseInfo = await ProcessRequestAsync<TResult>(uri, 
+                qParams, keys, requestType, token);
 
             return responseInfo;
         }
         
         public async Task<TResult> ProcessRequestAsync<TResult>(Uri uri, 
-            IDictionary<string, string> qParams, HttpMethods requestType, 
-            CancellationToken token) where TResult : class
+            IDictionary<string, string> qParams, (string apiKey, string secretKey) keys, 
+            HttpMethods requestType, CancellationToken token) 
+            where TResult : class
         {
+            _apiKey = keys.apiKey;
+            _secretKey = keys.secretKey;
+            
             Func<Uri, IDictionary<string, string>, CancellationToken, 
                 Task<HttpResponseMessage>> requestDelegate =
                     requestType switch
@@ -61,7 +83,7 @@ namespace BinanceBotInfrastructure.Services
                         HttpMethods.Get => GetRequestAsync,
                         HttpMethods.SignedGet => SignedGetRequestAsync,
                         HttpMethods.Post => PostRequestAsync,
-                        HttpMethods.SignedPost => SignedPostRequestAsync,
+                        HttpMethods.SignedPost => SignedPostRequestAsync, // TODO: Очень много однотипных методов с разными запросами. Через делегат упростить?
                         HttpMethods.Put => PutRequestAsync,
                         HttpMethods.SignedPut => SignedPutRequestAsync,
                         HttpMethods.Delete => DeleteRequestAsync,
@@ -103,7 +125,7 @@ namespace BinanceBotInfrastructure.Services
             return resultDict;
         }
 
-        private static bool IsNumericDefault(object value)
+        private static bool IsNumericDefault(object value)  // TODO: Убрать в Инфрастракче.Сервсез.Утилз. И конвертацию в словарь выше тоже.
         {
             var intVal = 1;
             var doubleVal = 1.0;

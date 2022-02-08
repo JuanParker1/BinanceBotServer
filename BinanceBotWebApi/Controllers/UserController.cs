@@ -18,11 +18,15 @@ namespace BinanceBotWebApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ISettingsService _settingsService;
         private readonly ICoinService _coinService;
 
-        public UserController(IUserService userService, ICoinService coinService)
+        public UserController(IUserService userService, 
+            ISettingsService settingsService, 
+            ICoinService coinService)
         {
             _userService = userService;
+            _settingsService = settingsService;
             _coinService = coinService;
         }
         
@@ -65,7 +69,8 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != apiKeysDto.Id)
                 return Forbid();
             
-            var result = await _userService.SaveApiKeysAsync(apiKeysDto, token);
+            var result = await _settingsService.SaveApiKeysAsync(apiKeysDto, 
+                token);
 
             return Ok(result);
         }

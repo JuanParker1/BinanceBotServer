@@ -2,22 +2,26 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using BinanceBotApp.Data;
 using BinanceBotApp.DataInternal.Endpoints;
 using BinanceBotApp.DataInternal.Enums;
 using BinanceBotApp.Services;
 using BinanceBotDb.Models;
+using BinanceBotInfrastructure.Services.Cache;
 
 namespace BinanceBotInfrastructure.Services
 {
     public class SettingsService : ISettingsService
     {
         private readonly IBinanceBotDbContext _db;
+        private readonly CacheTable<Settings> _cacheUserSettings;
         private readonly IHttpClientService _httpService;
         
-        public SettingsService(IBinanceBotDbContext db, 
+        public SettingsService(IBinanceBotDbContext db, CacheDb cacheDb,
             IHttpClientService httpService)
         {
             _db = db;
+            _cacheUserSettings = cacheDb.GetCachedTable<Settings>((BinanceBotDbContext)db);
             _httpService = httpService;
         }
 
@@ -38,13 +42,43 @@ namespace BinanceBotInfrastructure.Services
 
             return await _db.SaveChangesAsync(token);
         }
+
+        public async Task<(string apiKey, string secretKey)> GetApiKeysAsync(int idUser,
+            CancellationToken token)
+        {
+            var userSettings = await _cacheUserSettings.FirstOrDefaultAsync(s => 
+                s.IdUser == idUser, token);
+
+            return userSettings is null 
+                ? default 
+                : (userSettings.ApiKey, userSettings.SecretKey);
+        }
+        
+        public async Task<int> SaveApiKeysAsync(ApiKeysDto apiKeysDto,
+            CancellationToken token)
+        {
+            if (string.IsNullOrEmpty(apiKeysDto.ApiKey) ||
+                string.IsNullOrEmpty(apiKeysDto.SecretKey))
+                return 0;
+            
+            var userSettings = await _cacheUserSettings.FirstOrDefaultAsync(s =>
+                s.IdUser == apiKeysDto.Id, token);
+
+            if (userSettings is null)
+                return 0;
+
+            userSettings.ApiKey = apiKeysDto.ApiKey.Trim();
+            userSettings.SecretKey = apiKeysDto.SecretKey.Trim();
+
+            return await _cacheUserSettings.UpsertAsync(userSettings, token);
+        }
         
         public async Task<string> GetListenKey(CancellationToken token)
         {
             var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
         
             var listenKey = await _httpService.ProcessRequestAsync<string>(uri,
-                null, HttpMethods.SignedPost, token);
+                null, default, HttpMethods.SignedPost, token);
         
             return listenKey;
         }
@@ -55,7 +89,7 @@ namespace BinanceBotInfrastructure.Services
         
             await _httpService.ProcessRequestAsync<string>(uri,
                 new Dictionary<string, string>(), 
-                HttpMethods.SignedPut, token);
+                default, HttpMethods.SignedPut, token);
         }
         
         public async Task DeleteListenKey(string listenKey, CancellationToken token)
@@ -64,7 +98,7 @@ namespace BinanceBotInfrastructure.Services
         
             await _httpService.ProcessRequestAsync<string>(uri,
                 new Dictionary<string, string>(), 
-                HttpMethods.SignedDelete, token);
+                default, HttpMethods.SignedDelete, token);
         }
     }
 }

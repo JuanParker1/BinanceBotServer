@@ -42,7 +42,8 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            var allPairs = await _coinService.GetTradingPairsAsync(token);
+            var allPairs = await _coinService.GetTradingPairsAsync(idUser, 
+                token);
             return Ok(allPairs);
         }
 
