@@ -12,13 +12,13 @@ namespace BinanceBotDb.Models
 
         public BinanceBotDbContext()
         {
-            Database.Migrate(); // TODO: Убрать в единственный старт при старте приложения. А так при каждом запросе.
+            //Database.Migrate();
         }
 
         public BinanceBotDbContext(DbContextOptions<BinanceBotDbContext> options)
             : base(options)
         {
-            Database.Migrate();
+            //Database.Migrate();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
