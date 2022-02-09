@@ -7,7 +7,7 @@ namespace BinanceBotApp.Data
     {
         /// <summary>
         /// Cancelled order id
-        /// </summary
+        /// </summary>
         public string OrigClientOrderId { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BinanceBotApp.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using BinanceBotApp.Services;
 using BinanceBotInfrastructure.Extensions;
 
@@ -31,19 +32,21 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="idUser"> Requested user id </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> List of all trading pairs </returns>
+        /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet("tradingPairs")]
         [ProducesResponseType(typeof(IEnumerable<string>), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> GetTradingPairsAsync([FromQuery] int idUser, 
+        public async Task<IActionResult> GetTradingPairsAsync([FromQuery][Range(1, int.MaxValue)] int idUser, 
             CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
-            
+
             var allPairs = await _coinService.GetTradingPairsAsync(idUser, 
                 token);
+            
             return Ok(allPairs);
         }
 
@@ -54,11 +57,12 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="pair"> Trading pair name </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> Ok </returns>
+        /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet("{pair}/info")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> GetCoinPriceStreamAsync([FromRoute] string pair, 
-            [FromQuery] int idUser, CancellationToken token = default)
+        public async Task<IActionResult> GetCoinPriceStreamAsync([FromRoute][StringLength(20)] string pair, 
+            [FromQuery][Range(1, int.MaxValue)] int idUser, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
@@ -77,11 +81,12 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="pairNames"> Trading pairs names </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> Ok </returns>
+        /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet("combinedInfo")]
         [ProducesResponseType(typeof(OrderInfoDto), (int)System.Net.HttpStatusCode.OK)] //http://localhost:5000/api/coins/combined/info?collection=ethbtc&collection=btcusdt
         public async Task<IActionResult> GetCoinsListPriceStreamAsync([FromQuery] GenericCollectionDto<string> pairNames, 
-            int idUser, CancellationToken token = default)
+            [Range(1, int.MaxValue)] int idUser, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
@@ -100,11 +105,12 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="pair"> Trading pair name </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> Ok </returns>
+        /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpDelete("{pair}/info")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> UnsubscribeCoinPriceStreamAsync([FromRoute] string pair, 
-            [FromQuery] int idUser, CancellationToken token = default)
+        public async Task<IActionResult> UnsubscribeCoinPriceStreamAsync([FromRoute][StringLength(20)] string pair, 
+            [FromQuery][Range(1, int.MaxValue)] int idUser, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 

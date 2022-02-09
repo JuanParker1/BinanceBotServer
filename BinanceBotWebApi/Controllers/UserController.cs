@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using BinanceBotApp.Data;
 using BinanceBotApp.Services;
 using BinanceBotInfrastructure.Extensions;
@@ -18,15 +19,11 @@ namespace BinanceBotWebApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly ISettingsService _settingsService;
         private readonly ICoinService _coinService;
 
-        public UserController(IUserService userService, 
-            ISettingsService settingsService, 
-            ICoinService coinService)
+        public UserController(IUserService userService, ICoinService coinService)
         {
             _userService = userService;
-            _settingsService = settingsService;
             _coinService = coinService;
         }
         
@@ -36,6 +33,7 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="userDto"> User info object </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> 0 - no changes. 1 - changes applied </returns>
+        /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpPut("userInfo")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
@@ -51,29 +49,6 @@ namespace BinanceBotWebApi.Controllers
 
             return Ok(result);
         }
-        
-        /// <summary>
-        /// Saves user's Binance api keys
-        /// </summary>
-        /// <param name="apiKeysDto"> Api keys info object </param>
-        /// <param name="token"> Task cancellation token </param>
-        /// <returns code="200"> 0 - no changes. 1 - changes applied </returns>
-        /// <response code="403"> Wrong user id </response>
-        [HttpPost("apiKeys")]
-        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> SaveApiKeysAsync(ApiKeysDto apiKeysDto, 
-            CancellationToken token = default)
-        {
-            var authUserId = User.GetUserId();
-
-            if (authUserId is null || authUserId != apiKeysDto.IdUser)
-                return Forbid();
-            
-            var result = await _settingsService.SaveApiKeysAsync(apiKeysDto, 
-                token);
-
-            return Ok(result);
-        }
 
         /// <summary>
         /// Gets user data
@@ -82,11 +57,12 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="listenKey"> User listen key </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> User data </returns>
+        /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet("data")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> GetUserDataStreamAsync(int idUser, 
-            string listenKey, CancellationToken token = default)
+        public async Task<IActionResult> GetUserDataStreamAsync([Range(1, int.MaxValue)] int idUser, 
+            [StringLength(50)] string listenKey, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
@@ -105,10 +81,11 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="idUser"> User id </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> List with active websocket subscriptions </returns>
+        /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet("subscriptions")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> GetSubscriptionsListAsync(int idUser, 
+        public async Task<IActionResult> GetSubscriptionsListAsync([Range(1, int.MaxValue)] int idUser, 
             CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
