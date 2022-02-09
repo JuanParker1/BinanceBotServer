@@ -1,7 +1,7 @@
 using BinanceBotApp.Data;
 using FluentValidation;
 
-namespace BinanceBotApp.DataValidators.Dto
+namespace BinanceBotApp.DataValidators
 {
     public class ChangePasswordDtoValidator : AbstractValidator<ChangePasswordDto>
     {

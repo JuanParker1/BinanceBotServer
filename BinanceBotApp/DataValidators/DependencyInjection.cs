@@ -1,6 +1,5 @@
 using BinanceBotApp.Data;
 using Microsoft.Extensions.DependencyInjection;
-using BinanceBotApp.DataValidators.Dto;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
