@@ -35,9 +35,7 @@ namespace BinanceBotInfrastructure.Services
                 return 0;
             
             // TODO: Стопнуть здесь из другого сервиса всю BackgroundWorker торговлю
-            
-            // TODO: А еще надо реализовывать кэш, потому что многие настройки будут управляться именно через него.
-            
+
             userSettings.IsTradeEnabled = isTradeEnabled;
 
             return await _db.SaveChangesAsync(token);
