@@ -15,12 +15,16 @@ namespace BinanceBotApp.DataValidators
                 .WithMessage("Api ключ не должен быть пустым");
             RuleFor(x => x.ApiKey).Length(0, 51)
                 .WithMessage("Допустимая длина api ключа от 1 до 50 символов");
+            RuleFor(x => x.ApiKey).Matches("^\\S+$")
+                .WithMessage("Api ключ не может содержать пробелы.");
             RuleFor(x => x.SecretKey).NotNull()
                 .WithMessage("Секретный ключ не должен быть пустым");
             RuleFor(x => x.SecretKey).NotEmpty()
                 .WithMessage("Секретный ключ не должен быть пустым");
             RuleFor(x => x.SecretKey).Length(0, 51)
                 .WithMessage("Допустимая длина секретного ключа от 1 до 50 символов");
+            RuleFor(x => x.SecretKey).Matches("^\\S+$")
+                .WithMessage("Секретный ключ не может содержать пробелы.");
         }
     }
 }
