@@ -13,10 +13,6 @@ namespace BinanceBotApp.DataValidators
             
             services.AddTransient<IValidator<ApiKeysDto>, ApiKeysDtoValidator>();
             services.AddTransient<IValidator<AuthDto>, AuthDtoValidator>();
-            services.AddTransient<IValidator<CreatedOrderAckDto>, CreatedOrderAckDtoValidator>();
-            services.AddTransient<IValidator<CreatedOrderFullDto>, CreatedOrderFullDtoValidator>();
-            services.AddTransient<IValidator<CreatedOrderResultDto>, CreatedOrderResultDtoValidator>();
-            services.AddTransient<IValidator<DeletedOrderDto>, DeletedOrderDtoValidator>();
             services.AddTransient<IValidator<NewOrderDto>, NewOrderDtoValidator>();
             services.AddTransient<IValidator<OrderFillPartDto>, OrderFillPartDtoValidator>();
             services.AddTransient<IValidator<RegisterDto>, RegisterDtoValidator>();
