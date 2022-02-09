@@ -25,7 +25,7 @@ namespace BinanceBotDb.Models
         {
             if (!optionsBuilder.IsConfigured)
                 optionsBuilder.UseNpgsql(
-                    "Host=localhost;Database=postgres;Username=postgres;Password=q;Persist Security Info=True");
+                    "Host=localhost;Database=binanceBotDb;Username=postgres;Password=q;Persist Security Info=True;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -45,37 +45,6 @@ namespace BinanceBotDb.Models
                     new UserRole {Id = 2, Caption = "User",},
                 });
             });
-            
-             modelBuilder.Entity<User>(entity =>
-             {
-                 entity.HasData(new List<User> 
-                 {
-                     new User
-                     {
-                         Id = 1,
-                         IdRole = 1,
-                         Login = "dev",
-                         Password =
-                             "VzwA|6a4e3df1193666839c57ac8dcafe549cfb00fab0fdd78a008261332ba5c1a326ab93b6993a913219c2f8e078103b8f91",
-                         Name = "Developer",
-                     },
-                 });
-             });
-
-             modelBuilder.Entity<Settings>(entity =>
-             {
-                 entity.HasData(new List<Settings>
-                 {
-                     new Settings
-                     {
-                         Id = 1,
-                         IdUser = 1,
-                         IsTradeEnabled = false,
-                         TradeMode = 0,
-                         LimitOrderRate = 25
-                    }
-                 });
-             });
         }
 
         public IQueryable<User> GetUserByLogin(string login)
