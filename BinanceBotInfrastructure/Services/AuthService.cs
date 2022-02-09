@@ -103,17 +103,23 @@ namespace BinanceBotInfrastructure.Services
             return true;
         }
 
-        public async Task<int> ChangePasswordAsync(int idUser, string newPassword,
+        public async Task<int> ChangePasswordAsync(ChangePasswordDto changePasswordDto,
             CancellationToken token)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == idUser,
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == changePasswordDto.IdUser,
                 token);
             
             if (user == null)
                 return -1;
 
+            var isOldPasswordCorrect = CheckPassword(user.Password, 
+                changePasswordDto.OldPassword);
+
+            if (!isOldPasswordCorrect)
+                return -2;
+            
             var salt = GenerateSalt();
-            user.Password = salt + ComputeHash(salt, newPassword.Trim());
+            user.Password = salt + ComputeHash(salt, changePasswordDto.NewPassword.Trim());
             return await _db.SaveChangesAsync(token);
         }
 
@@ -160,13 +166,9 @@ namespace BinanceBotInfrastructure.Services
 
         private bool CheckPassword(string passwordHash, string password)
         {
-            switch (passwordHash.Length)
-            {
-                case 0 when password.Length == 0:
-                    return true;
-                case < _passwordSaltLength:
-                    return false;
-            }
+            if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(passwordHash) || 
+                passwordHash.Length < _passwordSaltLength)
+                return false;
 
             var salt = passwordHash[0.._passwordSaltLength];
             var hashDb = passwordHash[_passwordSaltLength..];

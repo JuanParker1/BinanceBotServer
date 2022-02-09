@@ -81,25 +81,25 @@ namespace BinanceBotWebApi.Controllers
         /// <summary>
         /// Changes user password
         /// </summary>
-        /// <param name="idUser"> User id </param>
-        /// <param name="newPassword"> New user password </param>
+        /// <param name="changePasswordDto"> User password info </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> Ок </returns>
         /// <response code="403"> Wrong user id or permissions </response>
         [HttpPut("changePassword")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> ChangePasswordAsync(int idUser, string newPassword, 
+        public async Task<IActionResult> ChangePasswordAsync([FromBody] ChangePasswordDto changePasswordDto, 
             CancellationToken token = default)
         {
-            if (User.GetUserId() == idUser || User.IsInRole("Administrator"))
+            if (User.GetUserId() == changePasswordDto.IdUser || User.IsInRole("Administrator"))
                 return Forbid();
 
-            var code = await _authService.ChangePasswordAsync(idUser, newPassword, token);
+            var code = await _authService.ChangePasswordAsync(changePasswordDto, token);
             
             return code switch
             {
                 0 => Ok(),
                 -1 => BadRequest("User does not exist"),
+                -2 => BadRequest("Old password is incorrect"),
                 _ => BadRequest(),
             };
         }

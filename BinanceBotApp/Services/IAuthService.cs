@@ -7,7 +7,7 @@ namespace BinanceBotApp.Services
 {
     public interface IAuthService
     {
-        Task<int> ChangePasswordAsync(int idUser, string newPassword, 
+        Task<int> ChangePasswordAsync(ChangePasswordDto changePasswordDto, 
             CancellationToken token);
         Task<AuthUserInfoDto> LoginAsync(string login, string password, 
             CancellationToken token);
