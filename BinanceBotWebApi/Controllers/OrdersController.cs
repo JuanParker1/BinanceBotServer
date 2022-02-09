@@ -103,21 +103,21 @@ namespace BinanceBotWebApi.Controllers
         /// <summary>
         /// Creates new test order (without sending it into the matching engine)
         /// </summary>
-        /// <param name="createOrderDto"> New order params </param>
+        /// <param name="newOrderDto"> New order params </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> New test order info </returns>
         /// <response code="403"> Wrong user id </response>
         [HttpPost("test")]
         [ProducesResponseType(typeof(CreatedOrderAckDto), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> CreateTestOrderAsync([FromBody]CreateOrderDto createOrderDto, 
+        public async Task<IActionResult> CreateTestOrderAsync([FromBody]NewOrderDto newOrderDto, 
             CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
-            if (authUserId is null || authUserId != createOrderDto.IdUser)
+            if (authUserId is null || authUserId != newOrderDto.IdUser)
                 return Forbid();
             
-            var orderInfo = await _ordersService.CreateTestOrderAsync(createOrderDto, token);
+            var orderInfo = await _ordersService.CreateTestOrderAsync(newOrderDto, token);
 
             return Ok(orderInfo);
         }
@@ -125,21 +125,21 @@ namespace BinanceBotWebApi.Controllers
         /// <summary>
         /// Creates new order
         /// </summary>
-        /// <param name="createOrder"> New order params </param>
+        /// <param name="newOrder"> New order params </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> New order info </returns>
         /// <response code="403"> Wrong user id </response>
         [HttpPost]
         [ProducesResponseType(typeof(CreatedOrderAckDto), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> CreateOrderAsync([FromBody] CreateOrderDto createOrder, 
+        public async Task<IActionResult> CreateOrderAsync([FromBody] NewOrderDto newOrder, 
             CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
-            if (authUserId is null || authUserId != createOrder.IdUser)
+            if (authUserId is null || authUserId != newOrder.IdUser)
                 return Forbid();
             
-            var orderInfo = await _ordersService.CreateOrderAsync(createOrder, token);
+            var orderInfo = await _ordersService.CreateOrderAsync(newOrder, token);
 
             return Ok(orderInfo);
         }

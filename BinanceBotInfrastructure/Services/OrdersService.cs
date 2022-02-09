@@ -81,30 +81,30 @@ namespace BinanceBotInfrastructure.Services
             return orderInfo;
         }
         
-        public async Task<CreatedOrderResultDto> CreateTestOrderAsync(CreateOrderDto createOrderDto, 
+        public async Task<CreatedOrderResultDto> CreateTestOrderAsync(NewOrderDto newOrderDto, 
             CancellationToken token)
         {
-            var keys = await _settingsService.GetApiKeysAsync(createOrderDto.IdUser,
+            var keys = await _settingsService.GetApiKeysAsync(newOrderDto.IdUser,
                 token);
 
             var uri = TradeEndpoints.GetTestNewOrderEndpoint();
 
-            var newOrderInfo = await _httpService.ProcessRequestAsync<CreateOrderDto, CreatedOrderResultDto>(uri, 
-                createOrderDto, keys, HttpMethods.SignedPost, token);
+            var newOrderInfo = await _httpService.ProcessRequestAsync<NewOrderDto, CreatedOrderResultDto>(uri, 
+                newOrderDto, keys, HttpMethods.SignedPost, token);
 
             return newOrderInfo;
         }
         
-        public async Task<CreatedOrderResultDto> CreateOrderAsync(CreateOrderDto createOrderDto, 
+        public async Task<CreatedOrderResultDto> CreateOrderAsync(NewOrderDto newOrderDto, 
             CancellationToken token)
         {
-            var keys = await _settingsService.GetApiKeysAsync(createOrderDto.IdUser,
+            var keys = await _settingsService.GetApiKeysAsync(newOrderDto.IdUser,
                 token);
 
             var uri = TradeEndpoints.GetOrderEndpoint();
 
-            var newOrderInfo = await _httpService.ProcessRequestAsync<CreateOrderDto, CreatedOrderResultDto>(uri, 
-                createOrderDto, keys, HttpMethods.SignedPost, token);
+            var newOrderInfo = await _httpService.ProcessRequestAsync<NewOrderDto, CreatedOrderResultDto>(uri, 
+                newOrderDto, keys, HttpMethods.SignedPost, token);
 
             return newOrderInfo;
         }

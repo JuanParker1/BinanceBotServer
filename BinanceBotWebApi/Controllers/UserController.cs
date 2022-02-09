@@ -66,7 +66,7 @@ namespace BinanceBotWebApi.Controllers
         {
             var authUserId = User.GetUserId();
 
-            if (authUserId is null || authUserId != apiKeysDto.Id)
+            if (authUserId is null || authUserId != apiKeysDto.IdUser)
                 return Forbid();
             
             var result = await _settingsService.SaveApiKeysAsync(apiKeysDto, 

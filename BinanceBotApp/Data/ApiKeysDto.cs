@@ -8,7 +8,7 @@ namespace BinanceBotApp.Data
         /// <summary>
         /// Keys owner id
         /// </summary>
-        public int Id { get; set; }
+        public int IdUser { get; set; }
         
         /// <summary>
         /// Binance api key

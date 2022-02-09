@@ -55,12 +55,8 @@ namespace BinanceBotInfrastructure.Services
         public async Task<int> SaveApiKeysAsync(ApiKeysDto apiKeysDto,
             CancellationToken token)
         {
-            if (string.IsNullOrEmpty(apiKeysDto.ApiKey) ||
-                string.IsNullOrEmpty(apiKeysDto.SecretKey))
-                return 0;
-            
             var userSettings = await _cacheUserSettings.FirstOrDefaultAsync(s =>
-                s.IdUser == apiKeysDto.Id, token);
+                s.IdUser == apiKeysDto.IdUser, token);
 
             if (userSettings is null)
                 return 0;

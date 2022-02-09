@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using BinanceBotApp.DataValidators;
 using BinanceBotInfrastructure;
 
 namespace BinanceBotWebApi
@@ -20,6 +21,7 @@ namespace BinanceBotWebApi
         {
             services.AddControllers();
             services.AddSwagger();
+            services.AddValidators();
             services.AddInfrastructure(Configuration);
             services.AddJWTAuthentication();
             services.AddSignalR();

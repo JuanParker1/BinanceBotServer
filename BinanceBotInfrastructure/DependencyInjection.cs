@@ -1,3 +1,4 @@
+using BinanceBotApp.DataValidators;
 using BinanceBotApp.Services;
 using BinanceBotDb.Models;
 using BinanceBotInfrastructure.Services;

@@ -3,7 +3,7 @@ namespace BinanceBotApp.Data
     /// <summary>
     /// New order creation params
     /// </summary>
-    public class CreateOrderDto
+    public class NewOrderDto
     {
         /// <summary>
         /// Requested user id
