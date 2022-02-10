@@ -11,7 +11,7 @@ using BinanceBotInfrastructure.Services.Cache;
 
 namespace BinanceBotInfrastructure.Services
 {
-    public class SettingsService : ISettingsService
+    public class SettingsService : ISettingsService // TODO: Mapster нужен. Напрмер, вытаскиваешь юзеринфо-модель, надо мапнуть в Дто. То же самое User Settings для отображения в профиле.
     {
         private readonly IBinanceBotDbContext _db;
         private readonly CacheTable<Settings> _cacheUserSettings;
