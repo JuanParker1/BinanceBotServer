@@ -25,6 +25,29 @@ namespace BinanceBotWebApi.Controllers
         }
         
         /// <summary>
+        /// Gets user application settings
+        /// </summary>
+        /// <param name="idUser"> User id </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns code="200"> 0 - no changes. 1 - changes applied </returns>
+        /// <response code="400"> Error in request parameters </response>
+        /// <response code="403"> Wrong user id </response>
+        [HttpGet]
+        [ProducesResponseType(typeof(SettingsDto), (int)System.Net.HttpStatusCode.OK)] // TODO: Проверить везде возвращаемые типы
+        public async Task<IActionResult> GetUserSettings([Range(1, int.MaxValue)] int idUser, 
+            CancellationToken token = default)
+        {
+            var authUserId = User.GetUserId();
+
+            if (authUserId is null || authUserId != idUser)
+                return Forbid();
+
+            var settingsDto = await _settingsService.GetSettingsAsync(idUser, token);
+
+            return Ok(settingsDto);
+        }
+        
+        /// <summary>
         /// Enables/disables trade
         /// </summary>
         /// <param name="idUser"> User id </param>

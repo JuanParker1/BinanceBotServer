@@ -8,10 +8,11 @@ using BinanceBotApp.DataInternal.Enums;
 using BinanceBotApp.Services;
 using BinanceBotDb.Models;
 using BinanceBotInfrastructure.Services.Cache;
+using Mapster;
 
 namespace BinanceBotInfrastructure.Services
 {
-    public class SettingsService : ISettingsService // TODO: Mapster нужен. Напрмер, вытаскиваешь юзеринфо-модель, надо мапнуть в Дто. То же самое User Settings для отображения в профиле.
+    public class SettingsService : ISettingsService
     {
         private readonly IBinanceBotDbContext _db;
         private readonly CacheTable<Settings> _cacheUserSettings;
@@ -21,8 +22,27 @@ namespace BinanceBotInfrastructure.Services
             IHttpClientService httpService)
         {
             _db = db;
-            _cacheUserSettings = cacheDb.GetCachedTable<Settings>((BinanceBotDbContext)db);
+            _cacheUserSettings = cacheDb.GetCachedTable<Settings>((BinanceBotDbContext)db, 
+                new HashSet<string> {"TradeMode"});
             _httpService = httpService;
+        }
+
+        public async Task<SettingsDto> GetSettingsAsync(int idUser, CancellationToken token)
+        {
+            var userSettings = await _cacheUserSettings.FirstOrDefaultAsync(c => 
+                c.IdUser == idUser, token);
+       
+            if (userSettings is null)
+                return null;
+            
+            var userSettingsDto = userSettings.Adapt<SettingsDto>();
+
+            userSettingsDto.IsApiKeysSet = !string.IsNullOrEmpty(userSettings.ApiKey) &&
+                                           !string.IsNullOrEmpty(userSettings.SecretKey);
+
+            userSettingsDto.TradeMode = userSettings.TradeMode.Caption;
+
+            return userSettingsDto;
         }
 
         public async Task<int> EnableTradeAsync(int idUser, bool isTradeEnabled, 

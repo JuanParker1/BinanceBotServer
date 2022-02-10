@@ -8,7 +8,7 @@ namespace BinanceBotInfrastructure.Services.Cache
 {
     public class CacheDb
     {
-        private readonly ConcurrentDictionary<string, CacheTableDataStorage> cache = 
+        private readonly ConcurrentDictionary<string, CacheTableDataStorage> _cache = 
             new ConcurrentDictionary<string, CacheTableDataStorage>();
 
         public CacheTable<TEntity> GetCachedTable<TEntity>(DbContext context, params string[] includes)
@@ -27,16 +27,17 @@ namespace BinanceBotInfrastructure.Services.Cache
             where TEntity : class
         {
             var nameOfTEntity = typeof(TEntity).FullName;
-            var cacheItem = cache.GetOrAdd(nameOfTEntity, (nameOfTEntity) => new CacheTableDataStorage
+            var cacheItem = _cache.GetOrAdd(nameOfTEntity, (nameOfTEntity) => new CacheTableDataStorage
             {
                 NameOfTEntity = nameOfTEntity,
                 Entities = new List<TEntity>(),
             });
+        
             return cacheItem;
         }
 
-        public void DropAll() => cache.Clear();
+        public void DropAll() => _cache.Clear();
 
-        public void Drop<TEntity>() => cache.Remove(typeof(TEntity).FullName, out _);
+        public void Drop<TEntity>() => _cache.Remove(typeof(TEntity).FullName, out _);
     }
 }

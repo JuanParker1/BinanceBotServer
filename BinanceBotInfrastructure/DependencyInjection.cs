@@ -1,4 +1,3 @@
-using BinanceBotApp.DataValidators;
 using BinanceBotApp.Services;
 using BinanceBotDb.Models;
 using BinanceBotInfrastructure.Services;
@@ -28,7 +27,7 @@ namespace BinanceBotInfrastructure
 
             services.AddScoped<IBinanceBotDbContext, BinanceBotDbContext>();
             services.AddScoped<IHttpClientService, HttpClientService>();
-            
+        
             services.AddSingleton(new CacheDb());
             
             services.AddTransient<IAuthService, AuthService>();
