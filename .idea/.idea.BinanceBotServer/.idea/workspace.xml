@@ -6,21 +6,10 @@
     <projectFile profileName="BinanceBotWebApi">BinanceBotWebApi/BinanceBotWebApi.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8afdc2c8-4263-4c38-8bac-ea244470d2e9" name="Changes" comment="Fix: Renamed solution to BinanceBotServer">
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.BinanceBotServer/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.BinanceBotServer/.idea/indexLayout.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.BinanceBotServer/.idea/projectSettingsUpdater.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.BinanceBotServer/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.BinanceBotServer/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BinanceBotServer.sln" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BinanceBotServer.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BinanceBotWebApi/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BinanceBotWebApi/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BinanceBotWebApi/.idea/indexLayout.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BinanceBotWebApi/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BinanceBotInfrastructure/Services/SettingsService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BinanceBotInfrastructure/Services/SettingsService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BinanceBotWebApi.sln" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BinanceBotWebApi.sln.DotSettings.user" beforeDir="false" />
+    <list default="true" id="8afdc2c8-4263-4c38-8bac-ea244470d2e9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/BinanceBotWebApi/wwwroot/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.BinanceBotServer/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BinanceBotServer/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BinanceBotWebApi/BinanceBotWebApi.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/BinanceBotWebApi/BinanceBotWebApi.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,6 +18,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///home/c/x-files/Projects/BinanceBotServer/BinanceBotServer/BinanceBotWebApi/Startup.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -40,6 +32,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -103,7 +96,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1644486772799</updated>
-      <workItem from="1644486776262" duration="305000" />
+      <workItem from="1644486776262" duration="4411000" />
+      <workItem from="1644492039226" duration="1311000" />
     </task>
     <task id="LOCAL-00001" summary="Fix: Renamed solution to BinanceBotServer">
       <created>1644487079151</created>
@@ -112,14 +106,21 @@
       <option name="project" value="LOCAL" />
       <updated>1644487079152</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Removed Swagger dark theme">
+      <created>1644487421504</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1644487421504</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
-  <component name="UnityProjectConfiguration" hasMinimizedUI="null" />
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -135,6 +136,7 @@
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Fix: Renamed solution to BinanceBotServer" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix: Renamed solution to BinanceBotServer" />
+    <MESSAGE value="Removed Swagger dark theme" />
+    <option name="LAST_COMMIT_MESSAGE" value="Removed Swagger dark theme" />
   </component>
 </project>
