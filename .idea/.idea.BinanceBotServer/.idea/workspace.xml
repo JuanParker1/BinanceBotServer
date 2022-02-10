@@ -6,15 +6,22 @@
     <projectFile profileName="BinanceBotWebApi">BinanceBotWebApi/BinanceBotWebApi.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8afdc2c8-4263-4c38-8bac-ea244470d2e9" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/BinanceBotWebApi/wwwroot/index.html" afterDir="false" />
+    <list default="true" id="8afdc2c8-4263-4c38-8bac-ea244470d2e9" name="Changes" comment="Add: Added index.html to wwwroot folder">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BinanceBotServer/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BinanceBotServer/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BinanceBotWebApi/BinanceBotWebApi.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/BinanceBotWebApi/BinanceBotWebApi.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BinanceBotApp/Data/AuthUserInfoDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BinanceBotApp/Data/AuthUserInfoDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BinanceBotInfrastructure/Services/AuthService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BinanceBotInfrastructure/Services/AuthService.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -97,7 +104,7 @@
       <option name="presentableId" value="Default" />
       <updated>1644486772799</updated>
       <workItem from="1644486776262" duration="4411000" />
-      <workItem from="1644492039226" duration="1311000" />
+      <workItem from="1644492039226" duration="1829000" />
     </task>
     <task id="LOCAL-00001" summary="Fix: Renamed solution to BinanceBotServer">
       <created>1644487079151</created>
@@ -113,7 +120,14 @@
       <option name="project" value="LOCAL" />
       <updated>1644487421504</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Add: Added index.html to wwwroot folder">
+      <created>1644493489372</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1644493489372</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -137,6 +151,7 @@
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Fix: Renamed solution to BinanceBotServer" />
     <MESSAGE value="Removed Swagger dark theme" />
-    <option name="LAST_COMMIT_MESSAGE" value="Removed Swagger dark theme" />
+    <MESSAGE value="Add: Added index.html to wwwroot folder" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add: Added index.html to wwwroot folder" />
   </component>
 </project>

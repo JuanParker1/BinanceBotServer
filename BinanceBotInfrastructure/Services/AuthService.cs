@@ -56,6 +56,7 @@ namespace BinanceBotInfrastructure.Services
                 Id = user.Id,
                 Name = user.Name,
                 Login = user.Login,
+                DateCreated = user.DateCreated,
                 RoleName = user.Role.Caption,
                 Surname = user.Surname,
                 Token = MakeToken(identity.Claims),

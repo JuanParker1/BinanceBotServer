@@ -1,3 +1,5 @@
+using System;
+
 namespace BinanceBotApp.Data
 {
     /// <summary>
@@ -24,6 +26,11 @@ namespace BinanceBotApp.Data
         /// User surname
         /// </summary>
         public string Surname { get; set; }
+        
+        /// <summary>
+        /// User registration date
+        /// </summary>
+        public DateTime DateCreated { get; set; }
         
         /// <summary>
         /// User email
