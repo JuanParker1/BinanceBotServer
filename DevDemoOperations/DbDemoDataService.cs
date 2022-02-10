@@ -46,6 +46,49 @@ public class DbDemoDataService
                     LimitOrderRate = 25
                 }
             );
+            
+            demoContext.BalanceChanges.AddRange(
+                new BalanceChange
+                {
+                    Id = 1,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-02 15:30"),
+                    IdDirection = 1,
+                    Amount = 100
+                },
+                new BalanceChange
+                {
+                    Id = 2,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-03 15:30"),
+                    IdDirection = 1,
+                    Amount = 400
+                },
+                new BalanceChange
+                {
+                    Id = 3,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-03 15:30"),
+                    IdDirection = 2,
+                    Amount = 200
+                },
+                new BalanceChange
+                {
+                    Id = 4,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-04 15:30"),
+                    IdDirection = 1,
+                    Amount = 1000
+                },
+                new BalanceChange
+                {
+                    Id = 5,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-05 15:30"),
+                    IdDirection = 2,
+                    Amount = 500
+                }
+            );
                 
             var res = demoContext.SaveChanges();
 
