@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BinanceBotDb.Models.Directories;
 using Microsoft.EntityFrameworkCore;
 
 namespace BinanceBotDb.Models
@@ -17,10 +18,10 @@ namespace BinanceBotDb.Models
         [Column("is_trade_enabled"), Comment("Trade on/off")]
         public bool IsTradeEnabled { get; set; }
         
-        [Column("trade_mode"), Comment("0 - trade only by signals \n 1 - purchase by signals, sale by limit order")]
-        public int TradeMode { get; set; }
+        [Column("id_trade_mode"), Comment("Selected trade mode")]
+        public int IdTradeMode { get; set; }
         
-        [Column("limit_order_rate"), Comment("Amount of % from highest price to place limit order")]
+        [Column("limit_order_rate"), Comment("Amount of percents from highest price to place limit order")]
         public int LimitOrderRate { get; set; }
         
         [Column("api_key"), Comment("api key")]
@@ -35,5 +36,9 @@ namespace BinanceBotDb.Models
         [ForeignKey(nameof(IdUser))]
         [InverseProperty(nameof(Models.User.Settings))]
         public virtual User User { get; set; }
+        
+        [ForeignKey(nameof(IdTradeMode))]
+        [InverseProperty(nameof(Models.Directories.TradeMode.Settings))]
+        public virtual TradeMode TradeMode { get; set; }
     }
 }

@@ -95,7 +95,7 @@ namespace BinanceBotInfrastructure.Services
             {
                 IdUser = newUser.Id,
                 IsTradeEnabled = false,
-                TradeMode = 0,
+                IdTradeMode = 0,
                 LimitOrderRate = 25
             };
 

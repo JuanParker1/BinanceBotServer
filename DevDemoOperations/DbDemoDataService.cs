@@ -32,6 +32,7 @@ public class DbDemoDataService
                     Password =
                         "VzwA|6a4e3df1193666839c57ac8dcafe549cfb00fab0fdd78a008261332ba5c1a326ab93b6993a913219c2f8e078103b8f91",
                     Name = "Developer",
+                    DateCreated = DateTime.Parse("2022-06-08T12:01:19.000000")
                 }
             );
                 
@@ -41,7 +42,7 @@ public class DbDemoDataService
                     Id = 1,
                     IdUser = 1,
                     IsTradeEnabled = false,
-                    TradeMode = 0,
+                    IdTradeMode = 1,
                     LimitOrderRate = 25
                 }
             );

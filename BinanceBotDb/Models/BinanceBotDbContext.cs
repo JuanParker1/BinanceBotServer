@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using BinanceBotDb.Models.Directories;
 using Microsoft.EntityFrameworkCore;
 
 namespace BinanceBotDb.Models
@@ -43,6 +44,15 @@ namespace BinanceBotDb.Models
                 {
                     new UserRole {Id = 1, Caption = "Administrator",},
                     new UserRole {Id = 2, Caption = "User",},
+                });
+            });
+            
+            modelBuilder.Entity<TradeMode>(entity =>
+            {
+                entity.HasData(new List<TradeMode>
+                {
+                    new TradeMode {Id = 1, Caption = "Auto",},
+                    new TradeMode {Id = 2, Caption = "Semiauto",},
                 });
             });
         }
