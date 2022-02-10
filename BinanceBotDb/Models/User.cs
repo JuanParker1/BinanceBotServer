@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
@@ -45,5 +46,8 @@ namespace BinanceBotDb.Models
         
         [InverseProperty(nameof(Models.Settings.User))]
         public virtual Settings Settings { get; set; }
+        
+        [InverseProperty(nameof(BalanceChange.User))]
+        public virtual ICollection<BalanceChange> BalanceChanges { get; set; }
     }
 }
