@@ -10,18 +10,19 @@ using BinanceBotInfrastructure.Extensions;
 namespace BinanceBotWebApi.Controllers
 {
     /// <summary>
-    /// Trade analytics controller
+    /// Account balance info controller
     /// </summary>
-    [Route("api/analytics")]
+    [Route("api/balance")]
     [ApiController]
     [Authorize]
-    public class AnalyticsController : ControllerBase
+    public class AccountBalanceController : ControllerBase // TODO: Нужен CRUD controller как минимум для BalanceChanges и для Ордеров. ООни всегда будут перегружать базовый
+    // Из CRUD сервиса, чтобы вызвать base.Method(), т.е. сохранить и после этого отправить запрос для Бинанса. Get все стандартные с Pagination container.
     {
-        private readonly IAnalyticsService _analyticsService;
+        private readonly IAccountBalanceService _balanceService;
 
-        public AnalyticsController(IAnalyticsService analyticsService)
+        public AccountBalanceController(IAccountBalanceService balanceService)
         {
-            _analyticsService = analyticsService;
+            _balanceService = balanceService;
         }
         
         /// <summary>
@@ -32,7 +33,7 @@ namespace BinanceBotWebApi.Controllers
         /// <returns code="200"> User's current balance info </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
-        [HttpGet("balance/current")]
+        [HttpGet("current")]
         [ProducesResponseType(typeof(double), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetCurrentBalanceAsync([Range(1, int.MaxValue)] int idUser, 
             CancellationToken token = default)
@@ -42,7 +43,7 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            var currentBalance = await _analyticsService.GetCurrentBalanceAsync(idUser, 
+            var currentBalance = await _balanceService.GetCurrentBalanceAsync(idUser, 
                 token);
 
             return Ok(currentBalance);
@@ -56,7 +57,7 @@ namespace BinanceBotWebApi.Controllers
         /// <returns code="200"> User's total balance info </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
-        [HttpGet("balance/total")]
+        [HttpGet("total")]
         [ProducesResponseType(typeof(TotalBalanceDto), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetTotalBalanceAsync([Range(1, int.MaxValue)] int idUser, 
             CancellationToken token = default)
@@ -66,7 +67,7 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            var totalBalance = await _analyticsService.GetTotalBalanceAsync(idUser, 
+            var totalBalance = await _balanceService.GetTotalBalanceAsync(idUser, 
                 token);
 
             return Ok(totalBalance);
