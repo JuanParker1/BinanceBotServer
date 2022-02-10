@@ -7,7 +7,10 @@ namespace BinanceBotApp.Services
 {
     public interface IUserService
     {
-        Task<int> UpdateUserInfoAsync(UserBaseDto userDto, CancellationToken token);
+        Task<AuthUserInfoDto> GetUserInfoAsync(int idUser,
+            CancellationToken token);
+        Task<int> UpdateUserInfoAsync(AuthUserInfoDto authUserDto, 
+            CancellationToken token);
         Task GetUserDataStreamAsync(string listenKey, Action<string> handler,
             CancellationToken token);
     }

@@ -42,7 +42,7 @@ namespace BinanceBotInfrastructure.Services
             _rnd = new Random((int)(DateTime.Now.Ticks % 2147480161));
         }
 
-        public async Task<AuthUserInfoDto> LoginAsync(string login, string password,
+        public async Task<AuthTokenDto> LoginAsync(string login, string password,
             CancellationToken token = default)
         {
             var (identity, user) = await GetClaimsUserAsync(login.Trim(), 
@@ -50,17 +50,14 @@ namespace BinanceBotInfrastructure.Services
 
             if (identity == default)
                 return null;
-
-            return new AuthUserInfoDto
+            
+            var authTokenDto = new AuthTokenDto()
             {
-                Id = user.Id,
-                Name = user.Name,
-                Login = user.Login,
-                DateCreated = user.DateCreated,
-                RoleName = user.Role.Caption,
-                Surname = user.Surname,
-                Token = MakeToken(identity.Claims),
+                IdUser = user.Id,
+                Token = MakeToken(identity.Claims)
             };
+
+            return authTokenDto;
         }
 
         public string Refresh(ClaimsPrincipal user) =>
@@ -91,7 +88,7 @@ namespace BinanceBotInfrastructure.Services
 
             await _db.SaveChangesAsync(token);
 
-            var userSettings = new Settings
+            var userSettings = new Settings // TODO: Убрать в Settings service
             {
                 IdUser = newUser.Id,
                 IsTradeEnabled = false,

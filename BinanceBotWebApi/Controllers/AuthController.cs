@@ -25,21 +25,22 @@ namespace BinanceBotWebApi.Controllers
         /// </summary>
         /// <param name="authDto"></param>
         /// <param name="token"> Task cancellation token </param>
-        /// <response code="200"> User info </response>
+        /// <response code="200"> User token </response>
+        /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Invalid login or password </response>
         [HttpPost("login")]
         [AllowAnonymous]
-        [ProducesResponseType(typeof(AuthUserInfoDto), (int)System.Net.HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(AuthTokenDto), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> LoginAsync([FromBody] AuthDto authDto, 
             CancellationToken token = default)
         {
-            var authUserInfo = await _authService.LoginAsync(authDto.Login,
+            var authToken = await _authService.LoginAsync(authDto.Login,
                 authDto.Password, token);
 
-            if (authUserInfo is null)
+            if (authToken is null)
                 return Forbid();
 
-            return Ok(authUserInfo);
+            return Ok(authToken);
         }
         
         /// <summary>
@@ -60,22 +61,23 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="registerDto"> New user info </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> User info </returns>
-        /// <response code="400"> User already exists </response>
+        /// <response code="400"> Error in request parameters </response>
+        /// <response code="403"> User already exists </response>
         [HttpPost("register")]
         [AllowAnonymous]
-        [ProducesResponseType(typeof(AuthUserInfoDto), (int)System.Net.HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(AuthTokenDto), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterDto registerDto,
             CancellationToken token = default)
         {
             var isNewUser = await _authService.RegisterAsync(registerDto, token);
 
             if (!isNewUser) 
-                return BadRequest("User with such login already exists");
+                return Forbid();
             
-            var authUserInfo = await _authService.LoginAsync(registerDto.Login,
+            var authToken = await _authService.LoginAsync(registerDto.Login,
                 registerDto.Password, token);
             
-            return Ok(authUserInfo);
+            return Ok(authToken);
         }
         
         /// <summary>
@@ -84,6 +86,7 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="changePasswordDto"> User password info </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> Ок </returns>
+        /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id or permissions </response>
         [HttpPut("changePassword")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]

@@ -28,30 +28,53 @@ namespace BinanceBotWebApi.Controllers
         }
         
         /// <summary>
+        /// Gets user info
+        /// </summary>
+        /// <param name="idUser"> User id </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns code="200"> User info </returns>
+        /// <response code="400"> Error in request parameters </response>
+        /// <response code="403"> Wrong user id </response>
+        [HttpPut("userInfo")]
+        [ProducesResponseType(typeof(AuthUserInfoDto), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> GetUserInfoAsync([Range(1, int.MaxValue)] int idUser, 
+            CancellationToken token = default)
+        {
+            var authUserId = User.GetUserId();
+
+            if (authUserId is null || authUserId != idUser)
+                return Forbid();
+            
+            var result = await _userService.GetUserInfoAsync(idUser, token);
+
+            return Ok(result);
+        }
+        
+        /// <summary>
         /// Updates user info
         /// </summary>
-        /// <param name="userDto"> User info object </param>
+        /// <param name="authUserDto"> User info object </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> 0 - no changes. 1 - changes applied </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpPut("userInfo")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> UpdateUserInfoAsync(UserBaseDto userDto, 
+        public async Task<IActionResult> UpdateUserInfoAsync(AuthUserInfoDto authUserDto, 
             CancellationToken token = default)
         {
-            var idUser = User.GetUserId();
+            var authUserId = User.GetUserId();
 
-            if (idUser is null || idUser != userDto.Id)
+            if (authUserId is null || authUserId != authUserDto.Id)
                 return Forbid();
             
-            var result = await _userService.UpdateUserInfoAsync(userDto, token);
+            var result = await _userService.UpdateUserInfoAsync(authUserDto, token);
 
             return Ok(result);
         }
 
         /// <summary>
-        /// Gets user data
+        /// Gets user exchange stream data
         /// </summary>
         /// <param name="idUser"> User id </param>
         /// <param name="listenKey"> User listen key </param>

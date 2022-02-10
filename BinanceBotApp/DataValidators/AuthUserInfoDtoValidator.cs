@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace BinanceBotApp.DataValidators
 {
-    public class UserBaseDtoValidator : AbstractValidator<UserBaseDto>
+    public class AuthUserInfoDtoValidator : AbstractValidator<AuthUserInfoDto>
     {
-        public UserBaseDtoValidator()
+        public AuthUserInfoDtoValidator()
         {
             RuleFor(x => x.Login).NotNull()
                 .WithMessage("Логин не должен быть пустым");
