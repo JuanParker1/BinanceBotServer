@@ -16,7 +16,8 @@ namespace BinanceBotWebApi.Controllers
     [ApiController]
     [Authorize]
     public class AccountBalanceController : ControllerBase // TODO: Нужен CRUD controller как минимум для BalanceChanges и для Ордеров. ООни всегда будут перегружать базовый
-    // Из CRUD сервиса, чтобы вызвать base.Method(), т.е. сохранить и после этого отправить запрос для Бинанса. Get все стандартные с Pagination container.
+    // Из CRUD сервиса, чтобы вызвать base.Method(), т.е. сохранить и после этого отправить запрос для Бинанса. Get все стандартные с Pagination container. 
+    // БОЛЕЕ ТОГО ЕЩЕ И USER EVENTS!!! Модалка, создать показать.
     {
         private readonly IAccountBalanceService _balanceService;
 

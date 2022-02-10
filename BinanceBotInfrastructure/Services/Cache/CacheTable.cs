@@ -154,7 +154,7 @@ namespace BinanceBotInfrastructure.Services.Cache
                 ? _dbSet 
                 : _configureDbSet(_dbSet);
             var queryEntities = await query.AsNoTracking()
-                .ToListAsync(token).ConfigureAwait(false);
+                .ToListAsync(token);
             _cached.AddRange(queryEntities);
             _data.LastRefreshDate = DateTime.Now;
 
@@ -294,7 +294,7 @@ namespace BinanceBotInfrastructure.Services.Cache
                     _dbSet.Update(entity);
                 else
                     _dbSet.Add(entity);
-                var affected = await _db.SaveChangesAsync(token).ConfigureAwait(false);
+                var affected = await _db.SaveChangesAsync(token);
                 if (affected > 0)
                     await InternalRefreshAsync(true, token);
                 return affected;
@@ -339,7 +339,7 @@ namespace BinanceBotInfrastructure.Services.Cache
                         _dbSet.Add(entity);
                 }
 
-                var affected = await _db.SaveChangesAsync(token).ConfigureAwait(false);
+                var affected = await _db.SaveChangesAsync(token);
                 if (affected > 0)
                     await InternalRefreshAsync(true, token);
                 return affected;
@@ -361,7 +361,7 @@ namespace BinanceBotInfrastructure.Services.Cache
             => SyncAsync(async (hasFree, token) =>
             {
                 _dbSet.RemoveRange(_dbSet.Where(predicate));
-                var affected = await _db.SaveChangesAsync(token).ConfigureAwait(false);
+                var affected = await _db.SaveChangesAsync(token);
                 if (affected > 0)
                     await InternalRefreshAsync(true, token);
                 
@@ -386,7 +386,7 @@ namespace BinanceBotInfrastructure.Services.Cache
             return SyncAsync(async (hasFree, token) =>
             {
                 var entry = _dbSet.Add(entity);
-                var affected = await _db.SaveChangesAsync(token).ConfigureAwait(false);
+                var affected = await _db.SaveChangesAsync(token);
                 if (affected > 0)
                     await InternalRefreshAsync(true, token);
                 
@@ -431,7 +431,7 @@ namespace BinanceBotInfrastructure.Services.Cache
                 var entries = new List<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<TEntity>>(count);
                 entries.AddRange(newEntities.Select(newEntity => _dbSet.Add(newEntity)));
                 
-                var affected = await _db.SaveChangesAsync(token).ConfigureAwait(false);
+                var affected = await _db.SaveChangesAsync(token);
                 if (affected > 0)
                     await InternalRefreshAsync(true, token);
                 else
