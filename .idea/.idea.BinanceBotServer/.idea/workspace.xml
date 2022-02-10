@@ -6,10 +6,9 @@
     <projectFile profileName="BinanceBotWebApi">BinanceBotWebApi/BinanceBotWebApi.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8afdc2c8-4263-4c38-8bac-ea244470d2e9" name="Changes" comment="Add: Added index.html to wwwroot folder">
+    <list default="true" id="8afdc2c8-4263-4c38-8bac-ea244470d2e9" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BinanceBotServer/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BinanceBotServer/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BinanceBotApp/Data/AuthUserInfoDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BinanceBotApp/Data/AuthUserInfoDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BinanceBotInfrastructure/Services/AuthService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BinanceBotInfrastructure/Services/AuthService.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,9 +25,6 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///home/c/x-files/Projects/BinanceBotServer/BinanceBotServer/BinanceBotWebApi/Startup.cs" root0="SKIP_HIGHLIGHTING" />
-  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -43,6 +39,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="settings.editor.selected.configurable" value="vcs.Git" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RunManager" selected=".NET Launch Settings Profile.BinanceBotWebApi">
@@ -104,7 +101,8 @@
       <option name="presentableId" value="Default" />
       <updated>1644486772799</updated>
       <workItem from="1644486776262" duration="4411000" />
-      <workItem from="1644492039226" duration="1829000" />
+      <workItem from="1644492039226" duration="2471000" />
+      <workItem from="1644494535551" duration="96000" />
     </task>
     <task id="LOCAL-00001" summary="Fix: Renamed solution to BinanceBotServer">
       <created>1644487079151</created>
@@ -127,7 +125,14 @@
       <option name="project" value="LOCAL" />
       <updated>1644493489372</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Add: Added date of user registration to AuthUserInfoDto">
+      <created>1644494279321</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1644494279321</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -152,6 +157,7 @@
     <MESSAGE value="Fix: Renamed solution to BinanceBotServer" />
     <MESSAGE value="Removed Swagger dark theme" />
     <MESSAGE value="Add: Added index.html to wwwroot folder" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add: Added index.html to wwwroot folder" />
+    <MESSAGE value="Add: Added date of user registration to AuthUserInfoDto" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add: Added date of user registration to AuthUserInfoDto" />
   </component>
 </project>
