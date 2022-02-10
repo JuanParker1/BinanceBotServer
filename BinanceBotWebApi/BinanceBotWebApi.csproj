@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="wwwroot\swagger-ui" />
+      <Folder Include="wwwroot" />
     </ItemGroup>
 
     <ItemGroup>
