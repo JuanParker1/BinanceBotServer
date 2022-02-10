@@ -33,7 +33,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet]
-        [ProducesResponseType(typeof(SettingsDto), (int)System.Net.HttpStatusCode.OK)] // TODO: Проверить везде возвращаемые типы
+        [ProducesResponseType(typeof(SettingsDto), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetUserSettings([Range(1, int.MaxValue)] int idUser, 
             CancellationToken token = default)
         {
