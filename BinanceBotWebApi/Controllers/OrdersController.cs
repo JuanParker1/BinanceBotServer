@@ -91,7 +91,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="403"> Wrong user id </response>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<OrderInfoDto>), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> GetOrdersForPairAsync([FromQuery][Range(1, int.MaxValue)] int idUser,  
+        public async Task<IActionResult> GetAllOrdersAsync([FromQuery][Range(1, int.MaxValue)] int idUser,  
             [Range(5000, int.MaxValue)] int recvWindow = 5000, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
@@ -114,7 +114,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpPost("test")]
-        [ProducesResponseType(typeof(CreatedOrderAckDto), (int)System.Net.HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(CreatedOrderResultDto), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> CreateTestOrderAsync([FromBody] NewOrderDto newOrderDto, 
             CancellationToken token = default)
         {
@@ -137,7 +137,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpPost]
-        [ProducesResponseType(typeof(CreatedOrderAckDto), (int)System.Net.HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(CreatedOrderResultDto), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> CreateOrderAsync([FromBody] NewOrderDto newOrder, 
             CancellationToken token = default)
         {

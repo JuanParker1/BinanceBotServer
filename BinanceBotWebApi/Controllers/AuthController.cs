@@ -47,7 +47,7 @@ namespace BinanceBotWebApi.Controllers
         /// </summary>
         /// <returns code="200"> New token </returns>
         [HttpGet("refresh")]
-        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)System.Net.HttpStatusCode.OK)]
         public ActionResult Refresh() // TODO: Добавить обновление токена
         {
             var newToken = _authService.Refresh(User);
@@ -63,7 +63,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="400"> User already exists </response>
         [HttpPost("register")]
         [AllowAnonymous]
-        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(AuthUserInfoDto), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterDto registerDto,
             CancellationToken token = default)
         {
