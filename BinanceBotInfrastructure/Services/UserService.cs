@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using BinanceBotApp.Data;
 using BinanceBotApp.DataInternal.Endpoints;
@@ -26,10 +27,12 @@ namespace BinanceBotInfrastructure.Services
         public async Task<AuthUserInfoDto> GetUserInfoAsync(int idUser,
             CancellationToken token = default)
         {
-            var authUserInfo = await _db.Users.FirstOrDefaultAsync(u => u.Id == idUser, 
-                token);
+            var user = await (from u in _db.Users
+                                where u.Id == idUser
+                                select u)
+                            .FirstOrDefaultAsync(token);
 
-            var authUserInfoDto = authUserInfo?.Adapt<AuthUserInfoDto>();
+            var authUserInfoDto = user?.Adapt<AuthUserInfoDto>();
             
             return authUserInfoDto;
         }
@@ -37,8 +40,10 @@ namespace BinanceBotInfrastructure.Services
         public async Task<int> UpdateUserInfoAsync(AuthUserInfoDto authUserDto,
             CancellationToken token)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => 
-                u.Id == authUserDto.Id, token);
+            var user = await (from u in _db.Users
+                                where u.Id == authUserDto.Id
+                                select u)
+                            .FirstOrDefaultAsync(token);
 
             if (user is null || string.IsNullOrEmpty(authUserDto.Login.Trim()))
                 return 0;

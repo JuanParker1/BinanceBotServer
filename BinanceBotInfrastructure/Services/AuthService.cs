@@ -65,8 +65,10 @@ namespace BinanceBotInfrastructure.Services
 
         public async Task<bool> RegisterAsync(RegisterDto registerDto, CancellationToken token)
         {
-            var user = _db.Users.FirstOrDefault(u => 
-                u.Login == registerDto.Login.Trim());
+            var user = await (from u in _db.Users
+                                where u.Login == registerDto.Login.Trim()
+                                select u)
+                            .FirstOrDefaultAsync(token);
             
             if(user is not null)
                 return false;
@@ -104,8 +106,10 @@ namespace BinanceBotInfrastructure.Services
         public async Task<int> ChangePasswordAsync(ChangePasswordDto changePasswordDto,
             CancellationToken token)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == changePasswordDto.IdUser,
-                token);
+            var user = await (from u in _db.Users
+                                where u.Id == changePasswordDto.IdUser
+                                select u)
+                            .FirstOrDefaultAsync(token);
             
             if (user == null)
                 return -1;
