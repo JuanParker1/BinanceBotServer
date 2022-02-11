@@ -10,7 +10,7 @@ namespace BinanceBotApp.Data
         /// <summary>
         /// User id
         /// </summary>
-        public int Id { get; set; }
+        public int IdUser { get; set; }
         
         /// <summary>
         /// User login

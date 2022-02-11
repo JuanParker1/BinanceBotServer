@@ -7,7 +7,7 @@ namespace BinanceBotInfrastructure.Extensions
     {
         public static int? GetUserId(this ClaimsPrincipal user)
         {
-            var userId = user.FindFirst(nameof(RegisterDto.Id));
+            var userId = user.FindFirst(nameof(RegisterDto.IdUser));
             if (userId is null)
                 return null;
 

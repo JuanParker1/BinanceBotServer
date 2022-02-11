@@ -30,7 +30,7 @@ namespace BinanceBotInfrastructure.Services
         private static readonly TimeSpan _expiresTimespan = TimeSpan.FromDays(365.25);
         private readonly Encoding _encoding = Encoding.UTF8;
         private const int _passwordSaltLength = 5;
-        private const string _claimIdUser = "id";
+        private const string _claimIdUser = "idUser";
         private readonly HashAlgorithm _hashAlgoritm;
         private readonly Random _rnd;
 

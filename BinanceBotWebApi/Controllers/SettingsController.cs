@@ -58,7 +58,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="403"> Wrong user id </response>
         [HttpPost("enableTrade")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> UpdateUserInfoAsync(bool isTradeEnabled, 
+        public async Task<IActionResult> EnableTradeAsync(bool isTradeEnabled, 
             [Range(1, int.MaxValue)] int idUser, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();

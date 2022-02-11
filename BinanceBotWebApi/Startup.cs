@@ -56,7 +56,7 @@ namespace BinanceBotWebApi
                 app.UseDeveloperExceptionPage();
             else
                 app.UseHsts();
-            
+            // TODO: Middleware история входов
             app.UseHttpsRedirection();
             app.UseDefaultFiles();
             app.UseStaticFiles();

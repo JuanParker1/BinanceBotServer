@@ -41,7 +41,7 @@ namespace BinanceBotInfrastructure.Services
             CancellationToken token)
         {
             var user = await (from u in _db.Users
-                                where u.Id == authUserDto.Id
+                                where u.Id == authUserDto.IdUser
                                 select u)
                             .FirstOrDefaultAsync(token);
 

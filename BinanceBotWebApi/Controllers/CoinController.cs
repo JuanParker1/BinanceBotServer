@@ -27,7 +27,7 @@ namespace BinanceBotWebApi.Controllers
         }
         
         /// <summary>
-        /// Gets list of all trading pairs
+        /// Gets list of all available trading pairs
         /// </summary>
         /// <param name="idUser"> Requested user id </param>
         /// <param name="token"> Task cancellation token </param>
