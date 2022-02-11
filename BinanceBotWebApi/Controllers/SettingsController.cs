@@ -58,8 +58,8 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="403"> Wrong user id </response>
         [HttpPost("enableTrade")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> EnableTradeAsync(bool isTradeEnabled, 
-            [Range(1, int.MaxValue)] int idUser, CancellationToken token = default)
+        public async Task<IActionResult> EnableTradeAsync([Range(1, int.MaxValue)] int idUser, 
+            bool isTradeEnabled, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
@@ -67,6 +67,56 @@ namespace BinanceBotWebApi.Controllers
                 return Forbid();
 
             var result = await _settingsService.EnableTradeAsync(idUser, isTradeEnabled, token);
+
+            return Ok(result);
+        }
+        
+        /// <summary>
+        /// Changes trade mode
+        /// </summary>
+        /// <param name="idUser"> User id </param>
+        /// <param name="idTradeMode"> 1-autoTrade, 2-Semiauto </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns code="200"> 0 - no changes. 1 - changes applied </returns>
+        /// <response code="400"> Error in request parameters </response>
+        /// <response code="403"> Wrong user id </response>
+        [HttpPost("tradeMode")]
+        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> SaveTradeModeAsync([Range(1, int.MaxValue)] int idUser, 
+            [Range(1, 2)] int idTradeMode, CancellationToken token = default)
+        {
+            var authUserId = User.GetUserId();
+
+            if (authUserId is null || authUserId != idUser)
+                return Forbid();
+
+            var result = await _settingsService.SaveTradeModeAsync(idUser, idTradeMode, 
+                token);
+
+            return Ok(result);
+        }
+        
+        /// <summary>
+        /// Changes limit auto order price rate
+        /// </summary>
+        /// <param name="idUser"> User id </param>
+        /// <param name="orderPriceRate"> Limit auto order rate in percents from highest price </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns code="200"> 0 - no changes. 1 - changes applied </returns>
+        /// <response code="400"> Error in request parameters </response>
+        /// <response code="403"> Wrong user id </response>
+        [HttpPost("orderPriceRate")]
+        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> ChangeOrderPriceRateAsync([Range(1, int.MaxValue)] int idUser, 
+            [Range(10, 30)] int orderPriceRate, CancellationToken token = default)
+        {
+            var authUserId = User.GetUserId();
+
+            if (authUserId is null || authUserId != idUser)
+                return Forbid();
+
+            var result = await _settingsService.ChangeOrderPriceRateAsync(idUser, orderPriceRate, 
+                token);
 
             return Ok(result);
         }

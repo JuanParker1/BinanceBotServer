@@ -72,6 +72,34 @@ namespace BinanceBotWebApi.Controllers
 
             return Ok(result);
         }
+        
+        /// <summary>
+        /// Changes user password
+        /// </summary>
+        /// <param name="changePasswordDto"> User password info </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns code="200"> Ок </returns>
+        /// <response code="400"> Error in request parameters </response>
+        /// <response code="403"> Wrong user id or permissions </response>
+        [HttpPut("changePassword")]
+        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> ChangePasswordAsync([FromBody] ChangePasswordDto changePasswordDto, // TODO: CRUD controller почти никак не задействован
+            CancellationToken token = default)
+        {
+            if (User.GetUserId() == changePasswordDto.IdUser || User.IsInRole("Administrator"))
+                return Forbid();
+
+            var code = await _userService.ChangePasswordAsync(changePasswordDto, 
+                token);
+            
+            return code switch
+            {
+                0 => Ok(),
+                -1 => BadRequest("User does not exist"),
+                -2 => BadRequest("Old password is incorrect"),
+                _ => BadRequest(),
+            };
+        }
 
         /// <summary>
         /// Gets user exchange stream data

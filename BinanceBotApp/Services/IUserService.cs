@@ -11,6 +11,8 @@ namespace BinanceBotApp.Services
             CancellationToken token);
         Task<int> UpdateUserInfoAsync(AuthUserInfoDto authUserDto, 
             CancellationToken token);
+        Task<int> ChangePasswordAsync(ChangePasswordDto changePasswordDto,
+            CancellationToken token);
         Task GetUserDataStreamAsync(string listenKey, Action<string> handler,
             CancellationToken token);
     }

@@ -16,12 +16,14 @@ namespace BinanceBotInfrastructure.Services
         private readonly IBinanceBotDbContext _db;
         private readonly IHttpClientService _httpService;
         private readonly IWebSocketClientService _wsService;
+        private readonly IAuthService _authService;
         public UserService(IBinanceBotDbContext db, IHttpClientService httpService, 
-            IWebSocketClientService wsService)
+            IWebSocketClientService wsService, IAuthService authService)
         {
             _db = db;
             _httpService = httpService;
             _wsService = wsService;
+            _authService = authService;
         }
 
         public async Task<AuthUserInfoDto> GetUserInfoAsync(int idUser,
@@ -60,6 +62,15 @@ namespace BinanceBotInfrastructure.Services
                 user.Email = authUserDto.Email.Trim();
 
             return await _db.SaveChangesAsync(token);
+        }
+
+        public async Task<int> ChangePasswordAsync(ChangePasswordDto changePasswordDto,
+            CancellationToken token)
+        {
+            var result = await _authService.ChangePasswordAsync(changePasswordDto, 
+                token);
+
+            return result;
         }
 
         public async Task GetUserDataStreamAsync(string listenKey, 
