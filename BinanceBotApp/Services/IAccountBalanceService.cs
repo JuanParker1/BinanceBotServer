@@ -9,6 +9,6 @@ namespace BinanceBotApp.Services
     public interface IAccountBalanceService : ICrudService<BalanceChangeDto>
     {
         Task<IEnumerable<CoinAmountDto>> GetCurrentBalanceAsync(int idUser, CancellationToken token);
-        Task<TotalBalanceDto> GetTotalBalanceAsync(int idUser, CancellationToken token);
+        Task<BalanceSummaryDto> GetTotalBalanceAsync(int idUser, CancellationToken token);
     }
 }

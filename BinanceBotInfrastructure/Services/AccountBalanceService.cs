@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using BinanceBotApp.Data;
 using BinanceBotApp.Services;
 using BinanceBotDb.Models;
-using BinanceBotApp.Data;
 using BinanceBotApp.DataInternal.Endpoints;
 using BinanceBotApp.DataInternal.Enums;
 using BinanceBotApp.DataInternal.Deserializers;
@@ -55,7 +54,7 @@ namespace BinanceBotInfrastructure.Services
             return currentBalance; 
         }
         
-        public async Task<TotalBalanceDto> GetTotalBalanceAsync(int idUser, 
+        public async Task<BalanceSummaryDto> GetTotalBalanceAsync(int idUser, 
             CancellationToken token)
         {
             var changesSum = await (from bChange in _db.BalanceChanges
@@ -68,7 +67,7 @@ namespace BinanceBotInfrastructure.Services
                                     })
                                     .ToListAsync(token);
             
-            var totalBalance = new TotalBalanceDto()
+            var totalBalance = new BalanceSummaryDto()
             {
                 TotalDeposit = changesSum
                     .FirstOrDefault(c => c.IdDirection == 1)?.Sum,

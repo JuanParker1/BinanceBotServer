@@ -57,8 +57,8 @@ namespace BinanceBotWebApi.Controllers
         /// <returns code="200"> User's total balance info </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
-        [HttpGet("total")]
-        [ProducesResponseType(typeof(TotalBalanceDto), (int)System.Net.HttpStatusCode.OK)]
+        [HttpGet("summary")]
+        [ProducesResponseType(typeof(BalanceSummaryDto), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetTotalBalanceAsync([Range(1, int.MaxValue)] int idUser, 
             CancellationToken token = default)
         {
