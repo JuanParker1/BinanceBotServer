@@ -1,26 +1,62 @@
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 using BinanceBotApp.Data;
 using BinanceBotApp.Services;
+using BinanceBotDb.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BinanceBotInfrastructure.Services
 {
-    public class AccountBalanceService : IAccountBalanceService
+    public class AccountBalanceService : CrudService<BalanceChangeDto, BalanceChange>, 
+        IAccountBalanceService
     {
-        public async Task<double> GetCurrentBalanceAsync(int idUser, CancellationToken token)
+        private readonly IBinanceBotDbContext _db;
+        private readonly ISettingsService _settingsService;
+
+        public AccountBalanceService(IBinanceBotDbContext db,
+            ISettingsService settingsService) : base(db)
         {
-            return await Task.FromResult(1500); // TODO: Запрос к БД where idUser, groupby IdDirection. Далее возвращать тапл с мин и макс и их вычитать
+            _db = db;
+            _settingsService = settingsService;
         }
         
-        public async Task<TotalBalanceDto> GetTotalBalanceAsync(int idUser, CancellationToken token)
+        public async Task<double?> GetCurrentBalanceAsync(int idUser, 
+            CancellationToken token)
         {
+            var apiKeys = await _settingsService.GetApiKeysAsync(idUser,
+                token);
+
+            if (apiKeys == default)
+                return null;
+            
+            // Запрос к апи на юзеринфо
+            
+            return await Task.FromResult(1500); 
+        }
+        
+        public async Task<TotalBalanceDto> GetTotalBalanceAsync(int idUser, 
+            CancellationToken token)
+        {
+            var changesSum = await (from bChange in _db.BalanceChanges
+                                    where bChange.IdUser == idUser
+                                    group bChange by bChange.IdDirection into g
+                                    select new
+                                    {
+                                        IdDirection = g.Key,
+                                        Sum = g.Sum(b => b.Amount)
+                                    })
+                                    .ToListAsync(token);
+            
             var totalBalance = new TotalBalanceDto()
             {
-                TotalDeposit = 1400, // Тут то же самое, как верху
-                TotalWithdraw = 1200
+                TotalDeposit = changesSum
+                    .FirstOrDefault(c => c.IdDirection == 1)?.Sum,
+                TotalWithdraw = changesSum
+                    .FirstOrDefault(c => c.IdDirection == 2)?.Sum,
             };
 
-            return await Task.FromResult(totalBalance);
+            return totalBalance;
         }
     }
 }

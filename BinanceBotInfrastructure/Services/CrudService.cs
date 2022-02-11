@@ -14,15 +14,15 @@ namespace BinanceBotInfrastructure.Services
         where TDto : BinanceBotApp.Data.IId
         where TModel : class, BinanceBotDb.Models.IId
     {
-        protected readonly IBinanceBotDbContext Context;
+        protected readonly IBinanceBotDbContext Db;
         protected readonly DbSet<TModel> DbSet;
 
         public IEnumerable<string> Includes { get; } = new List<string>();
 
-        public CrudService(IBinanceBotDbContext context)
+        public CrudService(IBinanceBotDbContext db)
         {
-            this.Context = context;
-            DbSet = context.Set<TModel>();
+            Db = db;
+            DbSet = db.Set<TModel>();
         }
 
         public virtual async Task<PaginationContainer<TDto>> GetPageAsync(int skip = 0, 
@@ -84,7 +84,7 @@ namespace BinanceBotInfrastructure.Services
             var entity = Convert(item);
             entity.Id = 0;
             DbSet.Add(entity);
-            await Context.SaveChangesAsync(token);
+            await Db.SaveChangesAsync(token);
             return entity.Id;
         }
 
@@ -97,7 +97,7 @@ namespace BinanceBotInfrastructure.Services
             });
 
             DbSet.AddRange(entities);
-            return Context.SaveChangesAsync(token);
+            return Db.SaveChangesAsync(token);
         }
 
         public virtual async Task<int> UpdateAsync(int id, TDto item, CancellationToken token)
@@ -109,7 +109,7 @@ namespace BinanceBotInfrastructure.Services
             var entity = Convert(item);
             entity.Id = id;
             DbSet.Update(entity);
-            return await Context.SaveChangesAsync(token);
+            return await Db.SaveChangesAsync(token);
         }
 
         public virtual Task<int> DeleteAsync(int id, CancellationToken token)
@@ -120,7 +120,7 @@ namespace BinanceBotInfrastructure.Services
                 return Task.FromResult(0);
             
             DbSet.Remove(entity);
-            return Context.SaveChangesAsync(token);
+            return Db.SaveChangesAsync(token);
         }
 
         public virtual Task<int> DeleteRangeAsync(IEnumerable<int> ids, CancellationToken token)
@@ -131,7 +131,7 @@ namespace BinanceBotInfrastructure.Services
                 return Task.FromResult(0);
             
             DbSet.RemoveRange(entities);
-            return Context.SaveChangesAsync(token);
+            return Db.SaveChangesAsync(token);
         }
         
         protected virtual TDto Convert(TModel src) => src.Adapt<TDto>();

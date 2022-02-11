@@ -4,9 +4,9 @@ using BinanceBotApp.Data;
 
 namespace BinanceBotApp.Services
 {
-    public interface IAccountBalanceService
+    public interface IAccountBalanceService : ICrudService<BalanceChangeDto>
     {
-        Task<double> GetCurrentBalanceAsync(int idUser, CancellationToken token);
+        Task<double?> GetCurrentBalanceAsync(int idUser, CancellationToken token);
         Task<TotalBalanceDto> GetTotalBalanceAsync(int idUser, CancellationToken token);
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BinanceBotDb.Models
 {
     [Table("t_balance_changes"), Comment("User balance deposits and withdrawals")]
-    public class BalanceChange
+    public class BalanceChange : IId
     {
         [Key]
         [Column("id")]
@@ -22,7 +22,7 @@ namespace BinanceBotDb.Models
         public int IdDirection { get; set; }
         
         [Column("amount"), Comment("Amount of change in USDT")]
-        public int Amount { get; set; }
+        public double Amount { get; set; }
         
         
         [ForeignKey(nameof(IdUser))]

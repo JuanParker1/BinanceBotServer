@@ -1,3 +1,4 @@
+using BinanceBotApp.Data;
 using BinanceBotApp.Services;
 using BinanceBotDb.Models;
 using BinanceBotInfrastructure.Services;
@@ -30,12 +31,16 @@ namespace BinanceBotInfrastructure
         
             services.AddSingleton(new CacheDb());
             
+            services.AddTransient<IAccountBalanceService, AccountBalanceService>();
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<ICoinService, CoinService>();
             services.AddTransient<IOrdersService, OrdersService>();
-            services.AddTransient<IUserService, UserService>();
             services.AddTransient<ISettingsService, SettingsService>();
+            services.AddTransient<IUserService, UserService>();
             services.AddTransient<IWebSocketClientService, WebSocketClientService>();
+            
+            // Crud Services
+            services.AddTransient<ICrudService<BalanceChangeDto>, AccountBalanceService>();
 
             return services;
         }

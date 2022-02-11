@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using BinanceBotApp.Data;
 using BinanceBotApp.DataInternal.Endpoints;
 using BinanceBotApp.DataInternal.Enums;
@@ -14,14 +13,12 @@ namespace BinanceBotInfrastructure.Services
 {
     public class SettingsService : ISettingsService
     {
-        private readonly IBinanceBotDbContext _db;
         private readonly CacheTable<Settings> _cacheUserSettings;
         private readonly IHttpClientService _httpService;
         
         public SettingsService(IBinanceBotDbContext db, CacheDb cacheDb,
             IHttpClientService httpService)
         {
-            _db = db;
             _cacheUserSettings = cacheDb.GetCachedTable<Settings>((BinanceBotDbContext)db, 
                 new HashSet<string> {"TradeMode"});
             _httpService = httpService;
@@ -48,7 +45,7 @@ namespace BinanceBotInfrastructure.Services
         public async Task<int> EnableTradeAsync(int idUser, bool isTradeEnabled, 
             CancellationToken token)
         {
-            var userSettings = await _db.UserSettings.FirstOrDefaultAsync(s => 
+            var userSettings = await _cacheUserSettings.FirstOrDefaultAsync(s => 
                     s.IdUser == idUser, token);
 
             if (userSettings is null) 
@@ -58,7 +55,7 @@ namespace BinanceBotInfrastructure.Services
 
             userSettings.IsTradeEnabled = isTradeEnabled;
 
-            return await _db.SaveChangesAsync(token);
+            return await _cacheUserSettings.UpsertAsync(userSettings, token);
         }
 
         public async Task<(string apiKey, string secretKey)> GetApiKeysAsync(int idUser,
