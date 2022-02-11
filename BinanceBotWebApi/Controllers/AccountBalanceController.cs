@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -33,7 +34,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet("current")]
-        [ProducesResponseType(typeof(double), (int)System.Net.HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<CoinAmountDto>), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetCurrentBalanceAsync([Range(1, int.MaxValue)] int idUser, 
             CancellationToken token = default)
         {

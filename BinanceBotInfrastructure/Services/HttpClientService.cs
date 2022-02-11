@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -20,20 +21,13 @@ namespace BinanceBotInfrastructure.Services
         private readonly HttpClient _httpClient;
         private const string _apiKeyHeader = "X-MBX-APIKEY";
         private readonly JsonSerializerOptions _jsonSerializerOptions;
-
-        private string _secretKey;
-        public string SecretKey
-        {
-            set => _secretKey = value;
-        }
         
-        private string _apiKey;
-        public string ApiKey
+        private string SecretKey { get; set; }
+
+        private string ApiKey
         {
             set
             {
-                _apiKey = value;
-                
                 var mt = new MediaTypeWithQualityHeaderValue("application/json");
                 _httpClient.DefaultRequestHeaders.Accept.Add(mt);
                 _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(_apiKeyHeader,
@@ -46,7 +40,8 @@ namespace BinanceBotInfrastructure.Services
             _httpClient = new HttpClient();
             _jsonSerializerOptions = new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true
+                PropertyNameCaseInsensitive = true,
+                NumberHandling = JsonNumberHandling.AllowReadingFromString
             };
         }
         
@@ -54,8 +49,8 @@ namespace BinanceBotInfrastructure.Services
             TDto dto, (string apiKey, string secretKey) keys, HttpMethods requestType, 
             CancellationToken token) where TResult : class
         {
-            _apiKey = keys.apiKey;
-            _secretKey = keys.secretKey;
+            ApiKey = keys.apiKey;
+            SecretKey = keys.secretKey;
             
             var qParams = Converter.ToDictionary(dto);
 
@@ -70,8 +65,8 @@ namespace BinanceBotInfrastructure.Services
             HttpMethods requestType, CancellationToken token) 
             where TResult : class
         {
-            _apiKey = keys.apiKey;
-            _secretKey = keys.secretKey;
+            ApiKey = keys.apiKey;
+            SecretKey = keys.secretKey;
             
             Func<Uri, IDictionary<string, string>, CancellationToken, 
                 Task<HttpResponseMessage>> requestDelegate =
@@ -103,7 +98,7 @@ namespace BinanceBotInfrastructure.Services
                 throw new ArgumentNullException("Message is null");
             
             var messageJson = await message.Content.ReadAsStringAsync(token);
-            
+
             if (!message.IsSuccessStatusCode)
             {
                 var errorObj = JsonSerializer.Deserialize<ApiErrorDto>(messageJson, 
@@ -134,7 +129,7 @@ namespace BinanceBotInfrastructure.Services
             IDictionary<string, string> qParams = default, 
             CancellationToken token = default)
         {
-            var signedUri = Converter.ToValidSignedUri(endpoint, _secretKey, 
+            var signedUri = Converter.ToValidSignedUri(endpoint, SecretKey, 
                 qParams);
             return _httpClient.GetAsync(signedUri, token);
         }
@@ -187,7 +182,7 @@ namespace BinanceBotInfrastructure.Services
             IDictionary<string, string> qParams = default, 
             CancellationToken token = default)
         {
-            var signedUri = Converter.ToValidSignedUri(endpoint, _secretKey, 
+            var signedUri = Converter.ToValidSignedUri(endpoint, SecretKey, 
                 qParams);
             return _httpClient.DeleteAsync(signedUri, token);
         }
@@ -199,7 +194,7 @@ namespace BinanceBotInfrastructure.Services
                 return qParams;
 
             var queryParamsString = Converter.ToParamsString(qParams);
-            var signature = Converter.ToHmacSignature(_secretKey, 
+            var signature = Converter.ToHmacSignature(SecretKey, 
                 queryParamsString);   
             qParams["signature"] = signature;
 

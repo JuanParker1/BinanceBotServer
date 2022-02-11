@@ -63,7 +63,7 @@ namespace BinanceBotInfrastructure.Utils
             var queryString = Converter.ToParamsString(qParams);
             var resultQueryString = $"{endpoint}";
             
-            if(queryString != string.Empty)
+            if(!string.IsNullOrEmpty(queryString))
                 resultQueryString = $"{endpoint}?{queryString}";
             
             var uri = new Uri(resultQueryString);
