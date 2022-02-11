@@ -35,7 +35,7 @@ namespace BinanceBotWebApi.Controllers
         /// <returns code="200"> User info </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
-        [HttpGet("userInfo")]
+        [HttpGet]
         [ProducesResponseType(typeof(AuthUserInfoDto), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetUserInfoAsync([Range(1, int.MaxValue)] int idUser, 
             CancellationToken token = default)
@@ -58,14 +58,14 @@ namespace BinanceBotWebApi.Controllers
         /// <returns code="200"> 0 - no changes. 1 - changes applied </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
-        [HttpPut("userInfo")]
+        [HttpPut]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> UpdateUserInfoAsync(AuthUserInfoDto authUserDto, 
             CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
-            if (authUserId is null || authUserId != authUserDto.IdUser)
+            if (authUserId is null || authUserId != authUserDto.Id)
                 return Forbid();
             
             var result = await _userService.UpdateUserInfoAsync(authUserDto, token);
