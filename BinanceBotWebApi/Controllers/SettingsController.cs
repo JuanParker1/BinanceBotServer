@@ -50,23 +50,23 @@ namespace BinanceBotWebApi.Controllers
         /// <summary>
         /// Enables/disables trade
         /// </summary>
-        /// <param name="idUser"> User id </param>
-        /// <param name="isTradeEnabled"> User info object </param>
+        /// <param name="enableTradeDto"> Enable/Disable trade info object </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> 0 - no changes. 1 - changes applied </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpPost("enableTrade")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> EnableTradeAsync([Range(1, int.MaxValue)] int idUser, 
-            bool isTradeEnabled, CancellationToken token = default)
+        public async Task<IActionResult> EnableTradeAsync([FromBody] EnableTradeDto enableTradeDto, 
+            CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
-            if (authUserId is null || authUserId != idUser)
+            if (authUserId is null || authUserId != enableTradeDto.IdUser)
                 return Forbid();
 
-            var result = await _settingsService.EnableTradeAsync(idUser, isTradeEnabled, token);
+            var result = await _settingsService.EnableTradeAsync(enableTradeDto, 
+                token);
 
             return Ok(result);
         }
@@ -74,23 +74,22 @@ namespace BinanceBotWebApi.Controllers
         /// <summary>
         /// Changes trade mode
         /// </summary>
-        /// <param name="idUser"> User id </param>
-        /// <param name="idTradeMode"> 1-autoTrade, 2-Semiauto </param>
+        /// <param name="tradeModeDto"> Trademode info (1-AutoTrade, 2-Semiauto) </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> 0 - no changes. 1 - changes applied </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpPost("tradeMode")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> SaveTradeModeAsync([Range(1, int.MaxValue)] int idUser, 
-            [Range(1, 2)] int idTradeMode, CancellationToken token = default)
+        public async Task<IActionResult> SaveTradeModeAsync([FromBody] TradeModeDto tradeModeDto, 
+            CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
-            if (authUserId is null || authUserId != idUser)
+            if (authUserId is null || authUserId != tradeModeDto.IdUser)
                 return Forbid();
 
-            var result = await _settingsService.SaveTradeModeAsync(idUser, idTradeMode, 
+            var result = await _settingsService.SaveTradeModeAsync(tradeModeDto, 
                 token);
 
             return Ok(result);

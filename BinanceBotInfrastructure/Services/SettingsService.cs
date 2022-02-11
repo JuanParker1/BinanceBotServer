@@ -42,32 +42,33 @@ namespace BinanceBotInfrastructure.Services
             return userSettingsDto;
         }
 
-        public async Task<int> EnableTradeAsync(int idUser, bool isTradeEnabled, 
+        public async Task<int> EnableTradeAsync(EnableTradeDto enableTradeDto, 
             CancellationToken token)
         {
             var userSettings = await _cacheUserSettings.FirstOrDefaultAsync(s => 
-                    s.IdUser == idUser, token);
+                    s.IdUser == enableTradeDto.IdUser, token);
 
             if (userSettings is null) 
                 return 0;
             
             // TODO: Стопнуть здесь из другого сервиса всю BackgroundWorker торговлю
 
-            userSettings.IsTradeEnabled = isTradeEnabled;
+            userSettings.IsTradeEnabled = enableTradeDto.IsTradeEnabled;
 
             return await _cacheUserSettings.UpsertAsync(userSettings, token);
         }
 
-        public async Task<int> SaveTradeModeAsync(int idUser, int idTradeMode, 
+        public async Task<int> SaveTradeModeAsync(TradeModeDto tradeModeDto, 
             CancellationToken token)
         {
             var userSettings = await _cacheUserSettings.FirstOrDefaultAsync(s => 
-                s.IdUser == idUser, token);
+                s.IdUser == tradeModeDto.IdUser, token);
 
             if (userSettings is null) 
                 return 0;
-
-            userSettings.IdTradeMode = idTradeMode;
+            
+            userSettings.TradeMode = null;
+            userSettings.IdTradeMode = tradeModeDto.IdTradeMode;
             
             return await _cacheUserSettings.UpsertAsync(userSettings, token);
         }

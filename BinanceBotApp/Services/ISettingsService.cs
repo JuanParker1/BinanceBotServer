@@ -7,9 +7,9 @@ namespace BinanceBotApp.Services
     public interface ISettingsService
     {
         Task<SettingsDto> GetSettingsAsync(int idUser, CancellationToken token);
-        Task<int> EnableTradeAsync(int idUser, bool isTradeEnabled,
+        Task<int> EnableTradeAsync(EnableTradeDto enableTradeDto,
             CancellationToken token);
-        Task<int> SaveTradeModeAsync(int idUser, int idTradeMode,
+        Task<int> SaveTradeModeAsync(TradeModeDto tradeModeDto,
             CancellationToken token);
         Task<int> ChangeOrderPriceRateAsync(int idUser, int orderPriceRate,
             CancellationToken token);
