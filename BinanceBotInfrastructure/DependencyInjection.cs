@@ -30,6 +30,7 @@ namespace BinanceBotInfrastructure
             services.AddScoped<IHttpClientService, HttpClientService>();
         
             services.AddSingleton(new CacheDb());
+            services.AddTransient<IRequestTrackerService, RequestTrackerService>();
             
             services.AddTransient<IAccountBalanceService, AccountBalanceService>();
             services.AddTransient<IAuthService, AuthService>();

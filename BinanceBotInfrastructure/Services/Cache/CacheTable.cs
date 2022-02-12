@@ -233,6 +233,27 @@ namespace BinanceBotInfrastructure.Services.Cache
             await RefreshAsync(false, token);
             return _cached.FirstOrDefault(predicate);
         }
+        
+        public TEntity LastOrDefault(Func<TEntity, bool> predicate)
+        {
+            var result = _cached.LastOrDefault(predicate);
+            if (result != default)
+                return result;
+
+            Refresh(false);
+            return _cached.LastOrDefault(predicate);
+        }
+        
+        public async Task<TEntity> LastOrDefaultAsync(Func<TEntity, bool> predicate, 
+            CancellationToken token = default)
+        {
+            var result = _cached.LastOrDefault(predicate);
+            if (result != default)
+                return result;
+
+            await RefreshAsync(false, token);
+            return _cached.LastOrDefault(predicate);
+        }
 
         public IEnumerable<TEntity> Where(Func<TEntity, bool> predicate = default)
         {

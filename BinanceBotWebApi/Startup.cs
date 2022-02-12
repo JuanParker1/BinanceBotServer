@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using BinanceBotApp.DataValidators;
 using BinanceBotInfrastructure;
+using BinanceBotWebApi.Middlewares;
 
 namespace BinanceBotWebApi
 {
@@ -56,7 +57,7 @@ namespace BinanceBotWebApi
                 app.UseDeveloperExceptionPage();
             else
                 app.UseHsts();
-            // TODO: Middleware история входов
+     
             app.UseHttpsRedirection();
             app.UseDefaultFiles();
             app.UseStaticFiles();
@@ -64,7 +65,9 @@ namespace BinanceBotWebApi
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-
+            
+            app.UseMiddleware<RequestTrackerMiddleware>();
+            
             app.UseEndpoints(endpoints =>
                 endpoints.MapControllers());
 

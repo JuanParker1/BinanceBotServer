@@ -11,6 +11,7 @@ namespace BinanceBotDb.Models
         public virtual DbSet<UserRole> UserRoles { get; set; }
         public virtual DbSet<Settings> UserSettings { get; set; }
         public virtual DbSet<BalanceChange> BalanceChanges { get; set; }
+        public virtual DbSet<Request> RequestLog { get; set; }
 
         public BinanceBotDbContext()
         {

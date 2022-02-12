@@ -49,5 +49,8 @@ namespace BinanceBotDb.Models
         
         [InverseProperty(nameof(BalanceChange.User))]
         public virtual ICollection<BalanceChange> BalanceChanges { get; set; }
+        
+        [InverseProperty(nameof(Request.User))]
+        public virtual ICollection<Request> RequestLog { get; set; }
     }
 }
