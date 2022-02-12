@@ -26,7 +26,7 @@ namespace BinanceBotInfrastructure.Services
             _authService = authService;
         }
 
-        public async Task<AuthUserInfoDto> GetUserInfoAsync(int idUser,
+        public async Task<UserInfoDto> GetUserInfoAsync(int idUser,
             CancellationToken token = default)
         {
             var user = await (from u in _db.Users
@@ -34,32 +34,32 @@ namespace BinanceBotInfrastructure.Services
                                 select u)
                             .FirstOrDefaultAsync(token);
 
-            var authUserInfoDto = user?.Adapt<AuthUserInfoDto>();
+            var authUserInfoDto = user?.Adapt<UserInfoDto>();
             
             return authUserInfoDto;
         }
 
-        public async Task<int> UpdateUserInfoAsync(AuthUserInfoDto authUserDto,
+        public async Task<int> UpdateUserInfoAsync(UserInfoDto userDto,
             CancellationToken token)
         {
             var user = await (from u in _db.Users
-                                where u.Id == authUserDto.Id
+                                where u.Id == userDto.Id
                                 select u)
                             .FirstOrDefaultAsync(token);
 
-            if (user is null || string.IsNullOrEmpty(authUserDto.Login.Trim()))
+            if (user is null || string.IsNullOrEmpty(userDto.Login.Trim()))
                 return 0;
             
-            user.Login = authUserDto.Login.Trim();
+            user.Login = userDto.Login.Trim();
 
-            if (!string.IsNullOrEmpty(authUserDto.Name.Trim()))
-                user.Name = authUserDto.Name.Trim();
+            if (!string.IsNullOrEmpty(userDto.Name.Trim()))
+                user.Name = userDto.Name.Trim();
             
-            if (!string.IsNullOrEmpty(authUserDto.Surname.Trim()))
-                user.Surname = authUserDto.Surname.Trim();
+            if (!string.IsNullOrEmpty(userDto.Surname.Trim()))
+                user.Surname = userDto.Surname.Trim();
             
-            if (!string.IsNullOrEmpty(authUserDto.Email.Trim()))
-                user.Email = authUserDto.Email.Trim();
+            if (!string.IsNullOrEmpty(userDto.Email.Trim()))
+                user.Email = userDto.Email.Trim();
 
             return await _db.SaveChangesAsync(token);
         }

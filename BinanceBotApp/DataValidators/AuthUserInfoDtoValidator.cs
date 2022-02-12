@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace BinanceBotApp.DataValidators
 {
-    public class AuthUserInfoDtoValidator : AbstractValidator<AuthUserInfoDto>
+    public class AuthUserInfoDtoValidator : AbstractValidator<UserInfoDto>
     {
         public AuthUserInfoDtoValidator()
         {

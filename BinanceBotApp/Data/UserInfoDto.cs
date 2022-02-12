@@ -5,7 +5,7 @@ namespace BinanceBotApp.Data
     /// <summary>
     /// Authenticated user info
     /// </summary>
-    public class AuthUserInfoDto
+    public class UserInfoDto
     {
         /// <summary>
         /// User id

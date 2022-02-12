@@ -3,7 +3,7 @@ namespace BinanceBotApp.Data
     /// <summary>
     /// New user register info
     /// </summary>
-    public class RegisterDto : AuthUserInfoDto
+    public class RegisterDto : UserInfoDto
     {
         /// <summary>
         /// New user role id
