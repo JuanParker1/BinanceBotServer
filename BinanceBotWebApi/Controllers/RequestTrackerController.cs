@@ -37,7 +37,7 @@ namespace BinanceBotWebApi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<RequestDto>), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetRequestsAsync([FromQuery][Range(1, int.MaxValue)] int idUser, 
-            [Range(1, int.MaxValue)] int take = 20, CancellationToken token = default)
+            [Range(1, int.MaxValue)] int take = 10, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 

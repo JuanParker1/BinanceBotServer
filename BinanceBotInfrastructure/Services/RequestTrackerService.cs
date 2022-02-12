@@ -25,7 +25,7 @@ namespace BinanceBotInfrastructure.Services
         }
 
         public async Task<IEnumerable<RequestDto>> GetUserRequestsAsync(int idUser,
-            int take = -1, CancellationToken token = default)
+            int take, CancellationToken token = default)
         {
             var requests = await _cacheRequestLogs.WhereAsync(r => 
                 r.IdUser == idUser, token);
