@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using BinanceBotApp.Services;
 
 namespace BinanceBotWebApi.Middlewares
 {
@@ -16,11 +17,11 @@ namespace BinanceBotWebApi.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var service = context.RequestServices.GetRequiredService<BinanceBotApp.Services.IRequestTrackerService>();
+            var service = context.RequestServices.GetRequiredService<IRequestTrackerService>();
             var requestLog = new BinanceBotApp.Data.RequestDto
             {
                 Login = context.User?.Identity.Name,
-                Ip = context.Connection.RemoteIpAddress.ToString(),
+                Ip = context.Connection.RemoteIpAddress.ToString(), // TODO: Внедрить побольше CRUDService. В том числе и сюда. И в создание OrdersHistory (GetAll/Insert) и т.д. Тупо создание и Get entites - все через CRUD
                 RequestMethod = context.Request.Method,
                 RequestPath = context.Request.Path.Value,
                 Referer = context.Request.Headers["Referer"].ToString(),
