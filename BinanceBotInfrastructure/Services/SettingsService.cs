@@ -73,16 +73,16 @@ namespace BinanceBotInfrastructure.Services
             return await _cacheUserSettings.UpsertAsync(userSettings, token);
         }
 
-        public async Task<int> ChangeOrderPriceRateAsync(int idUser, int orderPriceRate,
+        public async Task<int> ChangeOrderPriceRateAsync(OrderPriceRateDto orderPriceRateDto,
             CancellationToken token)
         {
             var userSettings = await _cacheUserSettings.FirstOrDefaultAsync(s => 
-                s.IdUser == idUser, token);
+                s.IdUser == orderPriceRateDto.IdUser, token);
 
             if (userSettings is null) 
                 return 0;
 
-            userSettings.LimitOrderRate = orderPriceRate;
+            userSettings.LimitOrderRate = orderPriceRateDto.OrderPriceRate;
             
             return await _cacheUserSettings.UpsertAsync(userSettings, token);
         }

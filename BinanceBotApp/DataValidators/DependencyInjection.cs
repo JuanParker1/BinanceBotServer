@@ -18,6 +18,7 @@ namespace BinanceBotApp.DataValidators
             services.AddTransient<IValidator<EnableTradeDto>, EnableTradeDtoValidator>();
             services.AddTransient<IValidator<NewOrderDto>, NewOrderDtoValidator>();
             services.AddTransient<IValidator<OrderFillPartDto>, OrderFillPartDtoValidator>();
+            services.AddTransient<IValidator<OrderPriceRateDto>, OrderPriceRateDtoValidator>();
             services.AddTransient<IValidator<RegisterDto>, RegisterDtoValidator>();
             services.AddTransient<IValidator<TradeModeDto>, TradeModeDtoValidator>();
 

@@ -98,23 +98,23 @@ namespace BinanceBotWebApi.Controllers
         /// <summary>
         /// Changes limit auto order price rate
         /// </summary>
-        /// <param name="idUser"> User id </param>
-        /// <param name="orderPriceRate"> Limit auto order rate in percents from highest price </param>
+        /// <param name="orderPriceRateDto"> Limit auto order rate from
+        /// highest price (in percents) info </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> 0 - no changes. 1 - changes applied </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpPost("orderPriceRate")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> ChangeOrderPriceRateAsync([Range(1, int.MaxValue)] int idUser, 
-            [Range(10, 30)] int orderPriceRate, CancellationToken token = default)
+        public async Task<IActionResult> ChangeOrderPriceRateAsync([FromBody] OrderPriceRateDto orderPriceRateDto, 
+            CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
-            if (authUserId is null || authUserId != idUser)
+            if (authUserId is null || authUserId != orderPriceRateDto.IdUser)
                 return Forbid();
 
-            var result = await _settingsService.ChangeOrderPriceRateAsync(idUser, orderPriceRate, 
+            var result = await _settingsService.ChangeOrderPriceRateAsync(orderPriceRateDto, 
                 token);
 
             return Ok(result);

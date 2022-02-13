@@ -11,7 +11,7 @@ namespace BinanceBotApp.Services
             CancellationToken token);
         Task<int> SaveTradeModeAsync(TradeModeDto tradeModeDto,
             CancellationToken token);
-        Task<int> ChangeOrderPriceRateAsync(int idUser, int orderPriceRate,
+        Task<int> ChangeOrderPriceRateAsync(OrderPriceRateDto orderPriceRateDto,
             CancellationToken token);
         Task<(string apiKey, string secretKey)> GetApiKeysAsync(int idUser,
             CancellationToken token);
