@@ -28,9 +28,8 @@ namespace BinanceBotInfrastructure
 
             services.AddScoped<IBinanceBotDbContext, BinanceBotDbContext>();
             services.AddScoped<IHttpClientService, HttpClientService>();
-
-            var cache = new CacheDb(); // Start with app, but not by first request (init in .AddSingleton())
-            services.AddSingleton(cache);
+            
+            services.AddSingleton(new CacheDb());
             services.AddTransient<IRequestTrackerService, RequestTrackerService>();
             
             services.AddTransient<IAccountBalanceService, AccountBalanceService>();

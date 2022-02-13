@@ -37,7 +37,8 @@ namespace BinanceBotInfrastructure.Services
         public AuthService(IBinanceBotDbContext db, CacheDb cacheDb)
         {
             _db = db;
-            _cacheUserSettings = cacheDb.GetCachedTable<Settings>((BinanceBotDbContext)_db);
+            _cacheUserSettings = cacheDb.GetCachedTable<Settings>((BinanceBotDbContext)_db,
+                new SortedSet<string> {nameof(Settings.TradeMode)});
             _hashAlgoritm = SHA384.Create();
             _rnd = new Random((int)(DateTime.Now.Ticks % 2147480161));
         }
@@ -90,11 +91,11 @@ namespace BinanceBotInfrastructure.Services
 
             await _db.SaveChangesAsync(token);
 
-            var userSettings = new Settings // TODO: Убрать в Settings service
+            var userSettings = new Settings
             {
                 IdUser = newUser.Id,
                 IsTradeEnabled = false,
-                IdTradeMode = 0,
+                IdTradeMode = 1,
                 LimitOrderRate = 25
             };
 

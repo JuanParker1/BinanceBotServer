@@ -20,7 +20,7 @@ namespace BinanceBotInfrastructure.Services
             IHttpClientService httpService)
         {
             _cacheUserSettings = cacheDb.GetCachedTable<Settings>((BinanceBotDbContext)db, 
-                new HashSet<string> {"TradeMode"});
+                new SortedSet<string> {nameof(Settings.TradeMode)});
             _httpService = httpService;
         }
 

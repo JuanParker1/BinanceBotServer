@@ -12,7 +12,7 @@ namespace BinanceBotInfrastructure.Services.Cache
         where TEntity : class
     {
         private const int _semaphoreTimeout = 5000;
-        private static readonly SemaphoreSlim _semaphore = new(1);
+        private static readonly SemaphoreSlim _semaphore = new(1, 1);
         private static readonly TimeSpan _minPeriodRefresh = TimeSpan.FromSeconds(5);
         private static readonly string _nameOfTEntity = typeof(TEntity).Name;
 
@@ -22,7 +22,8 @@ namespace BinanceBotInfrastructure.Services.Cache
         private readonly DbContext _db;
         private readonly DbSet<TEntity> _dbSet;
 
-        internal CacheTable(DbContext db, CacheTableDataStorage data, ISet<string> includes = null)
+        internal CacheTable(DbContext db, CacheTableDataStorage data, 
+            ISet<string> includes = null)
         {
             _db = db;
             _data = data;
@@ -31,50 +32,34 @@ namespace BinanceBotInfrastructure.Services.Cache
             if (includes is not null && includes.Any())
                 _configureDbSet = (dbSet) =>
                     includes.Aggregate<string, IQueryable<TEntity>>(dbSet, 
-                        (current, include) => current.Include(include));
-                
+                        (current, include) => 
+                            current.Include(include));
 
             _cached = (List<TEntity>)data.Entities;
-            if ((_cached.Count == 0) || data.IsObsolete)
-                Refresh(false);
-        }
-
-        internal CacheTable(DbContext db, CacheTableDataStorage data,
-            Func<DbSet<TEntity>, IQueryable<TEntity>> configureDbSet = null)
-        {
-            _db = db;
-            _data = data;
-            _configureDbSet = configureDbSet;
-
-            _dbSet = db.Set<TEntity>();
-
-            _cached = (List<TEntity>)data.Entities;
-            if ((_cached.Count == 0) || data.IsObsolete)
-                Refresh(false);
+            if (_cached.Count == 0 || data.IsObsolete)
+                Sync(() => InternalRefresh(true));
         }
 
         public TEntity this[int index] => 
             _cached.ElementAt(index);
 
         /// <summary>
-        /// Runs action like atomic operation.
-        /// hasFree is action argument indicates that semaphore was threads
-        /// to enter SemaphoreSlim object.
+        /// Runs delegate as atomic operation. Delegates are synchronized by
+        /// SemaphoreSlim object.
         /// It may be needed to avoid multiple operations like Refresh().
         /// </summary>
-        /// <param name="func"> (hasFree) => {...} </param>
-        /// <returns>default if semaphoreTimeout. Or result of func(..)</returns>
-        private static T Sync<T>(Func<bool, T> func)
+        /// <param name="func"> Semaphore synchronized function </param>
+        /// <returns> Result of func(..) </returns>
+        private static T Sync<T>(Func<T> func)
         {
-            if (func is null || !_semaphore.Wait(_semaphoreTimeout))
-                return default;
-   
-            var hasFree = _semaphore.CurrentCount > 0;
             T result = default;
             
             try
             {
-                result = func.Invoke(hasFree);
+                if (func is null || !_semaphore.Wait(_semaphoreTimeout))
+                    throw new Exception("Sync function was null or " +
+                                        "semaphore wait timeout was exceeded.");
+                result = func.Invoke();
             }
             catch (Exception ex)
             {
@@ -92,26 +77,23 @@ namespace BinanceBotInfrastructure.Services.Cache
         }
 
         /// <summary>
-        /// Runs action like atomic operation.
-        /// hasFree is action argument indicates that semaphore was threads
-        /// to enter SemaphoreSlim object.
-        /// It may be needed to avoid multiple operations like Refresh().
+        /// Runs delegate as atomic operation. Delegates are synchronized by
+        /// SemaphoreSlim object.
         /// </summary>
-        /// <param name="funcAsync"> (hasFree) => {...} </param>
+        /// <param name="funcAsync"> Semaphore synchronized function </param>
         /// <param name="token"> Task cancellation token </param>
-        /// <returns> default if semaphoreTimeout. Or result of func(..) </returns>
-        private static async Task<T> SyncAsync<T>(Func<bool, CancellationToken, Task<T>> funcAsync,
+        /// <returns> Result of func(..) </returns>
+        private static async Task<T> SyncAsync<T>(Func<CancellationToken, Task<T>> funcAsync,
             CancellationToken token = default)
         {
-            if (funcAsync is null || !await _semaphore.WaitAsync(_semaphoreTimeout, token))
-                return default;
-            
-            var hasFree = _semaphore.CurrentCount > 0;
             T result = default;
 
             try
             {
-                result = await funcAsync.Invoke(hasFree, token);
+                if (funcAsync is null || !await _semaphore.WaitAsync(_semaphoreTimeout, token))
+                    throw new Exception("Sync function was null or " +
+                                        "semaphore wait timeout was exceeded.");
+                result = await funcAsync.Invoke(token);
             }
             catch (Exception ex)
             {
@@ -136,7 +118,8 @@ namespace BinanceBotInfrastructure.Services.Cache
             _cached.Clear();
             var queryEntities = _configureDbSet is null 
                 ? _dbSet 
-                : _configureDbSet(_dbSet);
+                : _configureDbSet.Invoke(_dbSet);
+
             var entities = queryEntities.AsNoTracking().ToList();
             _cached.AddRange(entities);
             _data.LastRefreshDate = DateTime.Now;
@@ -152,7 +135,7 @@ namespace BinanceBotInfrastructure.Services.Cache
             _cached.Clear();
             var query = _configureDbSet is null 
                 ? _dbSet 
-                : _configureDbSet(_dbSet);
+                : _configureDbSet.Invoke(_dbSet);
             var queryEntities = await query.AsNoTracking()
                 .ToListAsync(token);
             _cached.AddRange(queryEntities);
@@ -160,13 +143,6 @@ namespace BinanceBotInfrastructure.Services.Cache
 
             return _cached.Count;
         }
-
-        public int Refresh(bool force)
-            => Sync((hasFree) => hasFree ? InternalRefresh(force) : 0);
-
-        public Task<int> RefreshAsync(bool force, CancellationToken token = default) =>
-            SyncAsync(
-                async (hasFree, token) => hasFree ? await InternalRefreshAsync(force, token) : 0, token);
 
         public bool Contains(Func<TEntity, bool> predicate)
             => FirstOrDefault(predicate) != default;
@@ -176,7 +152,7 @@ namespace BinanceBotInfrastructure.Services.Cache
             await FirstOrDefaultAsync(predicate, token) != default;
 
         public TEntity GetOrCreate(Func<TEntity, bool> predicate, Func<TEntity> makeNew)
-            => Sync(hasFree =>
+            => Sync(() =>
             {
                 var result = _cached.FirstOrDefault(predicate);
                 if (result != default)
@@ -199,7 +175,7 @@ namespace BinanceBotInfrastructure.Services.Cache
             if (result != default)
                 return result;
 
-            Refresh(false);
+            Sync(() => InternalRefresh(false));
             return _cached.FirstOrDefault();
         }
 
@@ -209,7 +185,9 @@ namespace BinanceBotInfrastructure.Services.Cache
             if (result != default)
                 return result;
 
-            await RefreshAsync(false, token);
+            await SyncAsync(
+                async (token) => await InternalRefreshAsync(false, token), token);
+            
             return _cached.FirstOrDefault();
         }
 
@@ -219,7 +197,7 @@ namespace BinanceBotInfrastructure.Services.Cache
             if (result != default)
                 return result;
 
-            Refresh(false);
+            Sync(() => InternalRefresh(false));
             return _cached.FirstOrDefault(predicate);
         }
 
@@ -230,7 +208,9 @@ namespace BinanceBotInfrastructure.Services.Cache
             if (result != default)
                 return result;
 
-            await RefreshAsync(false, token);
+            await SyncAsync(
+                async (token) => await InternalRefreshAsync(false, token), token);
+            
             return _cached.FirstOrDefault(predicate);
         }
         
@@ -240,7 +220,7 @@ namespace BinanceBotInfrastructure.Services.Cache
             if (result != default)
                 return result;
 
-            Refresh(false);
+            Sync(() => InternalRefresh(false));
             return _cached.LastOrDefault(predicate);
         }
         
@@ -251,7 +231,9 @@ namespace BinanceBotInfrastructure.Services.Cache
             if (result != default)
                 return result;
 
-            await RefreshAsync(false, token);
+            await SyncAsync(
+                async (token) => await InternalRefreshAsync(false, token), token);
+            
             return _cached.LastOrDefault(predicate);
         }
 
@@ -264,7 +246,7 @@ namespace BinanceBotInfrastructure.Services.Cache
             if (result.Any())
                 return result;
 
-            Refresh(false);
+            Sync(() => InternalRefresh(false));
             result = (predicate != default)
                 ? _cached.Where(predicate)
                 : _cached;
@@ -283,7 +265,9 @@ namespace BinanceBotInfrastructure.Services.Cache
             if (result.Any())
                 return result;
 
-            await RefreshAsync(false, token);
+            await SyncAsync(
+                async (token) => await InternalRefreshAsync(false, token), token);
+            
             result = (predicate != default)
                 ? _cached.Where(predicate)
                 : _cached;
@@ -295,7 +279,7 @@ namespace BinanceBotInfrastructure.Services.Cache
             if (entity == default)
                 return 0;
             
-            return Sync((hasFree) =>
+            return Sync(() =>
             {
                 if (_dbSet.Contains(entity))
                     _dbSet.Update(entity);
@@ -309,7 +293,7 @@ namespace BinanceBotInfrastructure.Services.Cache
         }
 
         public Task<int> UpsertAsync(TEntity entity, CancellationToken token = default)
-            => SyncAsync(async (hasFree, token) =>
+            => SyncAsync(async (token) =>
             {
                 if (_dbSet.Contains(entity))
                     _dbSet.Update(entity);
@@ -326,7 +310,7 @@ namespace BinanceBotInfrastructure.Services.Cache
             if (!entities.Any())
                 return 0;
 
-            return Sync((hasFree) =>
+            return Sync(() =>
             {
                 foreach (var entity in entities)
                 {
@@ -349,7 +333,7 @@ namespace BinanceBotInfrastructure.Services.Cache
             if (!entities.Any())
                 return Task.FromResult(0);
 
-            return SyncAsync(async (hasFree, token) =>
+            return SyncAsync(async (token) =>
             {
                 var upsertedEntries = new List<TEntity>(entities.Count());
                 foreach (var entity in entities)
@@ -368,7 +352,7 @@ namespace BinanceBotInfrastructure.Services.Cache
         }
 
         public int Remove(Func<TEntity, bool> predicate)
-            => Sync(_ =>
+            => Sync(() =>
             {
                 _dbSet.RemoveRange(_dbSet.Where(predicate));
                 var affected = _db.SaveChanges();
@@ -379,7 +363,7 @@ namespace BinanceBotInfrastructure.Services.Cache
             });
 
         public Task<int> RemoveAsync(Func<TEntity, bool> predicate, CancellationToken token = default)
-            => SyncAsync(async (hasFree, token) =>
+            => SyncAsync(async (token) =>
             {
                 _dbSet.RemoveRange(_dbSet.Where(predicate));
                 var affected = await _db.SaveChangesAsync(token);
@@ -391,7 +375,7 @@ namespace BinanceBotInfrastructure.Services.Cache
 
         public TEntity Insert(TEntity entity)
         {
-            return Sync(_ =>
+            return Sync(() =>
             {
                 var entry = _dbSet.Add(entity);
                 var affected = _db.SaveChanges();
@@ -404,7 +388,7 @@ namespace BinanceBotInfrastructure.Services.Cache
 
         public Task<TEntity> InsertAsync(TEntity entity, CancellationToken token = default)
         {
-            return SyncAsync(async (hasFree, token) =>
+            return SyncAsync(async (token) =>
             {
                 var entry = _dbSet.Add(entity);
                 var affected = await _db.SaveChangesAsync(token);
@@ -423,7 +407,7 @@ namespace BinanceBotInfrastructure.Services.Cache
             if (count == 0)
                 return null;
 
-            return Sync(_ =>
+            return Sync(() =>
             {
                 var entries = new List<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<TEntity>>(count);
                 entries.AddRange(newEntities.Select(newEntity => _dbSet.Add(newEntity)));
@@ -447,7 +431,7 @@ namespace BinanceBotInfrastructure.Services.Cache
             if (count == 0)
                 return null;
 
-            return SyncAsync(async (hasFree, token) =>
+            return SyncAsync(async (token) =>
             {
                 var entries = new List<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<TEntity>>(count);
                 entries.AddRange(newEntities.Select(newEntity => _dbSet.Add(newEntity)));

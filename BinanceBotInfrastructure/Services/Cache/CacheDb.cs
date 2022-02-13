@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
 namespace BinanceBotInfrastructure.Services.Cache
@@ -10,10 +8,6 @@ namespace BinanceBotInfrastructure.Services.Cache
     {
         private readonly ConcurrentDictionary<string, CacheTableDataStorage> _cache = 
             new ConcurrentDictionary<string, CacheTableDataStorage>();
-
-        public CacheTable<TEntity> GetCachedTable<TEntity>(DbContext context, params string[] includes)
-            where TEntity : class
-            => GetCachedTable<TEntity>(context, new SortedSet<string>(includes));
 
         public CacheTable<TEntity> GetCachedTable<TEntity>(DbContext context, ISet<string> includes = null)
             where TEntity : class
