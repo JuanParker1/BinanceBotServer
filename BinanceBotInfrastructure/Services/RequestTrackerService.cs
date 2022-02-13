@@ -41,10 +41,9 @@ namespace BinanceBotInfrastructure.Services
         public async Task RegisterRequestAsync(RequestDto requestDto, 
             CancellationToken token = default)
         {
-            if (requestDto.Status < 200 || !await IsNewRequestAsync(requestDto, token))
+            if (!await IsNewRequestAsync(requestDto, token))
                 return;
             
-            requestDto.Date = DateTime.Now;
             var request = requestDto.Adapt<Request>();
             await _cacheRequestLogs.InsertAsync(request, token);
         }
@@ -52,7 +51,7 @@ namespace BinanceBotInfrastructure.Services
         public async Task RegisterRequestErrorAsync(RequestDto requestDto, Exception ex,
             CancellationToken token)
         {
-            if (!await IsNewErrorRequest(requestDto, token))
+            if (!await IsNewRequestAsync(requestDto, token))
                 return;
             
             requestDto.Date = DateTime.Now;
@@ -79,18 +78,6 @@ namespace BinanceBotInfrastructure.Services
             var isNewIp = requestDto.Ip != lastRequest.Ip;
 
             return isNewRequest || isNewIp;
-        }
-
-        private async Task<bool> IsNewErrorRequest(RequestDto requestDto,
-            CancellationToken token)
-        {
-            var lastRequest = await _cacheRequestLogs.LastOrDefaultAsync(r => 
-                r.IdUser == requestDto.IdUser, token);
-            
-            if (lastRequest is null)
-                return true;
-
-            return requestDto.Status != lastRequest.Status;
         }
     }
 }

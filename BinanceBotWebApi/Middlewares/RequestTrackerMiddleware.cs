@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +23,7 @@ namespace BinanceBotWebApi.Middlewares
             {
                 Login = context.User?.Identity.Name,
                 Ip = context.Connection.RemoteIpAddress.ToString(), // TODO: Внедрить побольше CRUDService. В том числе и сюда. И в создание OrdersHistory (GetAll/Insert) и т.д. Тупо создание и Get entites - все через CRUD
+                Date = DateTime.Now,
                 RequestMethod = context.Request.Method,
                 RequestPath = context.Request.Path.Value,
                 Referer = context.Request.Headers["Referer"].ToString(),

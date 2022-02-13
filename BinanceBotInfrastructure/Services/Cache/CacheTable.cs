@@ -12,7 +12,7 @@ namespace BinanceBotInfrastructure.Services.Cache
         where TEntity : class
     {
         private const int _semaphoreTimeout = 5000;
-        private static readonly SemaphoreSlim _semaphore = new(2); // TODO: Что-то сразу съедает 1 из них.
+        private static readonly SemaphoreSlim _semaphore = new(1);
         private static readonly TimeSpan _minPeriodRefresh = TimeSpan.FromSeconds(5);
         private static readonly string _nameOfTEntity = typeof(TEntity).Name;
 
