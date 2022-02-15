@@ -5,7 +5,7 @@ using BinanceBotApp.Data;
 
 namespace BinanceBotApp.Services
 {
-    public interface IOrdersService
+    public interface ITradeService
     {
         Task<OrderInfoDto> GetOrderAsync(int idUser, int idOrder, 
             string symbol, int recvWindow, CancellationToken token);
