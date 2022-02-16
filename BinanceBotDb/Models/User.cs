@@ -52,5 +52,8 @@ namespace BinanceBotDb.Models
         
         [InverseProperty(nameof(Request.User))]
         public virtual ICollection<Request> RequestLog { get; set; }
+        
+        [InverseProperty(nameof(Event.User))]
+        public virtual ICollection<Event> EventLog { get; set; }
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BinanceBotDb.Models
 {
-    [Table("t_request_log"), Comment("Application http requests log")]
+    [Table("t_request_log"), Comment("Application http request log")]
     public class Request
     {
         [Key]
@@ -16,24 +16,29 @@ namespace BinanceBotDb.Models
         public int IdUser { get; set; }
         
         [Column("login")]
+        [StringLength(255)]
         public string Login { get; set; }
 
         [Column("date")]
         public DateTime Date { get; set; }
         
         [Column("ip")]
+        [StringLength(25)]
         public string Ip { get; set; }
         
         [Column("status")]
         public int Status { get; set; }
         
         [Column("request_method")]
+        [StringLength(10)]
         public string RequestMethod { get; set; }
         
         [Column("request_path")]
+        [StringLength(50)]
         public string RequestPath { get; set; }
         
         [Column("referer")]
+        [StringLength(100)]
         public string Referer { get; set; }
         
         [Column("elapsed_ms")]

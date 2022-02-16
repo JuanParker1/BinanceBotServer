@@ -89,6 +89,55 @@ public class DbDemoDataService
                     Amount = 500
                 }
             );
+            
+            demoContext.EventLog.AddRange(
+                new Event
+                {
+                    Id = 1,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-05 15:30"),
+                    IsRead = false,
+                    Text = "Совершена покупка торговой пары BTC/USDT в количестве 10 шт. по курсу 1000 USDT " +
+                           "на сумму 10000 USDT. Дата: 05.02.2022 Время: 15:30."
+                },
+                new Event
+                {
+                    Id = 2,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-05 16:49"),
+                    IsRead = false,
+                    Text = "Совершена покупка торговой пары LTC/USDT в количестве 2 шт. по курсу 500 USDT " +
+                           "на сумму 1000 USDT. Дата: 05.02.2022 Время: 16:49."
+                },
+                new Event
+                {
+                    Id = 3,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-06 07:02"),
+                    IsRead = false,
+                    Text = "Совершена продажа торговой пары BTC/USDT в количестве 2 шт. по курсу 1100 USDT " +
+                           "на сумму 2200 USDT. Дата: 06.02.2022 Время: 07:02."
+                },
+                new Event
+                {
+                    Id = 4,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-07 11:41"),
+                    IsRead = false,
+                    Text = "Произошла ошибка при попытке покупки торговой пары ETC/USDT в количестве 20 шт. " +
+                           "по курсу 52 USDT на сумму 1040 USDT. Дата: 07.02.2022 Время: 11:41.\n" +
+                           "Текст ошибки: Unable to place order. One of request params was invalid.",
+                },
+                new Event
+                {
+                    Id = 5,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-08 17:42"),
+                    IsRead = false,
+                    Text = "Совершена покупка торговой пары ETH/USDT в количестве 110 шт. по курсу 532 USDT " +
+                           "на сумму 58520 USDT. Дата: 08.02.2022 Время: 17:42."
+                }
+            );
                 
             var res = demoContext.SaveChanges();
 
@@ -98,7 +147,9 @@ public class DbDemoDataService
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            Console.WriteLine(ex.InnerException?.InnerException?.Message 
+                              ?? ex.InnerException?.Message 
+                              ?? ex.Message);
             Console.ReadLine();
         }
     }

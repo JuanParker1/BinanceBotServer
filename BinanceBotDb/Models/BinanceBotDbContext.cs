@@ -12,6 +12,8 @@ namespace BinanceBotDb.Models
         public virtual DbSet<Settings> UserSettings { get; set; }
         public virtual DbSet<BalanceChange> BalanceChanges { get; set; }
         public virtual DbSet<Request> RequestLog { get; set; }
+        public virtual DbSet<Event> EventLog { get; set; }
+        public virtual DbSet<EventTemplate> EventTemplates { get; set; }
 
         public BinanceBotDbContext()
         {
@@ -55,6 +57,39 @@ namespace BinanceBotDb.Models
                 {
                     new TradeMode {Id = 1, Caption = "Auto",},
                     new TradeMode {Id = 2, Caption = "Semiauto",},
+                });
+            });
+            
+            modelBuilder.Entity<EventTemplate>(entity =>
+            {
+                entity.HasData(new List<EventTemplate>
+                {
+                    new EventTemplate
+                    {
+                        Id = 1, 
+                        Template = "Совершена покупка торговой пары {} в количестве {} шт. по курсу {} USDT " +
+                                   "на сумму {} USDT. Дата: {} Время: {}."
+                    },
+                    new EventTemplate
+                    {
+                        Id = 2, 
+                        Template = "Совершена продажа торговой пары {} в количестве {} шт. по курсу {} USDT " +
+                                   "на сумму {} USDT. Дата: {} Время: {}.",
+                    },
+                    new EventTemplate
+                    {
+                        Id = 3, 
+                        Template = "Произошла ошибка при попытке покупки торговой пары {} в количестве {} шт. " +
+                                   "по курсу {} USDT на сумму {} USDT. Дата: {} Время: {}.\n" +
+                                   "Текст ошибки: {}.",
+                    },
+                    new EventTemplate
+                    {
+                        Id = 4, 
+                        Template = "Произошла ошибка при попытке продажи торговой пары {} в количестве {} шт. " +
+                                   "по курсу {} USDT на сумму {} USDT. Дата: {} Время: {}.\n" +
+                                   "Текст ошибки: {}.",
+                    }
                 });
             });
         }
