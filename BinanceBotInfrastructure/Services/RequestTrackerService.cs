@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -48,22 +47,6 @@ namespace BinanceBotInfrastructure.Services
             await _cacheRequestLogs.InsertAsync(request, token);
         }
 
-        public async Task RegisterRequestErrorAsync(RequestDto requestDto, Exception ex,
-            CancellationToken token)
-        {
-            if (!await IsNewRequestAsync(requestDto, token))
-                return;
-            
-            requestDto.Date = DateTime.Now;
-            requestDto.ExceptionMessage = ex.InnerException?.InnerException?.Message 
-                                          ?? ex.InnerException?.Message 
-                                          ?? ex.Message;
-            requestDto.ExceptionStack = ex.StackTrace?.Split(_stackTraceSeparators)[0];
-            var request = requestDto.Adapt<Request>();
-            
-            await _cacheRequestLogs.InsertAsync(request, token);
-        }
-        
         private async Task<bool> IsNewRequestAsync(RequestDto requestDto,
             CancellationToken token)
         {

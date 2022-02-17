@@ -12,7 +12,5 @@ namespace BinanceBotApp.Services
             int take, CancellationToken token = default);
         Task RegisterRequestAsync(RequestDto requestDto, 
             CancellationToken token = default);
-        Task RegisterRequestErrorAsync(RequestDto requestDto, Exception ex,
-            CancellationToken token = default);
     }
 }

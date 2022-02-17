@@ -51,15 +51,5 @@ namespace BinanceBotApp.Data
         /// Request duration
         /// </summary>
         public long ElapsedMilliseconds { get; set; }
-
-        /// <summary>
-        /// Exception message (for exception requests)
-        /// </summary>
-        public string ExceptionMessage { get; set; }
-        
-        /// <summary>
-        /// Exception stack (for exception requests)
-        /// </summary>
-        public string ExceptionStack { get; set; }
     }
 }

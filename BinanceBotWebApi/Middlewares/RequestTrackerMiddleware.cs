@@ -35,21 +35,11 @@ namespace BinanceBotWebApi.Middlewares
             
             var stopwatch = Stopwatch.StartNew();
             
-            try
-            {
-                await _next?.Invoke(context);
-                stopwatch.Stop();
-                requestLog.ElapsedMilliseconds = stopwatch.ElapsedMilliseconds;
-                requestLog.Status = context.Response.StatusCode;
-                await service.RegisterRequestAsync(requestLog);
-            }
-            catch (System.Exception ex)
-            {
-                stopwatch.Stop();
-                requestLog.ElapsedMilliseconds = stopwatch.ElapsedMilliseconds;
-                requestLog.Status = context.Response.StatusCode;
-                await service.RegisterRequestErrorAsync(requestLog, ex);
-            }
+            await _next?.Invoke(context);
+            stopwatch.Stop();
+            requestLog.ElapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+            requestLog.Status = context.Response.StatusCode;
+            await service.RegisterRequestAsync(requestLog);
         }
     }
 }
