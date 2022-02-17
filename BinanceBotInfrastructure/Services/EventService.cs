@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,10 +15,16 @@ namespace BinanceBotInfrastructure.Services
         public EventService(IBinanceBotDbContext db) : base(db) { }
         
         public virtual async Task<IEnumerable<EventDto>> GetAllAsync(int idUser, 
-            CancellationToken token)
+            int days, CancellationToken token)
         {
+            var startDate = DateTime.MinValue;
+            
+            if (days > 0)
+                startDate = DateTime.Now.AddDays(-days);
+            
             var entities = await (from ev in Db.EventLog
-                            where ev.IdUser == idUser
+                            where ev.IdUser == idUser &&
+                                  ev.Date > startDate
                             orderby ev.Id
                             select ev).ToListAsync(token);
             

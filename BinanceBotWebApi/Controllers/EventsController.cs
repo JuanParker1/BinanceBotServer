@@ -29,6 +29,7 @@ namespace BinanceBotWebApi.Controllers
         /// Gets user events
         /// </summary>
         /// <param name="idUser"> User id </param>
+        /// <param name="days"> Requested interval in days </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> Pagination container with user events </returns>
         /// <response code="400"> Error in request parameters </response>
@@ -36,14 +37,14 @@ namespace BinanceBotWebApi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<EventDto>), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetUserEventsAsync([Range(1, int.MaxValue)] int idUser, 
-            CancellationToken token = default)
+            [Range(0, int.MaxValue)] int days = 1, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
 
-            var eventDtos = await _eventService.GetAllAsync(idUser, 
+            var eventDtos = await _eventService.GetAllAsync(idUser, days,
                 token);
 
             return Ok(eventDtos);
