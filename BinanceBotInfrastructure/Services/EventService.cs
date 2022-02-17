@@ -45,7 +45,7 @@ namespace BinanceBotInfrastructure.Services
             var existingEntityDtos = await base.GetExistingEntitiesAsync(idsDto.Collection,
                 token);
 
-            var entities = existingEntityDtos.Adapt<IEnumerable<Event>>();
+            var entities = existingEntityDtos.Adapt<List<Event>>();
             
             foreach (var entity in entities)
                 entity.IsRead = true;

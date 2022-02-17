@@ -55,8 +55,8 @@ namespace BinanceBotDb.Models
             {
                 entity.HasData(new List<TradeMode>
                 {
-                    new TradeMode {Id = 1, Caption = "Auto",},
-                    new TradeMode {Id = 2, Caption = "Semiauto",},
+                    new TradeMode {Id = 1, Caption = "auto",},
+                    new TradeMode {Id = 2, Caption = "semiAuto",},
                 });
             });
             
