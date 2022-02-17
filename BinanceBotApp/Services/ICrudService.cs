@@ -14,6 +14,10 @@ namespace BinanceBotApp.Services
         Task<int> InsertRangeAsync(IEnumerable<TDto> newItems, 
             CancellationToken token);
         Task<int> UpdateAsync(int id, TDto item, CancellationToken token);
+        Task<int> UpdateRangeAsync(int id, IEnumerable<TDto> items,
+            CancellationToken token);
+        Task<IEnumerable<TDto>> GetExistingEntitiesAsync(IEnumerable<int> ids,
+            CancellationToken token);
         Task<int> DeleteAsync(int id, CancellationToken token);
         Task<int> DeleteRangeAsync(IEnumerable<int> ids, 
             CancellationToken token);

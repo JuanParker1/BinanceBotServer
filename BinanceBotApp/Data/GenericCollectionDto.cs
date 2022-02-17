@@ -8,6 +8,11 @@ namespace BinanceBotApp.Data
     public class GenericCollectionDto<T>
     {
         /// <summary>
+        /// User id
+        /// </summary>
+        public int IdUser { get; set; }
+        
+        /// <summary>
         /// Generic collection of request params
         /// </summary>
         public IEnumerable<T> Collection { get; set; }

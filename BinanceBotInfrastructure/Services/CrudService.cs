@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -74,7 +73,8 @@ namespace BinanceBotInfrastructure.Services
         {
             var entities = await (from q in GetQueryWithIncludes()
                                 orderby q.Id
-                                select q).ToListAsync(token);
+                                select q)
+                                .ToListAsync(token);
             var dtos = entities.Select(Convert);
             return dtos;
         }
@@ -88,7 +88,8 @@ namespace BinanceBotInfrastructure.Services
             return entity.Id;
         }
 
-        public virtual Task<int> InsertRangeAsync(IEnumerable<TDto> items, CancellationToken token)
+        public virtual Task<int> InsertRangeAsync(IEnumerable<TDto> items, 
+            CancellationToken token)
         {
             var entities = items.Select(i => { 
                 var entity = Convert(i);
@@ -100,7 +101,8 @@ namespace BinanceBotInfrastructure.Services
             return Db.SaveChangesAsync(token);
         }
 
-        public virtual async Task<int> UpdateAsync(int id, TDto item, CancellationToken token)
+        public virtual async Task<int> UpdateAsync(int id, TDto item, 
+            CancellationToken token)
         {
             var existingEntity = await DbSet.AsNoTracking()
                 .FirstOrDefaultAsync(e => e.Id == id, token);
@@ -108,8 +110,35 @@ namespace BinanceBotInfrastructure.Services
                 return 0;
             var entity = Convert(item);
             entity.Id = id;
+            
             DbSet.Update(entity);
             return await Db.SaveChangesAsync(token);
+        }
+        
+        public virtual async Task<int> UpdateRangeAsync(int id, IEnumerable<TDto> items, 
+            CancellationToken token)
+        {
+            var ids = items.Select(i => i.Id);
+            var dtos = await GetExistingEntitiesAsync(ids, token);
+            if (!dtos.Any())
+                return 0;
+            var entities = Convert(dtos);
+            
+            DbSet.UpdateRange(entities);
+
+            return await Db.SaveChangesAsync(token);
+        }
+
+        public async Task<IEnumerable<TDto>> GetExistingEntitiesAsync(IEnumerable<int> ids,
+            CancellationToken token)
+        {
+            var existingEntities = await (from entity in DbSet
+                                    where ids.Contains(entity.Id)
+                                    select entity)
+                                    .AsNoTracking()
+                                    .ToListAsync(token);
+            
+            return Convert(existingEntities);
         }
 
         public virtual Task<int> DeleteAsync(int id, CancellationToken token)
@@ -125,8 +154,11 @@ namespace BinanceBotInfrastructure.Services
 
         public virtual Task<int> DeleteRangeAsync(IEnumerable<int> ids, CancellationToken token)
         {
-            var entities = DbSet.Where(e => ids.Contains(e.Id))
-                .AsNoTracking();
+            var entities = (from entity in DbSet
+                            where ids.Contains(entity.Id)
+                            select entity)
+                            .AsNoTracking();
+            
             if (entities == default)
                 return Task.FromResult(0);
             
@@ -135,8 +167,13 @@ namespace BinanceBotInfrastructure.Services
         }
         
         protected virtual TDto Convert(TModel src) => src.Adapt<TDto>();
+        
+        protected virtual IEnumerable<TDto> Convert(IEnumerable<TModel> src) => 
+            src.Adapt<IEnumerable<TDto>>();
 
         protected virtual TModel Convert(TDto src) => src.Adapt<TModel>();
+        protected virtual IEnumerable<TModel> Convert(IEnumerable<TDto> src) => 
+            src.Adapt<IEnumerable<TModel>>();
 
         private IQueryable<TModel> GetQueryWithIncludes() =>
             Includes.Aggregate<string, IQueryable<TModel>>(DbSet, 

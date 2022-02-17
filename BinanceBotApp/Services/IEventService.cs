@@ -8,6 +8,8 @@ namespace BinanceBotApp.Services
     public interface IEventService
     {
         Task<IEnumerable<EventDto>> GetAllAsync(int idUser,
-            int days, CancellationToken token);
+            bool isUnreadRequested, int days, CancellationToken token);
+        Task<int> MarkAsReadAsync(GenericCollectionDto<int> idsDto,
+            CancellationToken token);
     }
 }

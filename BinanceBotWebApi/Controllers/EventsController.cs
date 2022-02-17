@@ -29,7 +29,9 @@ namespace BinanceBotWebApi.Controllers
         /// Gets user events
         /// </summary>
         /// <param name="idUser"> User id </param>
-        /// <param name="days"> Requested interval in days </param>
+        /// <param name="days"> Requested interval in days (0 value returns
+        /// all events for all time) </param>
+        /// <param name="isUnreadRequested"> Return only unread events (yes/no) </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> Pagination container with user events </returns>
         /// <response code="400"> Error in request parameters </response>
@@ -37,17 +39,42 @@ namespace BinanceBotWebApi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<EventDto>), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetUserEventsAsync([Range(1, int.MaxValue)] int idUser, 
-            [Range(0, int.MaxValue)] int days = 1, CancellationToken token = default)
+            bool isUnreadRequested = false, [Range(0, int.MaxValue)] int days = 1, 
+            CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
 
-            var eventDtos = await _eventService.GetAllAsync(idUser, days,
-                token);
+            var eventDtos = await _eventService.GetAllAsync(idUser, 
+                isUnreadRequested, days, token);
 
             return Ok(eventDtos);
+        }
+        
+        /// <summary>
+        /// Mark requested events as read by user
+        /// </summary>
+        /// <param name="idsDto"> Events ids </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns code="200"> Pagination container with user events </returns>
+        /// <response code="400"> Error in request parameters </response>
+        /// <response code="403"> Wrong user id </response>
+        [HttpPut]
+        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> MarkAsReadAsync(GenericCollectionDto<int> idsDto, 
+            CancellationToken token = default)
+        {
+            var authUserId = User.GetUserId();
+
+            if (authUserId is null || authUserId != idsDto.IdUser)
+                return Forbid();
+
+            var result = await _eventService.MarkAsReadAsync(idsDto, 
+                token);
+
+            return Ok(result);
         }
     }
 }
