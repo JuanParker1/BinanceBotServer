@@ -12,6 +12,9 @@ namespace BinanceBotDb.Models
         DbSet<UserRole> UserRoles { get; set; }
         DbSet<Settings> UserSettings { get; set; }
         DbSet<BalanceChange> BalanceChanges { get; set; }
+        DbSet<Request> RequestLog { get; set; }
+        DbSet<Event> EventLog { get; set; }
+        DbSet<EventTemplate> EventTemplates { get; set; }
         DatabaseFacade Database { get; }
         int SaveChanges();
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);

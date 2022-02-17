@@ -6,7 +6,7 @@ using BinanceBotApp.DataInternal.Deserializers;
 
 namespace BinanceBotApp.Services
 {
-    public interface IAccountBalanceService : ICrudService<BalanceChangeDto>
+    public interface IAccountBalanceService
     {
         Task<IEnumerable<CoinAmountDto>> GetCurrentBalanceAsync(int idUser, CancellationToken token);
         Task<BalanceSummaryDto> GetTotalBalanceAsync(int idUser, CancellationToken token);

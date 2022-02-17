@@ -39,9 +39,8 @@ namespace BinanceBotInfrastructure
             services.AddTransient<ISettingsService, SettingsService>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IWebSocketClientService, WebSocketClientService>();
-            
-            // Crud Services
-            services.AddTransient<ICrudService<BalanceChangeDto>, AccountBalanceService>();
+            services.AddTransient<IAccountBalanceService, AccountBalanceService>();
+            services.AddTransient<IEventService, EventService>();
 
             return services;
         }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -19,7 +20,7 @@ namespace BinanceBotInfrastructure.Services
 
         public IEnumerable<string> Includes { get; } = new List<string>();
 
-        public CrudService(IBinanceBotDbContext db)
+        protected CrudService(IBinanceBotDbContext db)
         {
             Db = db;
             DbSet = db.Set<TModel>();
@@ -71,12 +72,11 @@ namespace BinanceBotInfrastructure.Services
         
         public virtual async Task<IEnumerable<TDto>> GetAllAsync(CancellationToken token)
         {
-            var query = GetQueryWithIncludes();
-            var entities = await query
-                .OrderBy(e => e.Id)
-                .ToListAsync(token);
-            var dto = entities.Select(Convert).ToList();
-            return dto;
+            var entities = await (from q in GetQueryWithIncludes()
+                                orderby q.Id
+                                select q).ToListAsync(token);
+            var dtos = entities.Select(Convert);
+            return dtos;
         }
 
         public virtual async Task<int> InsertAsync(TDto item, CancellationToken token)

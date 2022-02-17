@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BinanceBotDb.Models
 {
     [Table("t_events"), Comment("User/application event log")]
-    public class Event
+    public class Event : IId
     {
         [Key]
         [Column("id")]

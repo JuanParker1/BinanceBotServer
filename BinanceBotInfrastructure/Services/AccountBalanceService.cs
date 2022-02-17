@@ -16,14 +16,12 @@ namespace BinanceBotInfrastructure.Services
     public class AccountBalanceService : CrudService<BalanceChangeDto, BalanceChange>, 
         IAccountBalanceService
     {
-        private readonly IBinanceBotDbContext _db;
         private readonly ISettingsService _settingsService;
         private readonly IHttpClientService _httpService;
 
         public AccountBalanceService(IBinanceBotDbContext db, ISettingsService settingsService, 
             IHttpClientService httpService) : base(db)
         {
-            _db = db;
             _settingsService = settingsService;
             _httpService = httpService;
         }
@@ -57,7 +55,7 @@ namespace BinanceBotInfrastructure.Services
         public async Task<BalanceSummaryDto> GetTotalBalanceAsync(int idUser, 
             CancellationToken token)
         {
-            var changesSum = await (from bChange in _db.BalanceChanges
+            var changesSum = await (from bChange in Db.BalanceChanges
                                     where bChange.IdUser == idUser
                                     group bChange by bChange.IdDirection into g
                                     select new
