@@ -45,11 +45,11 @@ namespace BinanceBotInfrastructure.Services
             var existingEntityDtos = await base.GetExistingEntitiesAsync(idsDto.Collection,
                 token);
 
-            foreach (var dto in existingEntityDtos)
-                dto.IsRead = true;
-
             var entities = existingEntityDtos.Adapt<IEnumerable<Event>>();
             
+            foreach (var entity in entities)
+                entity.IsRead = true;
+
             Db.EventLog.UpdateRange(entities);
             return await Db.SaveChangesAsync(token);
         }
