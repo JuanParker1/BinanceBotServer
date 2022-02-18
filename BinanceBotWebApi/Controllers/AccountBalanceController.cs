@@ -26,6 +26,32 @@ namespace BinanceBotWebApi.Controllers
         }
         
         /// <summary>
+        /// Gets user's deposit history
+        /// </summary>
+        /// <param name="idUser"> User id </param>
+        /// <param name="days"> Requested interval in days (0 value returns
+        /// all data for all time) </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns code="200"> User's total balance info </returns>
+        /// <response code="400"> Error in request parameters </response>
+        /// <response code="403"> Wrong user id </response>
+        [HttpGet]
+        [ProducesResponseType(typeof(BalanceChangeDto), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> GetDepositHistoryAsync([Range(1, int.MaxValue)] int idUser, 
+            [Range(0, int.MaxValue)] int days = 1, CancellationToken token = default)
+        {
+            var authUserId = User.GetUserId();
+
+            if (authUserId is null || authUserId != idUser)
+                return Forbid();
+            
+            var historyDtos = await _balanceService.GetAllAsync(idUser, 
+                days, token);
+
+            return Ok(historyDtos);
+        }
+        
+        /// <summary>
         /// Gets user's current balance info
         /// </summary>
         /// <param name="idUser"> User id </param>

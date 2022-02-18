@@ -8,7 +8,11 @@ namespace BinanceBotApp.Services
 {
     public interface IAccountBalanceService
     {
-        Task<IEnumerable<CoinAmountDto>> GetCurrentBalanceAsync(int idUser, CancellationToken token);
-        Task<BalanceSummaryDto> GetTotalBalanceAsync(int idUser, CancellationToken token);
+        Task<IEnumerable<BalanceChangeDto>> GetAllAsync(int idUser,
+            int days, CancellationToken token);
+        Task<IEnumerable<CoinAmountDto>> GetCurrentBalanceAsync(int idUser, 
+            CancellationToken token);
+        Task<BalanceSummaryDto> GetTotalBalanceAsync(int idUser, 
+            CancellationToken token);
     }
 }

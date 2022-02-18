@@ -54,6 +54,7 @@ public class DbDemoDataService
                     IdUser = 1,
                     Date = DateTime.Parse("2022-02-02 15:30"),
                     IdDirection = 1,
+                    Coin = "USDT",
                     Amount = 100
                 },
                 new BalanceChange
@@ -62,6 +63,7 @@ public class DbDemoDataService
                     IdUser = 1,
                     Date = DateTime.Parse("2022-02-03 15:30"),
                     IdDirection = 1,
+                    Coin = "BTC",
                     Amount = 400
                 },
                 new BalanceChange
@@ -70,6 +72,7 @@ public class DbDemoDataService
                     IdUser = 1,
                     Date = DateTime.Parse("2022-02-03 15:30"),
                     IdDirection = 2,
+                    Coin = "ETC",
                     Amount = 200
                 },
                 new BalanceChange
@@ -78,6 +81,7 @@ public class DbDemoDataService
                     IdUser = 1,
                     Date = DateTime.Parse("2022-02-04 15:30"),
                     IdDirection = 1,
+                    Coin = "USDT",
                     Amount = 1000
                 },
                 new BalanceChange
@@ -86,6 +90,7 @@ public class DbDemoDataService
                     IdUser = 1,
                     Date = DateTime.Parse("2022-02-05 15:30"),
                     IdDirection = 2,
+                    Coin = "ETH",
                     Amount = 500
                 }
             );

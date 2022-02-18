@@ -21,6 +21,9 @@ namespace BinanceBotDb.Models
         [Column("id_direction"), Comment("1 - Deposit \n2 - Withdraw")]
         public int IdDirection { get; set; }
         
+        [Column("coin"), Comment("Coin name")]
+        public string Coin { get; set; }
+        
         [Column("amount"), Comment("Amount of change in USDT")]
         public double Amount { get; set; }
         

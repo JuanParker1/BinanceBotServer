@@ -3,15 +3,17 @@ using System;
 using BinanceBotDb.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace BinanceBotDb.Migrations
 {
     [DbContext(typeof(BinanceBotDbContext))]
-    partial class BinanceBotDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220218065328_AddedCoinNameToBalanceChange")]
+    partial class AddedCoinNameToBalanceChange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

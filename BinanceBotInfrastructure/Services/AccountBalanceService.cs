@@ -10,6 +10,7 @@ using BinanceBotDb.Models;
 using BinanceBotApp.DataInternal.Endpoints;
 using BinanceBotApp.DataInternal.Enums;
 using BinanceBotApp.DataInternal.Deserializers;
+using Mapster;
 
 namespace BinanceBotInfrastructure.Services
 {
@@ -24,6 +25,33 @@ namespace BinanceBotInfrastructure.Services
         {
             _settingsService = settingsService;
             _httpService = httpService;
+        }
+
+        public async Task<IEnumerable<BalanceChangeDto>> GetAllAsync(int idUser,
+            int days, CancellationToken token)
+        {
+            var startDate = DateTime.MinValue;
+            
+            if (days > 0)
+                startDate = DateTime.Now.AddDays(-days);
+
+            var query = from bChange in Db.BalanceChanges
+                        where bChange.IdUser == idUser &&
+                              bChange.Date > startDate
+                        select bChange;
+            
+            var history = await query.ToListAsync(token);
+
+            var historyDtos = history.Select(h =>
+            {
+                var dto = h.Adapt<BalanceChangeDto>();
+                dto.Direction = h.IdDirection == 1 
+                    ? "Пополнение" 
+                    : "Вывод";
+                return dto;
+            });
+
+            return historyDtos;
         }
         
         public async Task<IEnumerable<CoinAmountDto>> GetCurrentBalanceAsync(int idUser, 
