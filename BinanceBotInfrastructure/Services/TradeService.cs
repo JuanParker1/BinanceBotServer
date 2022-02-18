@@ -1,27 +1,33 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BinanceBotApp.Data;
 using BinanceBotApp.DataInternal.Enums;
 using BinanceBotApp.DataInternal.Endpoints;
 using BinanceBotApp.Services;
+using BinanceBotDb.Models;
+using Mapster;
+using Microsoft.EntityFrameworkCore;
 
 namespace BinanceBotInfrastructure.Services
 {
     public class TradeService : ITradeService
     {
+        private readonly IBinanceBotDbContext _db;
         private readonly ISettingsService _settingsService;
         private readonly IHttpClientService _httpService;
 
-        public TradeService(ISettingsService settingsService, 
+        public TradeService(IBinanceBotDbContext db, ISettingsService settingsService, 
             IHttpClientService httpService)
         {
+            _db = db;
             _settingsService = settingsService;
             _httpService = httpService;
         }
 
-        public async Task<OrderInfoDto> GetOrderAsync(int idUser, int idOrder, string symbol, 
+        public async Task<OrderInfoDtoOld> GetOrderAsync(int idUser, int idOrder, string symbol, 
             int recvWindow, CancellationToken token)
         {
             var keys = await _settingsService.GetApiKeysAsync(idUser,
@@ -36,13 +42,13 @@ namespace BinanceBotInfrastructure.Services
                 {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}
             };
             
-            var orderInfo = await _httpService.ProcessRequestAsync<OrderInfoDto>(uri, 
+            var orderInfo = await _httpService.ProcessRequestAsync<OrderInfoDtoOld>(uri, 
                 qParams, keys, HttpMethods.SignedGet, token);
 
             return orderInfo;
         }
         
-        public async Task<IEnumerable<OrderInfoDto>> GetOrdersForPairAsync(int idUser, string symbol,
+        public async Task<IEnumerable<OrderInfoDtoOld>> GetOrdersForPairAsync(int idUser, string symbol,
             int recvWindow, CancellationToken token)
         {
             var keys = await _settingsService.GetApiKeysAsync(idUser,
@@ -56,13 +62,45 @@ namespace BinanceBotInfrastructure.Services
                 {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}
             };
             
-            var orderInfo = await _httpService.ProcessRequestAsync<IEnumerable<OrderInfoDto>>(uri, 
+            var orderInfo = await _httpService.ProcessRequestAsync<IEnumerable<OrderInfoDtoOld>>(uri, 
                     qParams, keys, HttpMethods.SignedGet, token);
 
             return orderInfo;
         }
+
+        public async Task<IEnumerable<OrderDto>> GetOrdersHistoryForPairAsync(int idUser,
+            string symbol, DateTime intervalStart, DateTime intervalEnd, CancellationToken token)
+        {
+            var start = DateTime.MinValue;
+            var end = DateTime.Now;
+
+            if (intervalStart != default)
+                start = intervalStart;
+
+            if (intervalEnd != default)
+                end = intervalEnd;
+
+            var orders = await (from order in _db.Orders.Include(o => o.OrderType)
+                                where order.IdUser == idUser &&
+                                      order.Symbol.Contains(symbol) &&
+                                      order.Date >= start &&
+                                      order.Date <= end
+                                select order).ToListAsync(token);
+
+            var orderDtos = orders.Select(o =>
+            {
+                var dto = o.Adapt<OrderDto>();
+                dto.Side = o.IdSide == 1 ? "Покупка" : "Продажа";
+                dto.Type = o.OrderType.Caption;
+                dto.CreationType = o.IdCreationType == 1 ? "Авто" : "Вручную";
+                dto.TimeInForce = o.IdTimeInForce == 1 ? "Полный" : "Частичный";
+                return dto;
+            });
+
+            return orderDtos;
+        }
         
-        public async Task<IEnumerable<OrderInfoDto>> GetAllOrdersAsync(int idUser, int recvWindow,
+        public async Task<IEnumerable<OrderInfoDtoOld>> GetAllOrdersAsync(int idUser, int recvWindow,
             CancellationToken token)
         {
             var keys = await _settingsService.GetApiKeysAsync(idUser,
@@ -75,7 +113,7 @@ namespace BinanceBotInfrastructure.Services
                 {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}
             };
             
-            var orderInfo = await _httpService.ProcessRequestAsync<IEnumerable<OrderInfoDto>>(uri, 
+            var orderInfo = await _httpService.ProcessRequestAsync<IEnumerable<OrderInfoDtoOld>>(uri, 
                 qParams, keys, HttpMethods.SignedGet, token);
 
             return orderInfo;

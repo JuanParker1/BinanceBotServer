@@ -3,13 +3,13 @@ namespace BinanceBotApp.Data
     /// <summary>
     /// New order creation params
     /// </summary>
-    public class NewOrderDto
+    public class NewOrderDto // TODO: Это просто OrderInfo. А наныешний OrderInfo, унаследованый от нескольких, надо удалить
     {
         /// <summary>
         /// Requested user id
         /// </summary>
         public int IdUser { get; set; }
-        
+
         /// <summary>
         /// Trading pair name
         /// </summary>

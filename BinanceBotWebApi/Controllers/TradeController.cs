@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,7 +38,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet("{idOrder}")]
-        [ProducesResponseType(typeof(OrderInfoDto), (int)System.Net.HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(OrderInfoDtoOld), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetOrderAsync([FromRoute][Range(1, int.MaxValue)] int idOrder, 
             [FromQuery][StringLength(20)] string pair, [Range(1, int.MaxValue)]int idUser, 
             [Range(5000, int.MaxValue)]int recvWindow = 5000, CancellationToken token = default)
@@ -64,7 +65,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet("{symbol}")]
-        [ProducesResponseType(typeof(IEnumerable<OrderInfoDto>), (int)System.Net.HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<OrderInfoDtoOld>), (int)System.Net.HttpStatusCode.OK)] // TODO: Наверно, не надо. Буду историю брать из БД
         public async Task<IActionResult> GetOrdersForPairAsync([FromRoute][StringLength(20)] string pair, 
             [FromQuery][Range(1, int.MaxValue)] int idUser, [Range(5000, int.MaxValue)] int recvWindow = 5000,  
             CancellationToken token = default)
@@ -81,6 +82,34 @@ namespace BinanceBotWebApi.Controllers
         }
         
         /// <summary>
+        /// Gets all orders history for requested symbol in time interval
+        /// </summary>
+        /// <param name="idUser"> Requested user id </param>
+        /// <param name="symbol"> Requested trading pair </param>
+        /// <param name="intervalStart"> Requested interval start date </param>
+        /// <param name="intervalEnd"> Requested interval end date </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns code="200"> Info about requested orders for trading pair </returns>
+        /// <response code="400"> Error in request parameters </response>
+        /// <response code="403"> Wrong user id </response>
+        [HttpGet("{symbol}/history")]
+        [ProducesResponseType(typeof(IEnumerable<OrderDto>), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> GetOrdersHistoryForPairAsync([FromRoute][StringLength(20)] string symbol, 
+            [FromQuery][Range(1, int.MaxValue)] int idUser, DateTime intervalStart, DateTime intervalEnd,  
+            CancellationToken token = default)
+        {
+            var authUserId = User.GetUserId();
+
+            if (authUserId is null || authUserId != idUser)
+                return Forbid();
+            
+            var ordersInfo = await _tradeService.GetOrdersHistoryForPairAsync(idUser, 
+                symbol, intervalStart, intervalEnd, token);
+
+            return Ok(ordersInfo);
+        }
+        
+        /// <summary>
         /// Gets all opened orders info
         /// </summary>
         /// <param name="idUser"> Requested user id </param>
@@ -90,7 +119,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<OrderInfoDto>), (int)System.Net.HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<OrderInfoDtoOld>), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetAllOrdersAsync([FromQuery][Range(1, int.MaxValue)] int idUser,  
             [Range(5000, int.MaxValue)] int recvWindow = 5000, CancellationToken token = default)
         {

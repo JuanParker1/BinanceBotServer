@@ -3,7 +3,7 @@ namespace BinanceBotApp.Data
     /// <summary>
     /// Order info
     /// </summary>
-    public class OrderInfoDto : CreatedOrderResultDto
+    public class OrderInfoDtoOld : CreatedOrderResultDto
     {
         /// <summary>
         /// Coin stop price

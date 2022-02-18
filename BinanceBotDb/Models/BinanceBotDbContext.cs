@@ -14,6 +14,9 @@ namespace BinanceBotDb.Models
         public virtual DbSet<Request> RequestLog { get; set; }
         public virtual DbSet<Event> EventLog { get; set; }
         public virtual DbSet<EventTemplate> EventTemplates { get; set; }
+        public virtual DbSet<Order> Orders { get; set; }
+        public virtual DbSet<OrderType> OrderTypes { get; set; }
+        public virtual DbSet<TradeMode> TradeModes { get; set; }
 
         public BinanceBotDbContext()
         {
@@ -102,6 +105,16 @@ namespace BinanceBotDb.Models
                                    "по курсу {} USDT на сумму {} USDT. Дата: {} Время: {}.\n" +
                                    "Текст ошибки: {}.",
                     }
+                });
+            });
+            
+            modelBuilder.Entity<OrderType>(entity =>
+            {
+                entity.HasData(new List<OrderType>
+                {
+                    new OrderType {Id = 1, Caption = "LIMIT"},
+                    new OrderType {Id = 2, Caption = "MARKET"},
+                    new OrderType {Id = 3, Caption = "STOP_LOSS"},
                 });
             });
         }

@@ -143,6 +143,121 @@ public class DbDemoDataService
                            "на сумму 58520 USDT. Дата: 08.02.2022 Время: 17:42."
                 }
             );
+            
+            demoContext.Orders.AddRange(
+                new Order
+                {
+                    Id = 1,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-05 15:30"),
+                    Symbol = "BNB/USDT",
+                    IdSide = 2,
+                    IdType = 1,
+                    IdCreationType = 1,
+                    IdTimeInForce = 1,
+                    Quantity = 10,
+                    Price = 100,
+                    CoinPrice = 110
+                },
+                new Order
+                {
+                    Id = 2,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-06 11:20"),
+                    Symbol = "BNB/USDT",
+                    IdSide = 1,
+                    IdType = 1,
+                    IdCreationType = 1,
+                    IdTimeInForce = 1,
+                    Quantity = 7,
+                    Price = 110,
+                    CoinPrice = 120
+                },
+                new Order
+                {
+                    Id = 3,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-06 15:30"),
+                    Symbol = "BNB/USDT",
+                    IdSide = 1,
+                    IdType = 1,
+                    IdCreationType = 1,
+                    IdTimeInForce = 1,
+                    Quantity = 11,
+                    Price = 90,
+                    CoinPrice = 100
+                },
+                new Order
+                {
+                    Id = 4,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-07 15:30"),
+                    Symbol = "BNB/USDT",
+                    IdSide = 2,
+                    IdType = 1,
+                    IdCreationType = 1,
+                    IdTimeInForce = 1,
+                    Quantity = 8,
+                    Price = 120,
+                    CoinPrice = 130
+                },
+                new Order
+                {
+                    Id = 5,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-07 15:30"),
+                    Symbol = "BNB/USDT",
+                    IdSide = 2,
+                    IdType = 1,
+                    IdCreationType = 1,
+                    IdTimeInForce = 1,
+                    Quantity = 10,
+                    Price = 100,
+                    CoinPrice = 110
+                },
+                new Order
+                {
+                    Id = 6,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-10 15:30"),
+                    Symbol = "BNB/USDT",
+                    IdSide = 2,
+                    IdType = 1,
+                    IdCreationType = 1,
+                    IdTimeInForce = 1,
+                    Quantity = 20,
+                    Price = 78,
+                    CoinPrice = 80
+                },
+                new Order
+                {
+                    Id = 7,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-11 15:30"),
+                    Symbol = "BNB/USDT",
+                    IdSide = 2,
+                    IdType = 1,
+                    IdCreationType = 1,
+                    IdTimeInForce = 1,
+                    Quantity = 11,
+                    Price = 90,
+                    CoinPrice = 100
+                },
+                new Order
+                {
+                    Id = 8,
+                    IdUser = 1,
+                    Date = DateTime.Parse("2022-02-11 15:30"),
+                    Symbol = "BNB/USDT",
+                    IdSide = 2,
+                    IdType = 1,
+                    IdCreationType = 1,
+                    IdTimeInForce = 1,
+                    Quantity = 12,
+                    Price = 110,
+                    CoinPrice = 120
+                }
+            );
                 
             var res = demoContext.SaveChanges();
 
