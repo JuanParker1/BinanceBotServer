@@ -86,8 +86,8 @@ namespace BinanceBotWebApi.Controllers
         /// </summary>
         /// <param name="idUser"> Requested user id </param>
         /// <param name="symbol"> Requested trading pair </param>
-        /// <param name="intervalStart"> Requested interval start date </param>
-        /// <param name="intervalEnd"> Requested interval end date </param>
+        /// <param name="days"> Requested interval in days (0 value returns
+        /// all events for all time) </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> Info about requested orders for trading pair </returns>
         /// <response code="400"> Error in request parameters </response>
@@ -95,7 +95,7 @@ namespace BinanceBotWebApi.Controllers
         [HttpGet("{symbol}/history")]
         [ProducesResponseType(typeof(IEnumerable<OrderDto>), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetOrdersHistoryForPairAsync([FromRoute][StringLength(20)] string symbol, 
-            [FromQuery][Range(1, int.MaxValue)] int idUser, DateTime intervalStart, DateTime intervalEnd,  
+            [FromQuery][Range(1, int.MaxValue)] int idUser, [Range(0, int.MaxValue)] int days = 1, 
             CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
@@ -104,7 +104,7 @@ namespace BinanceBotWebApi.Controllers
                 return Forbid();
             
             var ordersInfo = await _tradeService.GetOrdersHistoryForPairAsync(idUser, 
-                symbol, intervalStart, intervalEnd, token);
+                symbol, days, token);
 
             return Ok(ordersInfo);
         }

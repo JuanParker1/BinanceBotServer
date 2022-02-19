@@ -16,16 +16,22 @@ namespace BinanceBotInfrastructure.Services
         public EventService(IBinanceBotDbContext db) : base(db) { }
         
         public async Task<IEnumerable<EventDto>> GetAllAsync(int idUser, 
-            bool isUnreadRequested, int days, CancellationToken token)
+            bool isUnreadRequested, DateTime intervalStart, DateTime intervalEnd, 
+            CancellationToken token)
         {
-            var startDate = DateTime.MinValue;
-            
-            if (days > 0)
-                startDate = DateTime.Now.AddDays(-days);
+            var start = DateTime.MinValue;
+            var end = DateTime.Now;
+
+            if (intervalStart != default)
+                start = intervalStart;
+
+            if (intervalEnd != default)
+                end = intervalEnd;
             
             var query = (from ev in Db.EventLog
                         where ev.IdUser == idUser &&
-                              ev.Date > startDate
+                              ev.Date >= start &&
+                              ev.Date <= end
                         orderby ev.Id
                         select ev);
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,8 +30,8 @@ namespace BinanceBotWebApi.Controllers
         /// Gets user's deposit history
         /// </summary>
         /// <param name="idUser"> User id </param>
-        /// <param name="days"> Requested interval in days (0 value returns
-        /// all data for all time) </param>
+        /// <param name="intervalStart"> Requested interval start date </param>
+        /// <param name="intervalEnd"> Requested interval end date </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> User's total balance info </returns>
         /// <response code="400"> Error in request parameters </response>
@@ -38,7 +39,7 @@ namespace BinanceBotWebApi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(BalanceChangeDto), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetDepositHistoryAsync([Range(1, int.MaxValue)] int idUser, 
-            [Range(0, int.MaxValue)] int days = 1, CancellationToken token = default)
+            DateTime intervalStart, DateTime intervalEnd, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
@@ -46,7 +47,7 @@ namespace BinanceBotWebApi.Controllers
                 return Forbid();
             
             var historyDtos = await _balanceService.GetAllAsync(idUser, 
-                days, token);
+                intervalStart, intervalEnd, token);
 
             return Ok(historyDtos);
         }

@@ -28,16 +28,21 @@ namespace BinanceBotInfrastructure.Services
         }
 
         public async Task<IEnumerable<BalanceChangeDto>> GetAllAsync(int idUser,
-            int days, CancellationToken token)
+            DateTime intervalStart, DateTime intervalEnd, CancellationToken token)
         {
-            var startDate = DateTime.MinValue;
-            
-            if (days > 0)
-                startDate = DateTime.Now.AddDays(-days);
+            var start = DateTime.MinValue;
+            var end = DateTime.Now;
+
+            if (intervalStart != default)
+                start = intervalStart;
+
+            if (intervalEnd != default)
+                end = intervalEnd;
 
             var query = from bChange in Db.BalanceChanges
                         where bChange.IdUser == idUser &&
-                              bChange.Date > startDate
+                              bChange.Date >= start &&
+                              bChange.Date <= end
                         select bChange;
             
             var history = await query.ToListAsync(token);

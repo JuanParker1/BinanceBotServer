@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,8 +30,8 @@ namespace BinanceBotWebApi.Controllers
         /// Gets user events
         /// </summary>
         /// <param name="idUser"> User id </param>
-        /// <param name="days"> Requested interval in days (0 value returns
-        /// all events for all time) </param>
+        /// <param name="intervalStart"> Requested interval start date </param>
+        /// <param name="intervalEnd"> Requested interval end date </param>
         /// <param name="isUnreadRequested"> Return only unread events (yes/no) </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> Pagination container with user events </returns>
@@ -39,7 +40,7 @@ namespace BinanceBotWebApi.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<EventDto>), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetUserEventsAsync([Range(1, int.MaxValue)] int idUser, 
-            bool isUnreadRequested = false, [Range(0, int.MaxValue)] int days = 1, 
+            DateTime intervalStart, DateTime intervalEnd, bool isUnreadRequested = false, 
             CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
@@ -48,7 +49,7 @@ namespace BinanceBotWebApi.Controllers
                 return Forbid();
 
             var eventDtos = await _eventService.GetAllAsync(idUser, 
-                isUnreadRequested, days, token);
+                isUnreadRequested, intervalStart, intervalEnd, token);
 
             return Ok(eventDtos);
         }

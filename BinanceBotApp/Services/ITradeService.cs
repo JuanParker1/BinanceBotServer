@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,8 +12,7 @@ namespace BinanceBotApp.Services
         Task<IEnumerable<OrderInfoDtoOld>> GetOrdersForPairAsync(int idUser,
             string symbol, int recvWindow, CancellationToken token);
         Task<IEnumerable<OrderDto>> GetOrdersHistoryForPairAsync(int idUser,
-            string symbol, DateTime intervalStart, DateTime intervalEnd, 
-            CancellationToken token);
+            string symbol, int days, CancellationToken token);
         Task<IEnumerable<OrderInfoDtoOld>> GetAllOrdersAsync(int idUser, 
             int recvWindow, CancellationToken token);
         Task<CreatedOrderResultDto> CreateTestOrderAsync(NewOrderDto newOrderDto, 

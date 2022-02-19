@@ -27,8 +27,8 @@ namespace BinanceBotInfrastructure.Services
             _httpService = httpService;
         }
 
-        public async Task<OrderInfoDtoOld> GetOrderAsync(int idUser, int idOrder, string symbol, 
-            int recvWindow, CancellationToken token)
+        public async Task<OrderInfoDtoOld> GetOrderAsync(int idUser, int idOrder, 
+            string symbol, int recvWindow, CancellationToken token)
         {
             var keys = await _settingsService.GetApiKeysAsync(idUser,
                 token);
@@ -48,8 +48,8 @@ namespace BinanceBotInfrastructure.Services
             return orderInfo;
         }
         
-        public async Task<IEnumerable<OrderInfoDtoOld>> GetOrdersForPairAsync(int idUser, string symbol,
-            int recvWindow, CancellationToken token)
+        public async Task<IEnumerable<OrderInfoDtoOld>> GetOrdersForPairAsync(int idUser, 
+            string symbol, int recvWindow, CancellationToken token)
         {
             var keys = await _settingsService.GetApiKeysAsync(idUser,
                 token);
@@ -69,23 +69,18 @@ namespace BinanceBotInfrastructure.Services
         }
 
         public async Task<IEnumerable<OrderDto>> GetOrdersHistoryForPairAsync(int idUser,
-            string symbol, DateTime intervalStart, DateTime intervalEnd, CancellationToken token)
+            string symbol, int days, CancellationToken token)
         {
-            var start = DateTime.MinValue;
-            var end = DateTime.Now;
-
-            if (intervalStart != default)
-                start = intervalStart;
-
-            if (intervalEnd != default)
-                end = intervalEnd;
+            var startDate = DateTime.MinValue;
+            
+            if (days > 0)
+                startDate = DateTime.Now.AddDays(-days);
 
             var orders = await (from order in _db.Orders.Include(o => o.OrderType)
-                                where order.IdUser == idUser &&
-                                      order.Symbol.Contains(symbol) &&
-                                      order.Date >= start &&
-                                      order.Date <= end
-                                select order).ToListAsync(token);
+                            where order.IdUser == idUser &&
+                                  order.Symbol.StartsWith(symbol) &&
+                                  order.Date > startDate
+                            select order).ToListAsync(token);
 
             var orderDtos = orders.Select(o =>
             {
