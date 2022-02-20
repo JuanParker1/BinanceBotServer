@@ -17,7 +17,7 @@ namespace BinanceBotApp.Data
         /// <summary>
         /// Order closing date
         /// </summary>
-        public DateTime DateClosed { get; set; }
+        public DateTime? DateClosed { get; set; }
         
         /// <summary>
         /// Auto or manually created order

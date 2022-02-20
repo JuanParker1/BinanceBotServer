@@ -94,13 +94,14 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="403"> Wrong user id </response>
         [HttpGet("{symbol}/history")]
         [ProducesResponseType(typeof(IEnumerable<OrderDto>), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> GetOrdersHistoryForPairAsync([FromRoute][StringLength(20)] string symbol, 
+        public async Task<IActionResult> GetOrdersHistoryForPairAsync([FromRoute][StringLength(20), MinLength(2)] string symbol, 
             [FromQuery][Range(1, int.MaxValue)] int idUser, [Range(0, int.MaxValue)] int days = 1, 
             CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
-            if (authUserId is null || authUserId != idUser)
+            if (authUserId is null || authUserId != idUser ||
+                symbol.ToUpper().StartsWith("USDT"))
                 return Forbid();
             
             var ordersInfo = await _tradeService.GetOrdersHistoryForPairAsync(idUser, 

@@ -248,7 +248,7 @@ public class DbDemoDataService
                     Id = 8,
                     IdUser = 1,
                     DateCreated = DateTime.Parse("2022-02-12 11:45"),
-                    DateClosed = default,
+                    DateClosed = null,
                     Symbol = "BNB/USDT",
                     IdSide = 2,
                     IdType = 1,

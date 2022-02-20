@@ -20,7 +20,7 @@ namespace BinanceBotDb.Models
         public DateTime DateCreated { get; set; }
         
         [Column("date_closed"), Comment("Order closing date")]
-        public DateTime DateClosed { get; set; }
+        public DateTime? DateClosed { get; set; }
         
         [Column("symbol"), Comment("Trade pair")]
         public string Symbol { get; set; }
