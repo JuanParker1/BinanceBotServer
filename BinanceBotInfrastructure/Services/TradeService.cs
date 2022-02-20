@@ -79,7 +79,7 @@ namespace BinanceBotInfrastructure.Services
             var orders = await (from order in _db.Orders.Include(o => o.OrderType)
                             where order.IdUser == idUser &&
                                   order.Symbol.StartsWith(symbol) &&
-                                  order.Date > startDate
+                                  order.DateCreated > startDate
                             select order).ToListAsync(token);
 
             var orderDtos = orders.Select(o =>

@@ -16,8 +16,11 @@ namespace BinanceBotDb.Models
         [Column("id_user")]
         public int IdUser { get; set; }
         
-        [Column("date"), Comment("Order creation date")]
-        public DateTime Date { get; set; }
+        [Column("date_created"), Comment("Order creation date")]
+        public DateTime DateCreated { get; set; }
+        
+        [Column("date_closed"), Comment("Order closing date")]
+        public DateTime DateClosed { get; set; }
         
         [Column("symbol"), Comment("Trade pair")]
         public string Symbol { get; set; }
@@ -42,11 +45,8 @@ namespace BinanceBotDb.Models
         
         [Column("price"), Comment("Order price in secondary asset of trading pair")]
         public double Price { get; set; }
-        
-        [Column("coin_price"), Comment("Current coin price (when order was created) in secondary asset of trading pair")]
-        public double CoinPrice { get; set; }
-        
-        
+
+
         [ForeignKey(nameof(IdType))]
         [InverseProperty(nameof(Models.Directories.OrderType.Orders))]
         public virtual OrderType OrderType { get; set; }

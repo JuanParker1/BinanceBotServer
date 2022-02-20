@@ -149,113 +149,113 @@ public class DbDemoDataService
                 {
                     Id = 1,
                     IdUser = 1,
-                    Date = DateTime.Parse("2022-02-05 15:30"),
+                    DateCreated = DateTime.Parse("2022-02-05 15:30"),
+                    DateClosed = DateTime.Parse("2022-02-06 11:20"),
                     Symbol = "BNB/USDT",
                     IdSide = 2,
                     IdType = 1,
                     IdCreationType = 1,
                     IdTimeInForce = 1,
                     Quantity = 10,
-                    Price = 100,
-                    CoinPrice = 110
+                    Price = 100
                 },
                 new Order
                 {
                     Id = 2,
                     IdUser = 1,
-                    Date = DateTime.Parse("2022-02-06 11:20"),
+                    DateCreated = DateTime.Parse("2022-02-06 11:20"),
+                    DateClosed = DateTime.Parse("2022-02-06 15:30"),
                     Symbol = "BNB/USDT",
                     IdSide = 1,
                     IdType = 1,
                     IdCreationType = 1,
                     IdTimeInForce = 1,
                     Quantity = 7,
-                    Price = 110,
-                    CoinPrice = 120
+                    Price = 110
                 },
                 new Order
                 {
                     Id = 3,
                     IdUser = 1,
-                    Date = DateTime.Parse("2022-02-06 15:30"),
+                    DateCreated = DateTime.Parse("2022-02-06 15:30"),
+                    DateClosed = DateTime.Parse("2022-02-07 14:30"),
                     Symbol = "BNB/USDT",
                     IdSide = 1,
                     IdType = 1,
                     IdCreationType = 1,
                     IdTimeInForce = 1,
                     Quantity = 11,
-                    Price = 90,
-                    CoinPrice = 100
+                    Price = 90
                 },
                 new Order
                 {
                     Id = 4,
                     IdUser = 1,
-                    Date = DateTime.Parse("2022-02-07 15:30"),
+                    DateCreated = DateTime.Parse("2022-02-07 14:30"),
+                    DateClosed = DateTime.Parse("2022-02-07 15:30"),
                     Symbol = "BNB/USDT",
                     IdSide = 2,
                     IdType = 1,
                     IdCreationType = 1,
                     IdTimeInForce = 1,
                     Quantity = 8,
-                    Price = 120,
-                    CoinPrice = 130
+                    Price = 120
                 },
                 new Order
                 {
                     Id = 5,
                     IdUser = 1,
-                    Date = DateTime.Parse("2022-02-07 15:30"),
+                    DateCreated = DateTime.Parse("2022-02-07 15:30"),
+                    DateClosed = DateTime.Parse("2022-02-10 15:30"),
                     Symbol = "BNB/USDT",
                     IdSide = 2,
                     IdType = 1,
                     IdCreationType = 1,
                     IdTimeInForce = 1,
                     Quantity = 10,
-                    Price = 100,
-                    CoinPrice = 110
+                    Price = 100
                 },
                 new Order
                 {
                     Id = 6,
                     IdUser = 1,
-                    Date = DateTime.Parse("2022-02-10 15:30"),
+                    DateCreated = DateTime.Parse("2022-02-10 15:30"),
+                    DateClosed = DateTime.Parse("2022-02-11 15:30"),
                     Symbol = "BNB/USDT",
                     IdSide = 2,
                     IdType = 1,
                     IdCreationType = 1,
                     IdTimeInForce = 1,
                     Quantity = 20,
-                    Price = 78,
-                    CoinPrice = 80
+                    Price = 78
                 },
                 new Order
                 {
                     Id = 7,
                     IdUser = 1,
-                    Date = DateTime.Parse("2022-02-11 15:30"),
+                    DateCreated = DateTime.Parse("2022-02-11 15:30"),
+                    DateClosed = DateTime.Parse("2022-02-12 11:45"),
                     Symbol = "BNB/USDT",
                     IdSide = 2,
                     IdType = 1,
                     IdCreationType = 1,
                     IdTimeInForce = 1,
                     Quantity = 11,
-                    Price = 90,
-                    CoinPrice = 100
+                    Price = 90
                 },
                 new Order
                 {
                     Id = 8,
                     IdUser = 1,
-                    Date = DateTime.Parse("2022-02-11 15:30"),
+                    DateCreated = DateTime.Parse("2022-02-12 11:45"),
+                    DateClosed = default,
                     Symbol = "BNB/USDT",
                     IdSide = 2,
                     IdType = 1,
                     IdCreationType = 1,
                     IdTimeInForce = 1,
                     Quantity = 12,
-                    Price = 110,
-                    CoinPrice = 120
+                    Price = 110
                 }
             );
                 

@@ -12,7 +12,12 @@ namespace BinanceBotApp.Data
         /// <summary>
         /// Order creation date
         /// </summary>
-        public DateTime Date { get; set; }
+        public DateTime DateCreated { get; set; }
+        
+        /// <summary>
+        /// Order closing date
+        /// </summary>
+        public DateTime DateClosed { get; set; }
         
         /// <summary>
         /// Auto or manually created order
