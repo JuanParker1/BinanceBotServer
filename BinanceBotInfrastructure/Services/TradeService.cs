@@ -81,16 +81,19 @@ namespace BinanceBotInfrastructure.Services
                                   order.Symbol.StartsWith(symbol) &&
                                   order.DateCreated > startDate
                             select order).ToListAsync(token);
-
-            var orderDtos = orders.Select(o =>
+            
+            // Additionally check that if there are no orders for that period, maybe there is unclosed order before
+            // selected period and it is still alive.
+            if (!orders.Any())
             {
-                var dto = o.Adapt<OrderDto>();
-                dto.Side = o.IdSide == 1 ? "Покупка" : "Продажа";
-                dto.Type = o.OrderType.Caption;
-                dto.CreationType = o.IdCreationType == 1 ? "Авто" : "Вручную";
-                dto.TimeInForce = o.IdTimeInForce == 1 ? "Полный" : "Частичный";
-                return dto;
-            });
+                var lastOrderDto = await GetLastOrderAsync(idUser, symbol, token);
+                if (lastOrderDto is not null && lastOrderDto.DateClosed is null)
+                    return new List<OrderDto> {lastOrderDto};
+
+                return null;
+            }
+
+            var orderDtos = orders.Select(Convert);
 
             return orderDtos;
         }
@@ -179,6 +182,28 @@ namespace BinanceBotInfrastructure.Services
                     qParams, keys, HttpMethods.Delete, token); 
 
             return deletedOrdersInfo;
+        }
+
+        private async Task<OrderDto> GetLastOrderAsync(int idUser, string symbol,
+            CancellationToken token)
+        {
+            var lastOrder = await (from order in _db.Orders.Include(o => o.OrderType)
+                                    where order.IdUser == idUser &&
+                                          order.Symbol.StartsWith(symbol)
+                                    orderby order.DateCreated
+                                    select order).LastOrDefaultAsync(token);
+
+            return lastOrder is null ? null : Convert(lastOrder);
+        }
+
+        private static OrderDto Convert(Order order)
+        {
+            var dto = order.Adapt<OrderDto>();
+            dto.Side = order.IdSide == 1 ? "Покупка" : "Продажа";
+            dto.Type = order.OrderType.Caption;
+            dto.CreationType = order.IdCreationType == 1 ? "Авто" : "Вручную";
+            dto.TimeInForce = order.IdTimeInForce == 1 ? "Полный" : "Частичный";
+            return dto;
         }
     }
 }
