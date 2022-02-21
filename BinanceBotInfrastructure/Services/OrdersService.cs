@@ -81,7 +81,7 @@ namespace BinanceBotInfrastructure.Services
             return orderDtos;
         }
 
-        public async Task<IEnumerable<OrderDto>> GetOrdersHistoryAsync(int idUser,
+        public async Task<IEnumerable<OrderDto>> GetOrdersHistoryForPairAsync(int idUser,
             string symbol, int days, CancellationToken token)
         {
             var startDate = DateTime.MinValue;
@@ -109,6 +109,29 @@ namespace BinanceBotInfrastructure.Services
             var orderDtos = orders.Select(Convert);
 
             return orderDtos;
+        }
+
+        public async Task<IEnumerable<OrderDto>> GetOrdersHistoryAsync(int idUser, DateTime intervalStart,
+            DateTime intervalEnd, CancellationToken token)
+        {
+            var start = DateTime.MinValue;
+            var end = DateTime.Now;
+
+            if (intervalStart != default)
+                start = intervalStart;
+
+            if (intervalEnd != default)
+                end = intervalEnd;
+            
+            var orders = await (from order in _db.Orders.Include(o => o.OrderType)
+                            where order.IdUser == idUser &&
+                                  order.DateCreated >= start &&
+                                  order.DateCreated <= end
+                            orderby order.Id
+                            select order).ToListAsync(token);
+
+            var dtos = orders.Select(Convert);
+            return dtos;
         }
         
         public async Task<IEnumerable<OrderInfoDtoOld>> GetAllOrdersAsync(int idUser, int recvWindow,
