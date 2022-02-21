@@ -35,7 +35,7 @@ namespace BinanceBotInfrastructure
             services.AddTransient<IAccountBalanceService, AccountBalanceService>();
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<ICoinService, CoinService>();
-            services.AddTransient<ITradeService, TradeService>();
+            services.AddTransient<IOrdersService, OrdersService>();
             services.AddTransient<ISettingsService, SettingsService>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IWebSocketClientService, WebSocketClientService>();

@@ -14,16 +14,16 @@ namespace BinanceBotWebApi.Controllers
     /// <summary>
     /// Orders info controller
     /// </summary>
-    [Route("api/trade")]
+    [Route("api/orders")]
     [ApiController]
     [Authorize]
-    public class TradeController : ControllerBase
+    public class OrdersController : ControllerBase
     {
-        private readonly ITradeService _tradeService;
+        private readonly IOrdersService _ordersService;
 
-        public TradeController(ITradeService tradeService)
+        public OrdersController(IOrdersService ordersService)
         {
-            _tradeService = tradeService;
+            _ordersService = ordersService;
         }
         
         /// <summary>
@@ -48,7 +48,7 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            var orderInfo = await _tradeService.GetOrderAsync(idUser, idOrder, 
+            var orderInfo = await _ordersService.GetOrderAsync(idUser, idOrder, 
                 pair, recvWindow, token);
 
             return Ok(orderInfo);
@@ -75,7 +75,7 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            var ordersInfo = await _tradeService.GetOrdersForPairAsync(idUser, 
+            var ordersInfo = await _ordersService.GetOrdersForPairAsync(idUser, 
                 pair, recvWindow, token);
 
             return Ok(ordersInfo);
@@ -99,7 +99,7 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            var ordersInfo = await _tradeService.GetActiveOrdersAsync(idUser, 
+            var ordersInfo = await _ordersService.GetActiveOrdersAsync(idUser, 
                 token);
 
             return Ok(ordersInfo);
@@ -128,14 +128,14 @@ namespace BinanceBotWebApi.Controllers
                 symbol.ToUpper().StartsWith("USDT"))
                 return Forbid();
             
-            var ordersInfo = await _tradeService.GetOrdersHistoryAsync(idUser, 
+            var ordersInfo = await _ordersService.GetOrdersHistoryAsync(idUser, 
                 symbol, days, token);
 
             return Ok(ordersInfo);
         }
         
         /// <summary>
-        /// Gets all opened orders info
+        /// Gets all opened orders info for requested user
         /// </summary>
         /// <param name="idUser"> Requested user id </param>
         /// <param name="recvWindow"> Request lifetime in ms </param>
@@ -153,7 +153,7 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            var ordersInfo = await _tradeService.GetAllOrdersAsync(idUser, 
+            var ordersInfo = await _ordersService.GetAllOrdersAsync(idUser, 
                 recvWindow, token);
 
             return Ok(ordersInfo);
@@ -177,7 +177,7 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != newOrderDto.IdUser)
                 return Forbid();
             
-            var orderInfo = await _tradeService.CreateTestOrderAsync(newOrderDto, token);
+            var orderInfo = await _ordersService.CreateTestOrderAsync(newOrderDto, token);
 
             return Ok(orderInfo);
         }
@@ -200,7 +200,7 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != newOrder.IdUser)
                 return Forbid();
             
-            var orderInfo = await _tradeService.CreateOrderAsync(newOrder, token);
+            var orderInfo = await _ordersService.CreateOrderAsync(newOrder, token);
 
             return Ok(orderInfo);
         }
@@ -227,7 +227,7 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            var orderInfo = await _tradeService.DeleteOrderAsync(idUser, 
+            var orderInfo = await _ordersService.DeleteOrderAsync(idUser, 
                 idOrder, symbol, recvWindow, token);
 
             return Ok(orderInfo);
@@ -255,7 +255,7 @@ namespace BinanceBotWebApi.Controllers
                 return Forbid();
             
             var orderInfo = 
-                await _tradeService.DeleteAllOrdersForPairAsync(idUser, pair, 
+                await _ordersService.DeleteAllOrdersForPairAsync(idUser, pair, 
                     recvWindow, token);
 
             return Ok(orderInfo);

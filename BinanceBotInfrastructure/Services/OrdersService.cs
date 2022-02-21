@@ -13,13 +13,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BinanceBotInfrastructure.Services
 {
-    public class TradeService : ITradeService
+    public class OrdersService : IOrdersService
     {
         private readonly IBinanceBotDbContext _db;
         private readonly ISettingsService _settingsService;
         private readonly IHttpClientService _httpService;
 
-        public TradeService(IBinanceBotDbContext db, ISettingsService settingsService, 
+        public OrdersService(IBinanceBotDbContext db, ISettingsService settingsService, 
             IHttpClientService httpService)
         {
             _db = db;
