@@ -27,7 +27,7 @@ namespace BinanceBotInfrastructure.Services
             _httpService = httpService;
         }
 
-        public async Task<OrderInfoDtoOld> GetOrderAsync(int idUser, int idOrder, 
+        public async Task<OrderInfoDtoOld> GetOrderAsync(int idUser, int idOrder, // TODO: Многие методы зачем?
             string symbol, int recvWindow, CancellationToken token)
         {
             var keys = await _settingsService.GetApiKeysAsync(idUser,
@@ -68,7 +68,20 @@ namespace BinanceBotInfrastructure.Services
             return orderInfo;
         }
 
-        public async Task<IEnumerable<OrderDto>> GetOrdersHistoryForPairAsync(int idUser,
+        public async Task<IEnumerable<OrderDto>> GetActiveOrdersAsync(int idUser,
+            CancellationToken token)
+        {
+            var orders = await (from order in _db.Orders.Include(o => o.OrderType)
+                                where order.IdUser == idUser &&
+                                      order.DateClosed == null
+                                select order).ToListAsync(token);
+
+            var orderDtos = orders.Select(Convert);
+
+            return orderDtos;
+        }
+
+        public async Task<IEnumerable<OrderDto>> GetOrdersHistoryAsync(int idUser,
             string symbol, int days, CancellationToken token)
         {
             var startDate = DateTime.MinValue;

@@ -82,6 +82,30 @@ namespace BinanceBotWebApi.Controllers
         }
         
         /// <summary>
+        /// Gets all active orders for requested user
+        /// </summary>
+        /// <param name="idUser"> Requested user id </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns code="200"> Info about requested orders for trading pair </returns>
+        /// <response code="400"> Error in request parameters </response>
+        /// <response code="403"> Wrong user id </response>
+        [HttpGet("active")]
+        [ProducesResponseType(typeof(IEnumerable<OrderDto>), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> GetActiveOrdersAsync([FromQuery][Range(1, int.MaxValue)] int idUser, 
+            CancellationToken token = default)
+        {
+            var authUserId = User.GetUserId();
+
+            if (authUserId is null || authUserId != idUser)
+                return Forbid();
+            
+            var ordersInfo = await _tradeService.GetActiveOrdersAsync(idUser, 
+                token);
+
+            return Ok(ordersInfo);
+        }
+        
+        /// <summary>
         /// Gets all orders history for requested symbol in time interval
         /// </summary>
         /// <param name="idUser"> Requested user id </param>
@@ -94,7 +118,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="403"> Wrong user id </response>
         [HttpGet("{symbol}/history")]
         [ProducesResponseType(typeof(IEnumerable<OrderDto>), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> GetOrdersHistoryForPairAsync([FromRoute][StringLength(20), MinLength(2)] string symbol, 
+        public async Task<IActionResult> GetOrdersHistoryAsync([FromRoute][StringLength(20), MinLength(2)] string symbol, 
             [FromQuery][Range(1, int.MaxValue)] int idUser, [Range(0, int.MaxValue)] int days = 1, 
             CancellationToken token = default)
         {
@@ -104,7 +128,7 @@ namespace BinanceBotWebApi.Controllers
                 symbol.ToUpper().StartsWith("USDT"))
                 return Forbid();
             
-            var ordersInfo = await _tradeService.GetOrdersHistoryForPairAsync(idUser, 
+            var ordersInfo = await _tradeService.GetOrdersHistoryAsync(idUser, 
                 symbol, days, token);
 
             return Ok(ordersInfo);
