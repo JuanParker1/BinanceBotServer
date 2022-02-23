@@ -147,7 +147,7 @@ namespace BinanceBotWebApi.Controllers
         [HttpGet("history")]
         [ProducesResponseType(typeof(IEnumerable<OrderDto>), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetOrdersHistoryAsync([FromQuery][Range(1, int.MaxValue)] int idUser, 
-            DateTime intervalStart, DateTime intervalEnd, CancellationToken token = default)
+            DateTime intervalStart = default, DateTime intervalEnd = default, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 

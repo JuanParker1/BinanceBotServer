@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BinanceBotApp.Services;
 using BinanceBotApp.Data;
+using BinanceBotApp.DataInternal.Deserializers;
 using BinanceBotApp.DataInternal.Endpoints;
 using BinanceBotApp.DataInternal.Enums;
 
@@ -33,10 +34,13 @@ namespace BinanceBotInfrastructure.Services
 
             var uri = MarketDataEndpoints.GetCoinsPricesEndpoint();
             var coinPricesInfo = 
-                await _httpService.ProcessRequestAsync<IEnumerable<(string Symbol, string Price)>>(uri, 
+                await _httpService.ProcessRequestAsync<IEnumerable<CoinInfo>>(uri, 
                     new Dictionary<string, string>(), keys,HttpMethods.Get, token);
             
-            return coinPricesInfo.Select(c => c.Symbol);
+            var filtered =  coinPricesInfo.Select(c => CutTradePairEnding(c.Symbol))
+                .Distinct();
+            
+            return filtered;
         }
 
         public async Task GetSubscriptionsListAsync(CancellationToken token)
@@ -72,6 +76,15 @@ namespace BinanceBotInfrastructure.Services
             
             await _wsService.ConnectToWebSocketAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
                 data, null, token);
+        }
+
+        private string CutTradePairEnding(string tradePair)
+        {
+            if (tradePair.EndsWith("BTC") || tradePair.EndsWith("BNB"))
+                return tradePair[..^3];
+            if (tradePair.EndsWith("USDT"))
+                return tradePair[..^4];
+            return tradePair[..^3];
         }
     }
 }
