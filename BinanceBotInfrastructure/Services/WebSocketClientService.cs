@@ -13,6 +13,7 @@ namespace BinanceBotInfrastructure.Services
     {
         private readonly Dictionary<int, WebSocket> _activeWebSockets;
         private int _idWebSocket = 0;
+        private const int _receivedDataThreshold = 10;
 
         public WebSocketClientService()
         {
@@ -28,7 +29,7 @@ namespace BinanceBotInfrastructure.Services
             if (webSocket.State != WebSocketState.Open)
                 throw new Exception("Connection was not opened.");
             
-            _activeWebSockets.Add(_idWebSocket, webSocket);
+            _activeWebSockets.Add(_idWebSocket, webSocket); // TODO: Поменять id соединения на idUser. Закрывать будем все сразу у него.
             _idWebSocket++;
             
             if(!string.IsNullOrEmpty(data))
@@ -36,10 +37,13 @@ namespace BinanceBotInfrastructure.Services
                     WebSocketMessageType.Text, true, token);
             
             var buffer = new ArraySegment<byte>(new byte[2048]);
+            var i = 0;
+            
             do
             {
+                await using var ms = new MemoryStream(); // TODO: Вероятный ад по памяти. Нужен профилировщик
                 WebSocketReceiveResult result;
-                await using var ms = new MemoryStream();
+      
                 do
                 {
                     result = await webSocket.ReceiveAsync(buffer, CancellationToken.None);
@@ -52,8 +56,14 @@ namespace BinanceBotInfrastructure.Services
                 ms.Seek(0, SeekOrigin.Begin);
                 using var reader = new StreamReader(ms, Encoding.UTF8);
                 var response = await reader.ReadToEndAsync();
-                responseHandler?.Invoke(response);
                 
+                i++;
+                if(i < _receivedDataThreshold)
+                    continue;
+                
+                responseHandler?.Invoke(response);
+                i = 0;
+
             } while (!token.IsCancellationRequested);
         }
         
