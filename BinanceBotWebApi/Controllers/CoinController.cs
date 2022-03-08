@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using BinanceBotApp.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.ComponentModel.DataAnnotations;
 using BinanceBotApp.Services;
 using BinanceBotInfrastructure.Extensions;
+using BinanceBotWebApi.SignalR;
 
 namespace BinanceBotWebApi.Controllers
 {
@@ -20,10 +22,12 @@ namespace BinanceBotWebApi.Controllers
     public class CoinController : ControllerBase
     {
         private readonly ICoinService _coinService;
+        private readonly IHubContext<PricesHub> _pricesHubContext;
 
-        public CoinController(ICoinService coinService)
+        public CoinController(ICoinService coinService, IHubContext<PricesHub> pricesHubContext)
         {
             _coinService = coinService;
+            _pricesHubContext = pricesHubContext;
         }
         
         /// <summary>
@@ -49,7 +53,7 @@ namespace BinanceBotWebApi.Controllers
             
             return Ok(allPairs);
         }
-
+        
         /// <summary>
         /// Gets price info for requested trading pair in real time
         /// </summary>
@@ -93,7 +97,17 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            await _coinService.GetCoinsListPriceStreamAsync(pairNames, Console.WriteLine, token);
+            void HandleCoinPricesAsync(string price) =>
+                Task.Run(() =>
+                {
+                    _pricesHubContext.Clients.Group($"User_{authUserId}").SendAsync(
+                        nameof(IPriceHubClient.GetPrices),
+                        price,
+                        token
+                    );
+                }, token);
+            
+            await _coinService.GetCoinPricesStreamAsync(pairNames, HandleCoinPricesAsync, token);
         
             return Ok();
         }

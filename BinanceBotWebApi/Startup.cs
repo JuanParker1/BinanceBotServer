@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using BinanceBotApp.DataValidators;
 using BinanceBotInfrastructure;
 using BinanceBotWebApi.Middlewares;
+using BinanceBotWebApi.SignalR;
 
 namespace BinanceBotWebApi
 {
@@ -67,9 +68,12 @@ namespace BinanceBotWebApi
             app.UseAuthorization();
             
             app.UseMiddleware<RequestTrackerMiddleware>();
-            
+
             app.UseEndpoints(endpoints =>
-                endpoints.MapControllers());
+            {
+                endpoints.MapControllers();
+                endpoints.MapHub<PricesHub>("/hubs/prices");
+            });
 
             app.UseSpa(spa =>
                 spa.Options.SourcePath = "wwwroot");

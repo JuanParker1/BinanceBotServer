@@ -60,14 +60,14 @@ namespace BinanceBotInfrastructure.Services
                 data, Console.WriteLine, token );
         }
         
-        public async Task GetCoinsListPriceStreamAsync(GenericCollectionDto<string> pairs, 
+        public async Task GetCoinPricesStreamAsync(GenericCollectionDto<string> pairs, 
             Action<string> responseHandler, CancellationToken token)
         {
             var pairsString = string.Join(",", pairs.Collection.Select(p => $"\"{p}@bookTicker\""));
             var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[{pairsString}],\"id\": 1}}";
             
             await _wsService.ConnectToWebSocketAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
-                data, Console.WriteLine, token);
+                data, responseHandler, token);
         }
 
         public async Task UnsubscribeCoinPriceStreamAsync(string pair, CancellationToken token)
