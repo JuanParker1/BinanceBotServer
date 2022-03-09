@@ -1,47 +1,52 @@
 using System;
 using System.Net.WebSockets;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text;
 using BinanceBotApp.Services;
+using BinanceBotInfrastructure.Services.WebsocketStorage;
+using BinanceBotApp.DataInternal.Enums;
 
 namespace BinanceBotInfrastructure.Services
 {
     public class WebSocketClientService : IWebSocketClientService
     {
-        private readonly Dictionary<int, WebSocket> _activeWebSockets;
-        private int _idWebSocket = 0;
-        private const int _receivedDataThreshold = 10;
+        private readonly IActiveWebsockets _activeWebsockets;
 
-        public WebSocketClientService()
+        public WebSocketClientService(IActiveWebsockets activeWebsockets)
         {
-            _activeWebSockets = new Dictionary<int, WebSocket>();
+            _activeWebsockets = activeWebsockets;
         }
-        
-        public async Task ConnectToWebSocketAsync(Uri endpoint, string data,
-            Action<string> responseHandler, CancellationToken token)
+
+        public async Task ConnectToWebSocketAsync(Uri endpoint, string data, int idUser, 
+            WebsocketConnectionTypes streamType, Action<string> responseHandler, 
+            CancellationToken token)
         {
-            using var webSocket = new ClientWebSocket();
+            var (prices, userData) = _activeWebsockets.Get(idUser);
+
+            var webSocket = streamType switch
+            {
+                WebsocketConnectionTypes.Prices => prices,
+                WebsocketConnectionTypes.UserData => userData,
+                _ => throw new ArgumentOutOfRangeException(nameof(WebsocketConnectionTypes),
+                    "Unknown websocket connection type in Websocket client.")
+            };
+
             await webSocket.ConnectAsync(endpoint, token);
 
             if (webSocket.State != WebSocketState.Open)
                 throw new Exception("Connection was not opened.");
-            
-            _activeWebSockets.Add(_idWebSocket, webSocket); // TODO: Поменять id соединения на idUser. Закрывать будем все сразу у него.
-            _idWebSocket++;
-            
+
             if(!string.IsNullOrEmpty(data))
-                await webSocket.SendAsync(Encoding.UTF8.GetBytes(data), 
+                await webSocket.SendAsync(Encoding.UTF8.GetBytes(data),
                     WebSocketMessageType.Text, true, token);
             
             var buffer = new ArraySegment<byte>(new byte[2048]);
-            var i = 0;
-            
+
             do
             {
-                await using var ms = new MemoryStream(); // TODO: Вероятный ад по памяти. Нужен профилировщик
+                await using var ms = new MemoryStream();
                 WebSocketReceiveResult result;
       
                 do
@@ -56,34 +61,10 @@ namespace BinanceBotInfrastructure.Services
                 ms.Seek(0, SeekOrigin.Begin);
                 using var reader = new StreamReader(ms, Encoding.UTF8);
                 var response = await reader.ReadToEndAsync();
-                
-                i++;
-                if(i < _receivedDataThreshold)
-                    continue;
-                
-                responseHandler?.Invoke(response);
-                i = 0;
 
-            } while (!token.IsCancellationRequested);
-        }
-        
-        public async Task<bool> CloseWebSocketInstance(int id, CancellationToken token)
-        {
-            if(!_activeWebSockets.ContainsKey(id))
-                throw new Exception($"No Websocket exists with the Id {id}");
-            
-            var ws = _activeWebSockets[id];
-            await ws.CloseAsync(WebSocketCloseStatus.Empty, "", token);
-            return _activeWebSockets.Remove(id);
-        }
-        
-        public bool IsAlive(int id)
-        {
-            if (!_activeWebSockets.ContainsKey(id)) 
-                throw new Exception($"No Websocket exists with the Id {id}");
-            
-            var ws = _activeWebSockets[id];
-            return ws.State == WebSocketState.Open;
+                responseHandler?.Invoke(response);
+
+            } while (!token.IsCancellationRequested || webSocket.State == WebSocketState.Open);
         }
     }
 }

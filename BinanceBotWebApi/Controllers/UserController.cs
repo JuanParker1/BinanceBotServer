@@ -124,7 +124,7 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            await _userService.GetUserDataStreamAsync(listenKey, 
+            await _userService.GetUserDataStreamAsync(listenKey, idUser,
                 Console.WriteLine, token);
             
             return Ok();
@@ -148,7 +148,7 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            await _coinService.GetSubscriptionsListAsync(token);
+            await _userService.GetSubscriptionsListAsync(idUser, token);
             
             return Ok();
         }

@@ -7,6 +7,8 @@ using BinanceBotApp.Data;
 using BinanceBotApp.DataInternal.Endpoints;
 using BinanceBotApp.Services;
 using BinanceBotDb.Models;
+using BinanceBotApp.DataInternal.Enums;
+using BinanceBotInfrastructure.Services.WebsocketStorage;
 using Mapster;
 
 namespace BinanceBotInfrastructure.Services
@@ -14,16 +16,17 @@ namespace BinanceBotInfrastructure.Services
     public class UserService : IUserService
     {
         private readonly IBinanceBotDbContext _db;
-        private readonly IHttpClientService _httpService;
-        private readonly IWebSocketClientService _wsService;
         private readonly IAuthService _authService;
-        public UserService(IBinanceBotDbContext db, IHttpClientService httpService, 
-            IWebSocketClientService wsService, IAuthService authService)
+        private readonly IWebSocketClientService _wsService;
+        private readonly IActiveWebsockets _activeWebsockets;
+  
+        public UserService(IBinanceBotDbContext db, IAuthService authService,
+            IWebSocketClientService wsService, IActiveWebsockets activeWebsockets)
         {
             _db = db;
-            _httpService = httpService;
-            _wsService = wsService;
             _authService = authService;
+            _wsService = wsService;
+            _activeWebsockets = activeWebsockets;
         }
 
         public async Task<UserInfoDto> GetUserInfoAsync(int idUser,
@@ -73,13 +76,22 @@ namespace BinanceBotInfrastructure.Services
             return result;
         }
 
-        public async Task GetUserDataStreamAsync(string listenKey, 
+        public async Task GetUserDataStreamAsync(string listenKey, int idUser,
             Action<string> handler, CancellationToken token)
         {
             var uri = UserDataWebSocketEndpoints.GetUserDataStreamEndpoint(listenKey);
             
-            await _wsService.ConnectToWebSocketAsync(uri, "", 
-                Console.WriteLine, token );
+            await _wsService.ConnectToWebSocketAsync(uri, "", idUser,
+                WebsocketConnectionTypes.UserData, handler, token);
+        }
+        
+        public async Task GetSubscriptionsListAsync(int idUser, CancellationToken token)
+        {
+            var wsClient = _activeWebsockets.Get(idUser).userData; //TODO: в .prices надо кидать, а не в userdata. Там же ничего нет.
+            var data = $"{{\"method\": \"LIST_SUBSCRIPTIONS\",\"id\": 1}}"; // Надо закидывать запрос в тот же открытый инстанс WS клиента. Как и отписываться от стрима монет.
+            
+            await _wsService.ConnectToWebSocketAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
+                data, idUser, WebsocketConnectionTypes.UserData, Console.WriteLine, token ); // TODO: Handler надо принять из контроллера
         }
     }
 }

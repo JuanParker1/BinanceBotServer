@@ -1,8 +1,8 @@
-using BinanceBotApp.Data;
 using BinanceBotApp.Services;
 using BinanceBotDb.Models;
 using BinanceBotInfrastructure.Services;
 using BinanceBotInfrastructure.Services.Cache;
+using BinanceBotInfrastructure.Services.WebsocketStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,8 +30,9 @@ namespace BinanceBotInfrastructure
             services.AddScoped<IHttpClientService, HttpClientService>();
             
             services.AddSingleton(new CacheDb());
-            services.AddTransient<IRequestTrackerService, RequestTrackerService>();
+            services.AddSingleton<IActiveWebsockets, ActiveWebsockets>();
             
+            services.AddTransient<IRequestTrackerService, RequestTrackerService>();
             services.AddTransient<IAccountBalanceService, AccountBalanceService>();
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<ICoinService, CoinService>();

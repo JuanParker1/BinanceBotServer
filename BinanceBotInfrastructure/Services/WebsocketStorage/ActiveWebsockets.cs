@@ -1,4 +1,6 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
 using System.Net.WebSockets;
 
 namespace BinanceBotInfrastructure.Services.WebsocketStorage
@@ -19,10 +21,12 @@ namespace BinanceBotInfrastructure.Services.WebsocketStorage
             return _activeWebsocketsStorage.GetOrAdd(idUser, (pricesStream, userDataStream));
         }
 
-        public bool Remove(int idUser)
+        public async Task<bool> RemoveAsync(int idUser, CancellationToken token)
         {
             var (prices, userData) = Get(idUser);
+            await prices.CloseAsync(WebSocketCloseStatus.Empty, "", token);
             prices.Dispose();
+            await userData.CloseAsync(WebSocketCloseStatus.Empty, "", token);
             userData.Dispose();
             return _activeWebsocketsStorage.TryRemove(idUser, out var result);
         }

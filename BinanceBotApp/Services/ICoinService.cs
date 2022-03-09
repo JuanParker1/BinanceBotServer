@@ -10,11 +10,12 @@ namespace BinanceBotApp.Services
     {
         Task<IEnumerable<string>> GetTradingPairsAsync(int idUser, 
             CancellationToken token);
-        Task GetSubscriptionsListAsync(CancellationToken token);
-        Task GetCoinPriceStreamAsync(string pair, Action<string> responseHandler, 
-            CancellationToken token);
-        Task GetCoinPricesStreamAsync(GenericCollectionDto<string> pairs, 
+        Task GetCoinPriceStreamAsync(string pair, int idUser,  
             Action<string> responseHandler, CancellationToken token);
-        Task UnsubscribeCoinPriceStreamAsync(string pair, CancellationToken token);
+        Task GetCoinPricesStreamAsync(GenericCollectionDto<string> pairs, 
+            int idUser, Action<string> responseHandler, 
+            CancellationToken token);
+        Task UnsubscribeCoinPriceStreamAsync(GenericCollectionDto<string> pairs, int idUser,  
+            CancellationToken token);
     }
 }
