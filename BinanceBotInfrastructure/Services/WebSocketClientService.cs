@@ -19,9 +19,8 @@ namespace BinanceBotInfrastructure.Services
             _activeWebsockets = activeWebsockets;
         }
 
-        public async Task ConnectToWebSocketAsync(Uri endpoint, string data, int idUser, 
-            WebsocketConnectionTypes streamType, Action<string> responseHandler, 
-            CancellationToken token)
+        public async Task<ClientWebSocket> SendAsync(Uri endpoint, string data, int idUser, 
+            WebsocketConnectionTypes streamType, CancellationToken token)
         {
             var (prices, userData) = _activeWebsockets.Get(idUser);
 
@@ -32,8 +31,9 @@ namespace BinanceBotInfrastructure.Services
                 _ => throw new ArgumentOutOfRangeException(nameof(WebsocketConnectionTypes),
                     "Unknown websocket connection type in Websocket client.")
             };
-
-            await webSocket.ConnectAsync(endpoint, token);
+            
+            if(webSocket.State != WebSocketState.Open)
+                await webSocket.ConnectAsync(endpoint, token);
 
             if (webSocket.State != WebSocketState.Open)
                 throw new Exception("Connection was not opened.");
@@ -41,7 +41,13 @@ namespace BinanceBotInfrastructure.Services
             if(!string.IsNullOrEmpty(data))
                 await webSocket.SendAsync(Encoding.UTF8.GetBytes(data),
                     WebSocketMessageType.Text, true, token);
-            
+
+            return webSocket;
+        }
+
+        public async Task ListenAsync(ClientWebSocket webSocket, Action<string> responseHandler, 
+            CancellationToken token)
+        {
             var buffer = new ArraySegment<byte>(new byte[2048]);
 
             do

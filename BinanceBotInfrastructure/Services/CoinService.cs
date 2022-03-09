@@ -8,9 +8,6 @@ using BinanceBotApp.Data;
 using BinanceBotApp.DataInternal.Deserializers;
 using BinanceBotApp.DataInternal.Endpoints;
 using BinanceBotApp.DataInternal.Enums;
-using BinanceBotInfrastructure.Services.WebsocketStorage;
-using System.Net.WebSockets;
-using System.Text;
 
 namespace BinanceBotInfrastructure.Services
 {
@@ -19,15 +16,13 @@ namespace BinanceBotInfrastructure.Services
         private readonly ISettingsService _settingsService;
         private readonly IHttpClientService _httpService;
         private readonly IWebSocketClientService _wsService;
-        private readonly IActiveWebsockets _activeWebsockets; // TODO: Убрать.
 
         public CoinService(ISettingsService settingsService, IHttpClientService httpService, 
-            IWebSocketClientService wsService, IActiveWebsockets activeWebsockets)
+            IWebSocketClientService wsService)
         {
             _settingsService = settingsService;
             _httpService = httpService;
             _wsService = wsService;
-            _activeWebsockets = activeWebsockets;
         }
         
         public async Task<IEnumerable<string>> GetTradingPairsAsync(int idUser, 
@@ -52,8 +47,8 @@ namespace BinanceBotInfrastructure.Services
         {
             var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[\"{pair}@bookTicker\"],\"id\": 1}}";
             
-            await _wsService.ConnectToWebSocketAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
-                data, idUser, WebsocketConnectionTypes.Prices, Console.WriteLine, token );
+            await _wsService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
+                data, idUser, WebsocketConnectionTypes.Prices, token );
         }
         
         public async Task GetCoinPricesStreamAsync(GenericCollectionDto<string> pairs, int idUser, 
@@ -62,23 +57,20 @@ namespace BinanceBotInfrastructure.Services
             var pairsString = string.Join(",", pairs.Collection.Select(p => $"\"{p}@bookTicker\""));
             var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[{pairsString}],\"id\": 1}}";
             
-            await _wsService.ConnectToWebSocketAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
-                data, idUser, WebsocketConnectionTypes.Prices, responseHandler, token);
+            var wsClientInstance = await _wsService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
+                data, idUser, WebsocketConnectionTypes.Prices, token);
+
+            await _wsService.ListenAsync(wsClientInstance, responseHandler, token);
         }
 
         public async Task UnsubscribeCoinPriceStreamAsync(GenericCollectionDto<string> pairs, int idUser,  
             CancellationToken token)
         {
-            var wsClient = _activeWebsockets.Get(idUser).prices;
-
             var pairsString = string.Join(",", pairs.Collection.Select(p => $"\"{p}@bookTicker\""));
             var data = $"{{\"method\": \"UNSUBSCRIBE\",\"params\":[{pairsString}],\"id\": 1}}";
-            
-            await wsClient.SendAsync(Encoding.UTF8.GetBytes(data), // TODO: В сервисе разбить на методы Send и Listen. Тут эксупшон, он если поменять как надо он пытается там снова коннектится, хотя уже законнекчен.
-                WebSocketMessageType.Text, true, token); 
-            
-            // await _wsService.ConnectToWebSocketAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
-            //     data, idUser, WebsocketConnectionTypes.Prices, null, token);
+
+            await _wsService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
+                data, idUser, WebsocketConnectionTypes.Prices, token);
         }
 
         private static string CutTradePairEnding(string tradePair) =>
