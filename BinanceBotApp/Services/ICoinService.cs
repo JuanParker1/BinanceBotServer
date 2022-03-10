@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using BinanceBotApp.Data;
 
 namespace BinanceBotApp.Services
 {
@@ -10,12 +9,10 @@ namespace BinanceBotApp.Services
     {
         Task<IEnumerable<string>> GetTradingPairsAsync(int idUser, 
             CancellationToken token);
-        Task GetCoinPriceStreamAsync(string pair, int idUser,  
-            Action<string> responseHandler, CancellationToken token);
-        Task GetCoinPricesStreamAsync(GenericCollectionDto<string> pairs, 
+        Task SubscribeCoinPricesStreamAsync(IEnumerable<string> pairs, 
             int idUser, Action<string> responseHandler, 
             CancellationToken token);
-        Task UnsubscribeCoinPriceStreamAsync(GenericCollectionDto<string> pairs, int idUser,  
+        Task UnsubscribeCoinPriceStreamAsync(IEnumerable<string> pairs, int idUser,  
             CancellationToken token);
     }
 }

@@ -16,14 +16,14 @@ namespace BinanceBotInfrastructure.Services
     {
         private readonly IBinanceBotDbContext _db;
         private readonly IAuthService _authService;
-        private readonly IWebSocketClientService _wsService;
+        private readonly IWebSocketClientService _webSocketService;
 
         public UserService(IBinanceBotDbContext db, IAuthService authService,
-            IWebSocketClientService wsService)
+            IWebSocketClientService webSocketService)
         {
             _db = db;
             _authService = authService;
-            _wsService = wsService;
+            _webSocketService = webSocketService;
         }
 
         public async Task<UserInfoDto> GetUserInfoAsync(int idUser,
@@ -78,10 +78,10 @@ namespace BinanceBotInfrastructure.Services
         {
             var uri = UserDataWebSocketEndpoints.GetUserDataStreamEndpoint(listenKey);
             
-            var wsClientInstance = await _wsService.SendAsync(uri, "", idUser,
+            var wsClientInstance = await _webSocketService.SendAsync(uri, "", idUser,
                 WebsocketConnectionTypes.UserData, token);
             
-            await _wsService.ListenAsync(wsClientInstance, responseHandler, token);
+            await _webSocketService.ListenAsync(wsClientInstance, responseHandler, token);
         }
         
         public async Task GetSubscriptionsListAsync(int idUser, Action<string> responseHandler, 
@@ -89,10 +89,10 @@ namespace BinanceBotInfrastructure.Services
         { //TODO: в .prices надо кидать, а не в userdata. Там же ничего нет.
             var data = $"{{\"method\": \"LIST_SUBSCRIPTIONS\",\"id\": 1}}"; //TODO: Надо закидывать запрос в тот же открытый инстанс WS клиента. Как и отписываться от стрима монет.
             
-            var wsClientInstance = await _wsService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
+            var wsClientInstance = await _webSocketService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
                 data, idUser, WebsocketConnectionTypes.UserData, token );
             
-            await _wsService.ListenAsync(wsClientInstance, responseHandler, token);
+            await _webSocketService.ListenAsync(wsClientInstance, responseHandler, token);
         }
     }
 }
