@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text;
+using BinanceBotApp.DataInternal;
 using BinanceBotApp.Services;
 using BinanceBotInfrastructure.Services.WebsocketStorage;
 using BinanceBotApp.DataInternal.Enums;
@@ -19,18 +20,20 @@ namespace BinanceBotInfrastructure.Services
             _activeWebsockets = activeWebsockets;
         }
 
-        public async Task<ClientWebSocket> SendAsync(Uri endpoint, string data, int idUser, 
+        public async Task<WebSocketWrapper> SendAsync(Uri endpoint, string data, int idUser, 
             WebsocketConnectionTypes streamType, CancellationToken token)
         {
             var (prices, userData) = _activeWebsockets.Get(idUser);
 
-            var webSocket = streamType switch
+            var webSocketWrapper = streamType switch
             {
                 WebsocketConnectionTypes.Prices => prices,
                 WebsocketConnectionTypes.UserData => userData,
                 _ => throw new ArgumentOutOfRangeException(nameof(WebsocketConnectionTypes),
                     "Unknown websocket connection type in Websocket client.")
             };
+
+            var webSocket = webSocketWrapper.WebSocket;
     
             if(webSocket.State == WebSocketState.None)
                 await webSocket.ConnectAsync(endpoint, token);
@@ -42,7 +45,7 @@ namespace BinanceBotInfrastructure.Services
                 await webSocket.SendAsync(Encoding.UTF8.GetBytes(data),
                     WebSocketMessageType.Text, true, token);
        
-            return webSocket;
+            return webSocketWrapper;
         }
 
         public async Task ListenAsync(ClientWebSocket webSocket, Action<string> responseHandler, 

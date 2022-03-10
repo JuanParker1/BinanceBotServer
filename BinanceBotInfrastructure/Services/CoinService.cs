@@ -47,10 +47,16 @@ namespace BinanceBotInfrastructure.Services
             var pairsString = string.Join(",", pairs.Select(p => $"\"{p}@bookTicker\""));
             var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[{pairsString}],\"id\": 1}}";
             
-            var wsClientInstance = await _webSocketService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
+            var wsClientWrapper = await _webSocketService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
                 data, idUser, WebsocketConnectionTypes.Prices, token);
-         
-            await _webSocketService.ListenAsync(wsClientInstance, responseHandler, token);
+
+            if (!wsClientWrapper.IsListening)
+            {
+                wsClientWrapper.IsListening = true;
+                await _webSocketService.ListenAsync(wsClientWrapper.WebSocket, 
+                    responseHandler, token);
+            }
+
         }
 
         public async Task UnsubscribeCoinPriceStreamAsync(IEnumerable<string> pairs, int idUser,  
