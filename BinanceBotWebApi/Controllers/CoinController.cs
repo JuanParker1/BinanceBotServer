@@ -138,5 +138,29 @@ namespace BinanceBotWebApi.Controllers
             
             return Ok();
         }
+        
+        /// <summary>
+        /// Gets list of coins under price monitoring
+        /// </summary>
+        /// <param name="idUser"> Requested user id </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns code="200"> Ok </returns>
+        /// <response code="400"> Error in request parameters </response>
+        /// <response code="403"> Wrong user id </response>
+        [HttpGet("subscriptions")]
+        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> GetSubscriptionsListAsync([FromQuery][Range(1, int.MaxValue)] int idUser, 
+            CancellationToken token = default)
+        {
+            var authUserId = User.GetUserId();
+
+            if (authUserId is null || authUserId != idUser)
+                return Forbid();
+
+            await _coinService.GetSubscriptionsListAsync(idUser, 
+                Console.WriteLine, token);
+
+            return Ok();
+        }
     }
 }

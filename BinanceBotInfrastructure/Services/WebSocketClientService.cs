@@ -51,29 +51,32 @@ namespace BinanceBotInfrastructure.Services
         public async Task ListenAsync(ClientWebSocket webSocket, Action<string> responseHandler, 
             CancellationToken token)
         {
-            var buffer = new ArraySegment<byte>(new byte[2048]);
-                
             do
             {
-                await using var ms = new MemoryStream();
-                WebSocketReceiveResult result;
-  
-                do
-                {
-                    result = await webSocket.ReceiveAsync(buffer, token);
-                    ms.Write(buffer.Array ?? Array.Empty<byte>(), buffer.Offset, result.Count);
-                } while (!result.EndOfMessage);
-
-                if (result.MessageType == WebSocketMessageType.Close)
-                    throw new Exception("Connection closed by server side");
-
-                ms.Seek(0, SeekOrigin.Begin);
-                using var reader = new StreamReader(ms, Encoding.UTF8);
-                var response = await reader.ReadToEndAsync();
-           
+                var response = await GetResponseAsync(webSocket, token);
                 responseHandler?.Invoke(response);
-              
             } while (!token.IsCancellationRequested || webSocket.State == WebSocketState.Open);
+        }
+
+        private static async Task<string> GetResponseAsync(WebSocket webSocket, CancellationToken token)
+        {
+            var buffer = new ArraySegment<byte>(new byte[2048]);
+            
+            await using var ms = new MemoryStream();
+            WebSocketReceiveResult result;
+  
+            do
+            {
+                result = await webSocket.ReceiveAsync(buffer, token);
+                ms.Write(buffer.Array ?? Array.Empty<byte>(), buffer.Offset, result.Count);
+            } while (!result.EndOfMessage);
+
+            if (result.MessageType == WebSocketMessageType.Close)
+                throw new Exception("Connection closed by server side");
+
+            ms.Seek(0, SeekOrigin.Begin);
+            using var reader = new StreamReader(ms, Encoding.UTF8);
+            return await reader.ReadToEndAsync();
         }
     }
 }
