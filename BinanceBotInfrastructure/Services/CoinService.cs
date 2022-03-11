@@ -7,6 +7,7 @@ using BinanceBotApp.Services;
 using BinanceBotApp.DataInternal.Deserializers;
 using BinanceBotApp.DataInternal.Endpoints;
 using BinanceBotApp.DataInternal.Enums;
+using BinanceBotApp.Services.BackgroundWorkers;
 
 namespace BinanceBotInfrastructure.Services
 {
@@ -15,13 +16,15 @@ namespace BinanceBotInfrastructure.Services
         private readonly ISettingsService _settingsService;
         private readonly IHttpClientService _httpService;
         private readonly IWebSocketClientService _webSocketService;
+        private readonly IPricesBackgroundQueue _queue;
 
         public CoinService(ISettingsService settingsService, IHttpClientService httpService, 
-            IWebSocketClientService webSocketService)
+            IWebSocketClientService webSocketService, IPricesBackgroundQueue queue)
         {
             _settingsService = settingsService;
             _httpService = httpService;
             _webSocketService = webSocketService;
+            _queue = queue;
         }
         
         public async Task<IEnumerable<string>> GetTradingPairsAsync(int idUser, 
@@ -41,21 +44,24 @@ namespace BinanceBotInfrastructure.Services
             return filtered;
         }
 
-        public async Task SubscribeCoinPricesStreamAsync(IEnumerable<string> pairs, int idUser, 
-            Action<string> responseHandler, CancellationToken token)
+        public void SubscribeCoinPricesStream(IEnumerable<string> pairs, int idUser, 
+            Action<string> responseHandler)
         {
-            var pairsString = string.Join(",", pairs.Select(p => $"\"{p}@bookTicker\""));
-            var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[{pairsString}],\"id\": 1}}";
-            
-            var wsClientWrapper = await _webSocketService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
-                data, idUser, WebsocketConnectionTypes.Prices, token);
-
-            if (!wsClientWrapper.IsListening)
+            _queue.EnqueueTask(async (token) =>
             {
-                wsClientWrapper.IsListening = true;
-                await _webSocketService.ListenAsync(wsClientWrapper.WebSocket, 
-                    responseHandler, token);
-            }
+                var pairsString = string.Join(",", pairs.Select(p => $"\"{p}@bookTicker\""));
+                var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[{pairsString}],\"id\": 1}}";
+            
+                var wsClientWrapper = await _webSocketService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
+                    data, idUser, WebsocketConnectionTypes.Prices, token);
+
+                if (!wsClientWrapper.IsListening)
+                {
+                    wsClientWrapper.IsListening = true;
+                    await _webSocketService.ListenAsync(wsClientWrapper.WebSocket, 
+                        responseHandler, token);
+                }
+            });
         }
 
         public async Task UnsubscribeCoinPriceStreamAsync(IEnumerable<string> pairs, int idUser,  
