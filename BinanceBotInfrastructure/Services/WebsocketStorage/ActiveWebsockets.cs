@@ -6,6 +6,9 @@ using BinanceBotApp.DataInternal;
 
 namespace BinanceBotInfrastructure.Services.WebsocketStorage
 {
+    /// <summary>
+    /// Keeps 24/7 websocket connections for every user
+    /// </summary>
     public class ActiveWebsockets : IActiveWebsockets
     {
         private readonly ConcurrentDictionary<int, (WebSocketWrapper prices, WebSocketWrapper userData)> _activeWebsocketsStorage;

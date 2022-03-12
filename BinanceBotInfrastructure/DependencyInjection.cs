@@ -4,6 +4,7 @@ using BinanceBotDb.Models;
 using BinanceBotInfrastructure.Services;
 using BinanceBotInfrastructure.Services.BackgroundWorkers;
 using BinanceBotInfrastructure.Services.Cache;
+using BinanceBotInfrastructure.Services.CoinPricesStorage;
 using BinanceBotInfrastructure.Services.WebsocketStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -33,8 +34,9 @@ namespace BinanceBotInfrastructure
             
             services.AddHostedService<PricesBackgroundService>();
             
-            services.AddSingleton(new CacheDb());
+            services.AddSingleton(new CacheDb()); // TODO: Сделать нормально через интерфейс. Тогда при тестировании ничего мокать не надо будет, просто подставлю нужную затычку через полиморфизм.
             services.AddSingleton<IActiveWebsockets, ActiveWebsockets>();
+            services.AddSingleton<ICoinPricesStorage, CoinPricesStorage>();
             services.AddSingleton<IPricesBackgroundQueue, PricesBackgroundQueue>();
             
             services.AddTransient<IRequestTrackerService, RequestTrackerService>();
