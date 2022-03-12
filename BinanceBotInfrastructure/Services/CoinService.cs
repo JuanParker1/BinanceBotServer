@@ -35,7 +35,7 @@ namespace BinanceBotInfrastructure.Services
 
             var uri = MarketDataEndpoints.GetCoinsPricesEndpoint();
             var coinPricesInfo = 
-                await _httpService.ProcessRequestAsync<IEnumerable<CoinInfo>>(uri, 
+                await _httpService.ProcessRequestAsync<IEnumerable<CoinPrice>>(uri, 
                     new Dictionary<string, string>(), keys,HttpMethods.Get, token);
             
             var filtered =  coinPricesInfo.Select(c => CutTradePairEnding(c.Symbol))
