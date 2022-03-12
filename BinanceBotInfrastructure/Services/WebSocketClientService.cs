@@ -1,9 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
+using System.Text.Json;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
-using System.Text;
+using BinanceBotApp.DataInternal.Deserializers;
 using BinanceBotApp.DataInternal;
 using BinanceBotApp.Services;
 using BinanceBotInfrastructure.Services.WebsocketStorage;
@@ -14,10 +18,17 @@ namespace BinanceBotInfrastructure.Services
     public class WebSocketClientService : IWebSocketClientService
     {
         private readonly IActiveWebsockets _activeWebsockets;
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
+        private const int _notifyThreshold = 10;
 
         public WebSocketClientService(IActiveWebsockets activeWebsockets)
         {
             _activeWebsockets = activeWebsockets;
+            _jsonSerializerOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            _jsonSerializerOptions.Converters.Add(new StringConverter());
         }
 
         public async Task<WebSocketWrapper> SendAsync(Uri endpoint, string data, int idUser, 
@@ -48,17 +59,47 @@ namespace BinanceBotInfrastructure.Services
             return webSocketWrapper;
         }
 
-        public async Task ListenAsync(ClientWebSocket webSocket, Action<string> responseHandler, 
+        public async Task ListenAsync(ClientWebSocket webSocket, Action<string> responseHandler,
             CancellationToken token)
         {
+            var i = 0;
             do
             {
-                var response = await GetResponseAsync(webSocket, token);
-                responseHandler?.Invoke(response);
-            } while (!token.IsCancellationRequested || webSocket.State == WebSocketState.Open);
+                try
+                {
+                    var responseString = await GetResponseAsync(webSocket, token);
+                
+                    if (string.IsNullOrEmpty(responseString))
+                        continue;
+                
+                    var response = JsonSerializer.Deserialize<IDictionary<string, string>>(responseString, 
+                        _jsonSerializerOptions) ?? new Dictionary<string, string>();
+
+                    if (response.ContainsKey("s") && !string.IsNullOrEmpty(response["s"]))
+                    {
+                        i++;
+                        if (i <= _notifyThreshold) 
+                            continue;
+                        HandleNewCoinPrice(response, responseHandler);
+                        i = 0;
+                    }
+                    
+                    if(response.ContainsKey("result"))
+                        responseHandler?.Invoke(response["result"]);
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError(ex.Message);
+                    Trace.TraceError(ex.InnerException?.Message);
+                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex.InnerException?.Message);
+                }
+            } 
+            while (!token.IsCancellationRequested || webSocket.State == WebSocketState.Open);
         }
 
-        private static async Task<string> GetResponseAsync(WebSocket webSocket, CancellationToken token)
+        private static async Task<string> GetResponseAsync(WebSocket webSocket, 
+            CancellationToken token)
         {
             var buffer = new ArraySegment<byte>(new byte[2048]);
             
@@ -68,7 +109,9 @@ namespace BinanceBotInfrastructure.Services
             do
             {
                 result = await webSocket.ReceiveAsync(buffer, token);
-                ms.Write(buffer.Array ?? Array.Empty<byte>(), buffer.Offset, result.Count);
+                ms.Write(buffer.Array ?? Array.Empty<byte>(), 
+                    buffer.Offset, result.Count);
+                
             } while (!result.EndOfMessage);
 
             if (result.MessageType == WebSocketMessageType.Close)
@@ -76,7 +119,19 @@ namespace BinanceBotInfrastructure.Services
 
             ms.Seek(0, SeekOrigin.Begin);
             using var reader = new StreamReader(ms, Encoding.UTF8);
-            return await reader.ReadToEndAsync();
+            var response = await reader.ReadToEndAsync();
+      
+            return response;
+        }
+
+        private void HandleNewCoinPrice(IDictionary<string, string> response,
+            Action<string> responseHandler)
+        {
+            if (response.ContainsKey("s") && !string.IsNullOrEmpty(response["s"]))
+            {
+                // TODO: Проверить и обновить максимальную цену
+                responseHandler?.Invoke(response["b"]);
+            }
         }
     }
 }
