@@ -19,7 +19,7 @@ namespace BinanceBotInfrastructure.Services
     {
         private readonly IActiveWebsockets _activeWebsockets;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
-        private const int _notifyThreshold = 10;
+        private const int _notifyThreshold = 30;
 
         public WebSocketClientService(IActiveWebsockets activeWebsockets)
         {
@@ -85,7 +85,7 @@ namespace BinanceBotInfrastructure.Services
                     }
                     
                     if(response.ContainsKey("result"))
-                        responseHandler?.Invoke(response["result"]);
+                        responseHandler?.Invoke($@"{{'result':'{response["result"]}'}}");
                 }
                 catch (Exception ex)
                 {
@@ -143,8 +143,7 @@ namespace BinanceBotInfrastructure.Services
                 highestPrices[tradePair] = currentPrice;
 
             //TODO: Обновить стоп ордер на бирже.
-            
-            responseHandler?.Invoke(response["b"]);
+            responseHandler?.Invoke($@"{{'symbol':'{tradePair}','price': {currentPrice}}}");
         }
     }
 }
