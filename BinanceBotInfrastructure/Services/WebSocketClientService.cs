@@ -59,8 +59,8 @@ namespace BinanceBotInfrastructure.Services
             return webSocketWrapper;
         }
 
-        public async Task ListenAsync(ClientWebSocket webSocket, Action<string> responseHandler,
-            CancellationToken token)
+        public async Task ListenAsync(ClientWebSocket webSocket, IDictionary<string, double> highestPrices, 
+            Action<string> responseHandler, CancellationToken token)
         {
             var i = 0;
             do
@@ -80,7 +80,7 @@ namespace BinanceBotInfrastructure.Services
                         i++;
                         if (i <= _notifyThreshold) 
                             continue;
-                        HandleNewCoinPrice(response, responseHandler);
+                        HandleNewCoinPrice(response, highestPrices, responseHandler);
                         i = 0;
                     }
                     
@@ -124,14 +124,27 @@ namespace BinanceBotInfrastructure.Services
             return response;
         }
 
-        private void HandleNewCoinPrice(IDictionary<string, string> response,
-            Action<string> responseHandler)
+        private static void HandleNewCoinPrice(IDictionary<string, string> response,
+            IDictionary<string, double> highestPrices, Action<string> responseHandler)
         {
-            if (response.ContainsKey("s") && !string.IsNullOrEmpty(response["s"]))
-            {
-                // TODO: Проверить и обновить максимальную цену
-                responseHandler?.Invoke(response["b"]);
-            }
+            if(!response.ContainsKey("s") || string.IsNullOrEmpty(response["s"]))
+                return;
+            
+            var tradePair = response["s"];
+     
+            if (!double.TryParse(response["b"], out var currentPrice))
+                return;
+            
+            var currentHighestPrice = highestPrices.ContainsKey(tradePair) 
+                ? highestPrices[tradePair] 
+                : 0D;
+
+            if (currentPrice > currentHighestPrice)
+                highestPrices[tradePair] = currentPrice;
+
+            //TODO: Обновить стоп ордер на бирже.
+            
+            responseHandler?.Invoke(response["b"]);
         }
     }
 }

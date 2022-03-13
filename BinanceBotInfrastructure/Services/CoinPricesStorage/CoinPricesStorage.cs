@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace BinanceBotInfrastructure.Services.CoinPricesStorage
 {
     /// <summary>
-    /// Keeps highest prices for trading pair in user's wallet
+    /// Keeps highest prices for trading pairs in user's wallet
     /// </summary>
     public class CoinPricesStorage : ICoinPricesStorage
     {
@@ -14,22 +14,11 @@ namespace BinanceBotInfrastructure.Services.CoinPricesStorage
         {
             _coinPricesStorage = new ConcurrentDictionary<int, IDictionary<string, double>>();
         }
-        
-        public double? GetCurrentHighestPrice(int idUser, string tradePair)
-        {
-            var highestCoinPrices = new Dictionary<string, double>();
-            var highestPrices = _coinPricesStorage.GetOrAdd(idUser, highestCoinPrices);
-            if(highestPrices.ContainsKey(tradePair))
-                return highestPrices[tradePair];
 
-            return null;
-        }
+        public IDictionary<string, double> Get(int idUser) =>
+            _coinPricesStorage.GetOrAdd(idUser, new Dictionary<string, double>());
 
-        public void UpdateHighestPrice(int idUser, string tradePair, double newPrice)
-        {
-            var highestCoinPrices = new Dictionary<string, double>();
-            var highestPrices = _coinPricesStorage.GetOrAdd(idUser, highestCoinPrices);
-            highestPrices[tradePair] = newPrice;
-        }
+        public bool Remove(int idUser) =>
+            _coinPricesStorage.Remove(idUser, out var result);
     }
 }

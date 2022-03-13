@@ -81,7 +81,7 @@ namespace BinanceBotInfrastructure.Services
             var wsClientInstance = await _webSocketService.SendAsync(uri, "", idUser,
                 WebsocketConnectionTypes.UserData, token);
             
-            await _webSocketService.ListenAsync(wsClientInstance.WebSocket, responseHandler, token);
+            //await _webSocketService.ListenAsync(wsClientInstance.WebSocket, responseHandler, token);
         }
         
         public async Task GetSubscriptionsListAsync(int idUser, Action<string> responseHandler, 
@@ -92,7 +92,7 @@ namespace BinanceBotInfrastructure.Services
             var wsClientInstance = await _webSocketService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
                 data, idUser, WebsocketConnectionTypes.UserData, token );
             
-            await _webSocketService.ListenAsync(wsClientInstance.WebSocket, responseHandler, token);
+            //await _webSocketService.ListenAsync(wsClientInstance.WebSocket, responseHandler, token);
         }
     }
 }

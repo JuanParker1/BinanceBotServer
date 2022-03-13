@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace BinanceBotApp.Services
     {
         Task<WebSocketWrapper> SendAsync(Uri endpoint, string data, int idUser, 
             WebsocketConnectionTypes streamType, CancellationToken token);
-        Task ListenAsync(ClientWebSocket webSocket, Action<string> responseHandler,
-            CancellationToken token);
+        Task ListenAsync(ClientWebSocket webSocket, IDictionary<string, double> highestPrices, 
+            Action<string> responseHandler, CancellationToken token);
     }
 }

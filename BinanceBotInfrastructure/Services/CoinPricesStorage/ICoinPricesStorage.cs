@@ -1,9 +1,10 @@
-﻿namespace BinanceBotInfrastructure.Services.CoinPricesStorage
+﻿using System.Collections.Generic;
+
+namespace BinanceBotInfrastructure.Services.CoinPricesStorage
 {
     public interface ICoinPricesStorage
     {
-        double? GetCurrentHighestPrice(int idUser, string tradePair);
-        void UpdateHighestPrice(int idUser, string tradePair, 
-            double newPrice);
+        IDictionary<string, double> Get(int idUser);
+        bool Remove(int idUser);
     }
 }
