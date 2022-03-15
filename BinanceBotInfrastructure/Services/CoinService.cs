@@ -53,7 +53,7 @@ namespace BinanceBotInfrastructure.Services
         {
             _queue.EnqueueTask(async (token) =>
             {
-                var pairsString = string.Join(",", pairs.Select(p => $"\"{p}@bookTicker\""));
+                var pairsString = string.Join(",", pairs.Select(p => $"\"{p.ToLower()}@bookTicker\""));
                 var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[{pairsString}],\"id\": 1}}";
 
                 var endpoint = TradeWebSocketEndpoints.GetMainWebSocketEndpoint();

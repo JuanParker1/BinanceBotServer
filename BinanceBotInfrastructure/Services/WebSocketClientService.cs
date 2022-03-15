@@ -15,20 +15,29 @@ using BinanceBotApp.DataInternal.Enums;
 
 namespace BinanceBotInfrastructure.Services
 {
+    /// <summary>
+    /// Websocket client to transfer data to the exchange back and forth
+    /// </summary>
     public class WebSocketClientService : IWebSocketClientService
     {
         private readonly IActiveWebsockets _activeWebsockets;
+        private readonly JsonSerializerOptions _jsonDeserializerOptions;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
-        private const int _notifyThreshold = 30;
+        private const int _notifyThreshold = 50;
 
         public WebSocketClientService(IActiveWebsockets activeWebsockets)
         {
             _activeWebsockets = activeWebsockets;
-            _jsonSerializerOptions = new JsonSerializerOptions
+            _jsonDeserializerOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             };
-            _jsonSerializerOptions.Converters.Add(new StringConverter());
+            _jsonDeserializerOptions.Converters.Add(new StringConverter());
+            _jsonSerializerOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
         }
 
         public async Task<WebSocketWrapper> SendAsync(Uri endpoint, string data, int idUser, 
@@ -73,7 +82,7 @@ namespace BinanceBotInfrastructure.Services
                         continue;
                 
                     var response = JsonSerializer.Deserialize<IDictionary<string, string>>(responseString, 
-                        _jsonSerializerOptions) ?? new Dictionary<string, string>();
+                        _jsonDeserializerOptions) ?? new Dictionary<string, string>();
 
                     if (response.ContainsKey("s") && !string.IsNullOrEmpty(response["s"]))
                     {
@@ -85,7 +94,8 @@ namespace BinanceBotInfrastructure.Services
                     }
                     
                     if(response.ContainsKey("result"))
-                        responseHandler?.Invoke($@"{{'result':'{response["result"]}'}}");
+                        responseHandler?.Invoke(JsonSerializer.Serialize(new { Result = response["result"] },
+                            _jsonSerializerOptions));
                 }
                 catch (Exception ex)
                 {
@@ -124,7 +134,7 @@ namespace BinanceBotInfrastructure.Services
             return response;
         }
 
-        private static void HandleNewCoinPrice(IDictionary<string, string> response,
+        private void HandleNewCoinPrice(IDictionary<string, string> response,
             IDictionary<string, double> highestPrices, Action<string> responseHandler)
         {
             if(!response.ContainsKey("s") || string.IsNullOrEmpty(response["s"]))
@@ -143,7 +153,9 @@ namespace BinanceBotInfrastructure.Services
                 highestPrices[tradePair] = currentPrice;
 
             //TODO: Обновить стоп ордер на бирже.
-            responseHandler?.Invoke($@"{{'symbol':'{tradePair}','price': {currentPrice}}}");
+      
+            responseHandler?.Invoke(JsonSerializer.Serialize(new { Symbol = tradePair, Price = currentPrice },
+                _jsonSerializerOptions));
         }
     }
 }

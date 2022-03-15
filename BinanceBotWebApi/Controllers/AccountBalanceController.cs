@@ -5,9 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using BinanceBotApp.Data;
 using BinanceBotApp.Services;
 using BinanceBotInfrastructure.Extensions;
+using BinanceBotWebApi.SignalR;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BinanceBotWebApi.Controllers
 {
@@ -20,10 +23,15 @@ namespace BinanceBotWebApi.Controllers
     public class AccountBalanceController : ControllerBase
     {
         private readonly IAccountBalanceService _balanceService;
+        private readonly ICoinService _coinService;
+        private readonly IHubContext<PricesHub> _pricesHubContext;
 
-        public AccountBalanceController(IAccountBalanceService balanceService)
+        public AccountBalanceController(IAccountBalanceService balanceService,
+            ICoinService coinService, IHubContext<PricesHub> pricesHubContext)
         {
             _balanceService = balanceService;
+            _coinService = coinService;
+            _pricesHubContext = pricesHubContext;
         }
         
         /// <summary>
@@ -72,6 +80,16 @@ namespace BinanceBotWebApi.Controllers
             
             var currentBalance = await _balanceService.GetCurrentBalanceAsync(idUser, 
                 token);
+    
+            async void HandleCoinPricesAsync(string price) =>
+                await _pricesHubContext.Clients.Group($"User_{authUserId}").SendAsync(
+                    nameof(IPriceHubClient.GetPrices),
+                    price,
+                    CancellationToken.None
+                );
+            
+            _coinService.SubscribeCoinPricesStream(currentBalance.Select(b => $"{b.Asset}USDT"), idUser, 
+                HandleCoinPricesAsync);
 
             return Ok(currentBalance);
         }
