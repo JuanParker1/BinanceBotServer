@@ -73,6 +73,7 @@ namespace BinanceBotWebApi
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<PricesHub>("/hubs/prices");
+                endpoints.MapHub<ConnectionStatusHub>("/hubs/connection");
             });
 
             app.UseSpa(spa =>
