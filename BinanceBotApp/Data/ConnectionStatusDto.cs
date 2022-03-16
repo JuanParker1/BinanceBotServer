@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace BinanceBotApp.Data
+﻿namespace BinanceBotApp.Data
 {
     /// <summary>
     /// Exchange websockets connection status
