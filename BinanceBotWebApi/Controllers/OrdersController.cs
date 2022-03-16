@@ -66,7 +66,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet("{symbol}")]
-        [ProducesResponseType(typeof(IEnumerable<OrderInfo>), (int)System.Net.HttpStatusCode.OK)] // TODO: Наверно, не надо. Буду историю брать из БД
+        [ProducesResponseType(typeof(IEnumerable<OrderInfo>), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetOrdersForPairAsync([FromRoute][StringLength(20)] string pair, 
             [FromQuery][Range(1, int.MaxValue)] int idUser, [Range(5000, int.MaxValue)] int recvWindow = 5000,  
             CancellationToken token = default)

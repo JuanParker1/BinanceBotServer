@@ -15,7 +15,7 @@ namespace BinanceBotApp.Data
         /// <summary>
         /// User login
         /// </summary>
-        public string Login { get; set; } // TODO: Описание ВСЕХ Dto
+        public string Login { get; set; }
         
         /// <summary>
         /// Request date

@@ -86,8 +86,8 @@ namespace BinanceBotInfrastructure.Services
         
         public async Task GetSubscriptionsListAsync(int idUser, Action<string> responseHandler, 
             CancellationToken token)
-        { //TODO: в .prices надо кидать, а не в userdata. Там же ничего нет.
-            var data = $"{{\"method\": \"LIST_SUBSCRIPTIONS\",\"id\": 1}}"; //TODO: Надо закидывать запрос в тот же открытый инстанс WS клиента. Как и отписываться от стрима монет.
+        {
+            var data = $"{{\"method\": \"LIST_SUBSCRIPTIONS\",\"id\": 1}}";
             
             var wsClientInstance = await _webSocketService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
                 data, idUser, WebsocketConnectionTypes.UserData, token );

@@ -22,7 +22,7 @@ namespace BinanceBotWebApi.Middlewares
             var requestLog = new BinanceBotApp.Data.RequestDto
             {
                 Login = context.User?.Identity.Name,
-                Ip = context.Connection.RemoteIpAddress.ToString(), // TODO: Внедрить побольше CRUDService. В том числе и сюда. И в создание OrdersHistory (GetAll/Insert) и т.д. Тупо создание и Get entites - все через CRUD
+                Ip = context.Connection.RemoteIpAddress.ToString(),
                 Date = DateTime.Now,
                 RequestMethod = context.Request.Method,
                 RequestPath = context.Request.Path.Value,

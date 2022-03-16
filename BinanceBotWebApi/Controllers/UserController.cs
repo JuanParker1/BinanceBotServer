@@ -83,7 +83,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="403"> Wrong user id or permissions </response>
         [HttpPost("changePassword")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> ChangePasswordAsync([FromBody] ChangePasswordDto changePasswordDto, // TODO: CRUD controller почти никак не задействован
+        public async Task<IActionResult> ChangePasswordAsync([FromBody] ChangePasswordDto changePasswordDto,
             CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
