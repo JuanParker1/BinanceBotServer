@@ -21,16 +21,18 @@ namespace BinanceBotInfrastructure.Services
     /// </summary>
     public class WebSocketClientService : IWebSocketClientService
     {
-        private IHttpClientService _httpService;
+        private readonly IHttpClientService _httpService;
+        private readonly ISettingsService _settingsService;
         private readonly IActiveWebsockets _activeWebsockets;
         private readonly JsonSerializerOptions _jsonDeserializerOptions;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
         private const int _notifyThreshold = 20;
 
         public WebSocketClientService(IHttpClientService httpService, 
-            IActiveWebsockets activeWebsockets)
+            ISettingsService settingsService, IActiveWebsockets activeWebsockets)
         {
             _httpService = httpService;
+            _settingsService = settingsService;
             _activeWebsockets = activeWebsockets;
             _jsonDeserializerOptions = new JsonSerializerOptions
             {
@@ -78,8 +80,9 @@ namespace BinanceBotInfrastructure.Services
             return webSocketWrapper;
         }
 
-        public async Task ListenAsync(ClientWebSocket webSocket, IDictionary<string, double> highestPrices, 
-            Action<string> responseHandler, CancellationToken token)
+        public async Task ListenAsync(int idUser, ClientWebSocket webSocket, 
+            IDictionary<string, double> highestPrices, Action<string> responseHandler, 
+            CancellationToken token)
         {
             var i = 0;
             do
@@ -99,7 +102,8 @@ namespace BinanceBotInfrastructure.Services
                         i++;
                         if (i <= _notifyThreshold) 
                             continue;
-                        HandleNewCoinPrice(response, highestPrices, responseHandler);
+                        await HandleNewCoinPriceAsync(idUser, response, highestPrices, 
+                            responseHandler, token);
                         i = 0;
                     }
                     
@@ -172,8 +176,9 @@ namespace BinanceBotInfrastructure.Services
             return response;
         }
 
-        private void HandleNewCoinPrice(IDictionary<string, string> response,
-            IDictionary<string, double> highestPrices, Action<string> responseHandler)
+        private async Task HandleNewCoinPriceAsync(int idUser, IDictionary<string, string> response,
+            IDictionary<string, double> highestPrices, Action<string> responseHandler,
+            CancellationToken token)
         {
             if(!response.ContainsKey("s") || string.IsNullOrEmpty(response["s"]))
                 return;
@@ -190,8 +195,13 @@ namespace BinanceBotInfrastructure.Services
             if (currentPrice > currentHighestPrice)
                 highestPrices[tradePair] = currentPrice;
 
-            //TODO: Обновить стоп ордер на бирже, если включена торговля
-      
+            var userSettings = await _settingsService.GetSettingsAsync(idUser, token);
+
+            if (userSettings.IsTradeEnabled)
+            {
+                //TODO: Обновить стоп ордер на бирже, если включена торговля
+            }
+
             responseHandler?.Invoke(JsonSerializer.Serialize(new { Symbol = tradePair, Price = currentPrice },
                 _jsonSerializerOptions));
         }

@@ -66,7 +66,7 @@ namespace BinanceBotInfrastructure.Services
                 if (!wsClientWrapper.IsListening)
                 {
                     wsClientWrapper.IsListening = true;
-                    await _webSocketService.ListenAsync(wsClientWrapper.WebSocket, 
+                    await _webSocketService.ListenAsync(idUser, wsClientWrapper.WebSocket, 
                         userCoinPrices, responseHandler, token);
                 }
             });
