@@ -3,7 +3,7 @@ namespace BinanceBotApp.Data
     /// <summary>
     /// Enable/disable trade
     /// </summary>
-    public class EnableTradeDto
+    public class SwitchTradeDto
     {
         /// <summary>
         /// User id

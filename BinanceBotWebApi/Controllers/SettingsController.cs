@@ -50,22 +50,22 @@ namespace BinanceBotWebApi.Controllers
         /// <summary>
         /// Enables/disables trade
         /// </summary>
-        /// <param name="enableTradeDto"> Enable/Disable trade info object </param>
+        /// <param name="switchTradeDto"> Enable/Disable trade info object </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> 0 - no changes. 1 - changes applied </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
-        [HttpPost("enableTrade")]
+        [HttpPost("switchTrade")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> EnableTradeAsync([FromBody] EnableTradeDto enableTradeDto, 
+        public async Task<IActionResult> EnableTradeAsync([FromBody] SwitchTradeDto switchTradeDto, 
             CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
-            if (authUserId is null || authUserId != enableTradeDto.IdUser)
+            if (authUserId is null || authUserId != switchTradeDto.IdUser)
                 return Forbid();
 
-            var result = await _settingsService.EnableTradeAsync(enableTradeDto, 
+            var result = await _settingsService.SwitchTradeAsync(switchTradeDto, 
                 token);
 
             return Ok(result);

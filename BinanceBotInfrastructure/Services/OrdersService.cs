@@ -76,7 +76,7 @@ namespace BinanceBotInfrastructure.Services
                 token);
             
             var uri = TradeEndpoints.GetOpenOrdersEndpoint();
-            var qParams = new Dictionary<string, string>()
+            var qParams = new Dictionary<string, string>
             {
                 {"recvWindow", recvWindow == default ? null : $"{recvWindow}" },
                 {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}

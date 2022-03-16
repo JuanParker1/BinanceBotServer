@@ -42,18 +42,16 @@ namespace BinanceBotInfrastructure.Services
             return userSettingsDto;
         }
 
-        public async Task<int> EnableTradeAsync(EnableTradeDto enableTradeDto, 
+        public async Task<int> SwitchTradeAsync(SwitchTradeDto switchTradeDto, 
             CancellationToken token)
         {
             var userSettings = await _cacheUserSettings.FirstOrDefaultAsync(s => 
-                    s.IdUser == enableTradeDto.IdUser, token);
+                    s.IdUser == switchTradeDto.IdUser, token);
 
             if (userSettings is null) 
                 return 0;
-            
-            // TODO: Стопнуть здесь из другого сервиса всю BackgroundWorker торговлю
 
-            userSettings.IsTradeEnabled = enableTradeDto.IsTradeEnabled;
+            userSettings.IsTradeEnabled = switchTradeDto.IsTradeEnabled;
 
             return await _cacheUserSettings.UpsertAsync(userSettings, token);
         }
@@ -111,34 +109,6 @@ namespace BinanceBotInfrastructure.Services
             userSettings.SecretKey = apiKeysDto.SecretKey.Trim();
 
             return await _cacheUserSettings.UpsertAsync(userSettings, token);
-        }
-        
-        public async Task<string> GetListenKey(CancellationToken token)
-        {
-            var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
-        
-            var listenKey = await _httpService.ProcessRequestAsync<string>(uri,
-                null, default, HttpMethods.SignedPost, token);
-        
-            return listenKey;
-        }
-        
-        public async Task ExtendListenKey(string listenKey, CancellationToken token)
-        {
-            var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
-        
-            await _httpService.ProcessRequestAsync<string>(uri,
-                new Dictionary<string, string>(), 
-                default, HttpMethods.SignedPut, token);
-        }
-        
-        public async Task DeleteListenKey(string listenKey, CancellationToken token)
-        {
-            var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
-        
-            await _httpService.ProcessRequestAsync<string>(uri,
-                new Dictionary<string, string>(), 
-                default, HttpMethods.SignedDelete, token);
         }
     }
 }
