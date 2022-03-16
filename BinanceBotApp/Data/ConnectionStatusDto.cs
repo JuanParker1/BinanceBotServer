@@ -16,10 +16,5 @@ namespace BinanceBotApp.Data
         /// User data (orders, account balance refresh) stream connection status
         /// </summary>
         public bool IsUserDataStreamConnected { get; set; }
-        
-        /// <summary>
-        /// Coins under price monitoring list
-        /// </summary>
-        public IEnumerable<string> SubscriptionsList { get; set; }
     }
 }

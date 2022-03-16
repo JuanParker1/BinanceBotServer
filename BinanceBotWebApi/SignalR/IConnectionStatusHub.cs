@@ -2,6 +2,6 @@
 {
     public interface IConnectionStatusHub
     {
-        string GetStatus(int idUser);
+        string GetStatusAsync(int idUser);
     }
 }

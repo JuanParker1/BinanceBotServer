@@ -10,6 +10,8 @@ namespace BinanceBotApp.Services
 {
     public interface IWebSocketClientService
     {
+        (WebSocketWrapper prices, WebSocketWrapper userData) GetConnections(int idUser);
+        bool IsAlive(WebSocket webSocket);
         Task<WebSocketWrapper> SendAsync(Uri endpoint, string data, int idUser, 
             WebsocketConnectionTypes streamType, CancellationToken token);
         Task ListenAsync(ClientWebSocket webSocket, IDictionary<string, double> highestPrices, 

@@ -39,11 +39,17 @@ namespace BinanceBotInfrastructure.Services
                 WriteIndented = true
             };
         }
+        
+        public (WebSocketWrapper prices, WebSocketWrapper userData) GetConnections(int idUser) =>
+            _activeWebsockets.Get(idUser);
+
+        public bool IsAlive(WebSocket webSocket) =>
+            webSocket.State == WebSocketState.Open;
 
         public async Task<WebSocketWrapper> SendAsync(Uri endpoint, string data, int idUser, 
             WebsocketConnectionTypes streamType, CancellationToken token)
         {
-            var (prices, userData) = _activeWebsockets.Get(idUser);
+            var (prices, userData) = GetConnections(idUser);
 
             var webSocketWrapper = streamType switch
             {
