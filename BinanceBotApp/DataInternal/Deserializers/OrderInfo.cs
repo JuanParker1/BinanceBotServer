@@ -1,9 +1,9 @@
-namespace BinanceBotApp.Data
+namespace BinanceBotApp.DataInternal.Deserializers
 {
     /// <summary>
     /// Order info
     /// </summary>
-    public class OrderInfoDtoOld : CreatedOrderResultDto
+    public class OrderInfo : CreatedOrderResult
     {
         /// <summary>
         /// Coin stop price

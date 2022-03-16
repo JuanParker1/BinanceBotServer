@@ -10,7 +10,7 @@ using Mapster;
 
 namespace BinanceBotInfrastructure.Services
 {
-    public class CrudService<TDto, TModel> : ICrudService<TDto>
+    public class CrudService<TDto, TModel> : ICrudService<TDto> // TODO: Использовать везде или почти везде.
         where TDto : BinanceBotApp.Data.IId
         where TModel : class, BinanceBotDb.Models.IId
     {

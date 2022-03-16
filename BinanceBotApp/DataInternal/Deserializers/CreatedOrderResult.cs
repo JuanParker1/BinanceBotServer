@@ -1,9 +1,9 @@
-namespace BinanceBotApp.Data
+namespace BinanceBotApp.DataInternal.Deserializers
 {
     /// <summary>
     /// Middle size new order info object
     /// </summary>
-    public class CreatedOrderResultDto : CreatedOrderAckDto
+    public class CreatedOrderResult : CreatedOrderAck
     {
         /// <summary>
         /// New order coin price

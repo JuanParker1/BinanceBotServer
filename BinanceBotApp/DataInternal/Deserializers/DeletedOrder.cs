@@ -1,9 +1,9 @@
-namespace BinanceBotApp.Data
+namespace BinanceBotApp.DataInternal.Deserializers
 {
     /// <summary>
     /// Deleted order info object
     /// </summary>
-    public class DeletedOrderDto : CreatedOrderResultDto
+    public class DeletedOrder : CreatedOrderResult
     {
         /// <summary>
         /// Cancelled order id

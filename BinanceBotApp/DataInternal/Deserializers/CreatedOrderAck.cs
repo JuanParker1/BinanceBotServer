@@ -1,9 +1,9 @@
-namespace BinanceBotApp.Data
+namespace BinanceBotApp.DataInternal.Deserializers
 {
     /// <summary>
     /// The smallest new order info object
     /// </summary>
-    public class CreatedOrderAckDto
+    public class CreatedOrderAck
     {
         /// <summary>
         /// Trading pair

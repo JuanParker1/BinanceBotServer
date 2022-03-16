@@ -1,9 +1,9 @@
-namespace BinanceBotApp.Data
+namespace BinanceBotApp.DataInternal.Deserializers
 {
     /// <summary>
     /// Successful order, that filled main one
     /// </summary>
-    public class OrderFillPartDto
+    public class OrderFillPart
     {
         /// <summary>
         /// Coin price

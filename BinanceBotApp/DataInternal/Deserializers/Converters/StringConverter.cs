@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
-namespace BinanceBotApp.DataInternal.Deserializers
+namespace BinanceBotApp.DataInternal.Deserializers.Converters
 {
     public class StringConverter : JsonConverter<string>
     {

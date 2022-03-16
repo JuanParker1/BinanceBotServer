@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 
-namespace BinanceBotApp.Data
+namespace BinanceBotApp.DataInternal.Deserializers
 {
     /// <summary>
     /// The most full new order info object
     /// </summary>
-    public class CreatedOrderFullDto : CreatedOrderResultDto
+    public class CreatedOrderFull : CreatedOrderResult
     {
         /// <summary>
         /// List of successful orders, that filled that order
         /// </summary>
-        public IEnumerable<OrderFillPartDto> FillParts { get; set; }
+        public IEnumerable<OrderFillPart> FillParts { get; set; }
     }
 }

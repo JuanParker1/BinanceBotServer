@@ -7,7 +7,7 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
-using BinanceBotApp.DataInternal.Deserializers;
+using BinanceBotApp.DataInternal.Deserializers.Converters;
 using BinanceBotApp.DataInternal;
 using BinanceBotApp.Services;
 using BinanceBotInfrastructure.Services.WebsocketStorage;

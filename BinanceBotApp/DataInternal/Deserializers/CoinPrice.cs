@@ -3,7 +3,7 @@ namespace BinanceBotApp.DataInternal.Deserializers
     /// <summary>
     /// Short coin price info
     /// </summary>
-    public class CoinPrice
+    public class CoinPrice // TODO: Юольшую часть классов-десериализаторов можно удалить и заменить десериализацией в словари
     {
         /// <summary>
         /// Trade pair
