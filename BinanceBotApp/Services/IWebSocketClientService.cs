@@ -16,5 +16,8 @@ namespace BinanceBotApp.Services
             WebsocketConnectionTypes streamType, CancellationToken token);
         Task ListenAsync(ClientWebSocket webSocket, IDictionary<string, double> highestPrices, 
             Action<string> responseHandler, CancellationToken token);
+        Task<string> GetListenKey(CancellationToken token);
+        Task ExtendListenKey(string listenKey, CancellationToken token);
+        Task DeleteListenKey(string listenKey, CancellationToken token);
     }
 }

@@ -7,6 +7,7 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
+using BinanceBotApp.DataInternal.Endpoints;
 using BinanceBotApp.DataInternal.Deserializers.Converters;
 using BinanceBotApp.DataInternal;
 using BinanceBotApp.Services;
@@ -20,13 +21,16 @@ namespace BinanceBotInfrastructure.Services
     /// </summary>
     public class WebSocketClientService : IWebSocketClientService
     {
+        private IHttpClientService _httpService;
         private readonly IActiveWebsockets _activeWebsockets;
         private readonly JsonSerializerOptions _jsonDeserializerOptions;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
         private const int _notifyThreshold = 20;
 
-        public WebSocketClientService(IActiveWebsockets activeWebsockets)
+        public WebSocketClientService(IHttpClientService httpService, 
+            IActiveWebsockets activeWebsockets)
         {
+            _httpService = httpService;
             _activeWebsockets = activeWebsockets;
             _jsonDeserializerOptions = new JsonSerializerOptions
             {
@@ -113,6 +117,34 @@ namespace BinanceBotInfrastructure.Services
             } 
             while (!token.IsCancellationRequested || webSocket.State == WebSocketState.Open);
         }
+        
+        public async Task<string> GetListenKey(CancellationToken token)
+        {
+            var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
+        
+            var listenKey = await _httpService.ProcessRequestAsync<string>(uri,
+                null, default, HttpMethods.SignedPost, token);
+        
+            return listenKey;
+        }
+        
+        public async Task ExtendListenKey(string listenKey, CancellationToken token)
+        {
+            var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
+        
+            await _httpService.ProcessRequestAsync<string>(uri,
+                new Dictionary<string, string>(), 
+                default, HttpMethods.SignedPut, token);
+        }
+        
+        public async Task DeleteListenKey(string listenKey, CancellationToken token)
+        {
+            var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
+        
+            await _httpService.ProcessRequestAsync<string>(uri,
+                new Dictionary<string, string>(), 
+                default, HttpMethods.SignedDelete, token);
+        }
 
         private static async Task<string> GetResponseAsync(WebSocket webSocket, 
             CancellationToken token)
@@ -158,7 +190,7 @@ namespace BinanceBotInfrastructure.Services
             if (currentPrice > currentHighestPrice)
                 highestPrices[tradePair] = currentPrice;
 
-            //TODO: Обновить стоп ордер на бирже.
+            //TODO: Обновить стоп ордер на бирже, если включена торговля
       
             responseHandler?.Invoke(JsonSerializer.Serialize(new { Symbol = tradePair, Price = currentPrice },
                 _jsonSerializerOptions));
