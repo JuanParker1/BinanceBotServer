@@ -23,7 +23,7 @@ namespace BinanceBotInfrastructure.Services
         private readonly IActiveWebsockets _activeWebsockets;
         private readonly JsonSerializerOptions _jsonDeserializerOptions;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
-        private const int _notifyThreshold = 50;
+        private const int _notifyThreshold = 20;
 
         public WebSocketClientService(IActiveWebsockets activeWebsockets)
         {

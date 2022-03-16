@@ -82,14 +82,14 @@ namespace BinanceBotWebApi.Controllers
                 token);
     
             async void HandleCoinPricesAsync(string price) =>
-                await _pricesHubContext.Clients.Group($"User_{authUserId}").SendAsync(
-                    nameof(IPriceHubClient.GetPrices),
+                await _pricesHubContext.Clients.Group($"User_{authUserId}_Prices").SendAsync(
+                    nameof(IPriceHubClient.GetPricesAsync),
                     price,
                     CancellationToken.None
                 );
             
-            _coinService.SubscribeCoinPricesStream(currentBalance.Select(b => $"{b.Asset}USDT"), idUser, 
-                HandleCoinPricesAsync);
+            _coinService.SubscribeCoinPricesStream(currentBalance.Select(b => $"{b.Asset}USDT"), 
+                idUser, HandleCoinPricesAsync);
 
             return Ok(currentBalance);
         }

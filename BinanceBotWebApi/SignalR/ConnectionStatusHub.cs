@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using BinanceBotApp.Data;
 using BinanceBotApp.Services;
-using BinanceBotInfrastructure.Services;
 
 namespace BinanceBotWebApi.SignalR
 {
@@ -21,10 +19,10 @@ namespace BinanceBotWebApi.SignalR
             _webSocketService = webSocketService;
             _coinService = coinService;
         }
-        public Task AddToGroup(string groupName) => // TODO: Async naming
+        public Task AddToGroupAsync(string groupName) =>
             Groups.AddToGroupAsync(Context.ConnectionId, groupName);
 
-        public Task RemoveFromGroup(string groupName) => 
+        public Task RemoveFromGroupAsync(string groupName) => 
             Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
 
         public async Task GetStatusAsync(int idUser)

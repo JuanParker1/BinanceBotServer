@@ -2,6 +2,6 @@
 {
     public interface IPriceHubClient
     {
-        string GetPrices(string price);
+        string GetPricesAsync(string price);
     }
 }

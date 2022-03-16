@@ -10,10 +10,10 @@ namespace BinanceBotWebApi.SignalR
     [Authorize]
     public class PricesHub : Hub
     {
-        public Task AddToGroup(string groupName) =>
+        public Task AddToGroupAsync(string groupName) =>
             Groups.AddToGroupAsync(Context.ConnectionId, groupName);
 
-        public Task RemoveFromGroup(string groupName) => 
+        public Task RemoveFromGroupAsync(string groupName) => 
             Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
     }
 }
