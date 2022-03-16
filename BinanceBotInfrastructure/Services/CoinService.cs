@@ -82,13 +82,12 @@ namespace BinanceBotInfrastructure.Services
                 data, idUser, WebsocketConnectionTypes.Prices, token);
         }
 
-        public async Task GetSubscriptionsListAsync(int idUser, Action<string> responseHandler,
-            CancellationToken token)
+        public async Task GetSubscriptionsListAsync(int idUser, CancellationToken token)
         {
             var data = $"{{\"method\": \"LIST_SUBSCRIPTIONS\",\"id\": 1}}";
             
             await _webSocketService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
-                data, idUser, WebsocketConnectionTypes.Prices, token );
+                data, idUser, WebsocketConnectionTypes.Prices, token);
         }
 
         private static string CutTradePairEnding(string tradePair) =>
