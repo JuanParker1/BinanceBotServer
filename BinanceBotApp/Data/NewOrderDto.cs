@@ -11,7 +11,7 @@ namespace BinanceBotApp.Data
         public int IdUser { get; set; }
 
         /// <summary>
-        /// Trading pair name
+        /// Trade pair name
         /// </summary>
         public string Symbol { get; set; }
         
