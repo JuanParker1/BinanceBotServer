@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BinanceBotInfrastructure.Services.Cache
 {
-    public class CacheDb
+    public class CacheDb : ICacheDb
     {
         private readonly ConcurrentDictionary<string, CacheTableDataStorage> _cache = 
             new ConcurrentDictionary<string, CacheTableDataStorage>();

@@ -18,7 +18,7 @@ namespace BinanceBotInfrastructure.Services
 
         private readonly CacheTable<Request> _cacheRequestLogs;
 
-        public RequestTrackerService(BinanceBotDbContext db, CacheDb cacheDb)
+        public RequestTrackerService(BinanceBotDbContext db, ICacheDb cacheDb)
         {
             _cacheRequestLogs = cacheDb.GetCachedTable<Request>((BinanceBotDbContext) db);
         }

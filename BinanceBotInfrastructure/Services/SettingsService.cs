@@ -16,7 +16,7 @@ namespace BinanceBotInfrastructure.Services
         private readonly CacheTable<Settings> _cacheUserSettings;
         private readonly IHttpClientService _httpService;
         
-        public SettingsService(IBinanceBotDbContext db, CacheDb cacheDb,
+        public SettingsService(IBinanceBotDbContext db, ICacheDb cacheDb,
             IHttpClientService httpService)
         {
             _cacheUserSettings = cacheDb.GetCachedTable<Settings>((BinanceBotDbContext)db, 

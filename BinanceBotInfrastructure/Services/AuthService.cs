@@ -34,7 +34,7 @@ namespace BinanceBotInfrastructure.Services
         private readonly HashAlgorithm _hashAlgoritm;
         private readonly Random _rnd;
 
-        public AuthService(IBinanceBotDbContext db, CacheDb cacheDb)
+        public AuthService(IBinanceBotDbContext db, ICacheDb cacheDb)
         {
             _db = db;
             _cacheUserSettings = cacheDb.GetCachedTable<Settings>((BinanceBotDbContext)_db,

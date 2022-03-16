@@ -34,7 +34,7 @@ namespace BinanceBotInfrastructure
             
             services.AddHostedService<PricesBackgroundService>();
             
-            services.AddSingleton(new CacheDb()); // TODO: Сделать нормально через интерфейс. Тогда при тестировании ничего мокать не надо будет, просто подставлю нужную затычку через полиморфизм.
+            services.AddSingleton<ICacheDb, CacheDb>();
             services.AddSingleton<IActiveWebsockets, ActiveWebsockets>();
             services.AddSingleton<ICoinPricesStorage, CoinPricesStorage>();
             services.AddSingleton<IPricesBackgroundQueue, PricesBackgroundQueue>();
