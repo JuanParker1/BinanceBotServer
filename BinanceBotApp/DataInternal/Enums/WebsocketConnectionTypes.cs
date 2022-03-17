@@ -3,6 +3,7 @@
     public enum WebsocketConnectionTypes
     {
         Prices,
+        Price,
         UserData
     }
 }

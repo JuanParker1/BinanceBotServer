@@ -47,6 +47,29 @@ namespace BinanceBotInfrastructure.Services
             
             return filtered;
         }
+        
+        public void SubscribeSingleCoinPriceStream(string pair, int idUser, 
+            Action<string> responseHandler)
+        {
+            _queue.EnqueueTask(async (token) => // TODO: Эту очередь убрать и приделать ее к обновлению ордеров
+            {
+                var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[\"{pair.ToLower()}@bookTicker\"],\"id\": 1}}";
+
+                var endpoint = TradeWebSocketEndpoints.GetMainWebSocketEndpoint();
+            
+                var wsClientWrapper = await _webSocketService.SendAsync(endpoint, data, 
+                    idUser, WebsocketConnectionTypes.Price, token);
+                
+                var userCoinPrices = _coinPricesStorage.Get(idUser);
+
+                if (!wsClientWrapper.IsListening)
+                {
+                    wsClientWrapper.IsListening = true;
+                    await _webSocketService.ListenAsync(idUser, wsClientWrapper.WebSocket, 
+                        userCoinPrices, responseHandler, token);
+                }
+            });
+        }
 
         public void SubscribeCoinPricesStream(IEnumerable<string> pairs, int idUser, 
             Action<string> responseHandler)
@@ -72,14 +95,14 @@ namespace BinanceBotInfrastructure.Services
             });
         }
 
-        public async Task UnsubscribeCoinPriceStreamAsync(IEnumerable<string> pairs, int idUser,  
-            CancellationToken token)
+        public async Task UnsubscribeCoinPriceStreamAsync(IEnumerable<string> pairs, 
+            int idUser, WebsocketConnectionTypes connectionType, CancellationToken token)
         {
             var pairsString = string.Join(",", pairs.Select(p => $"\"{p}@bookTicker\""));
             var data = $"{{\"method\": \"UNSUBSCRIBE\",\"params\":[{pairsString}],\"id\": 1}}";
 
             await _webSocketService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
-                data, idUser, WebsocketConnectionTypes.Prices, token);
+                data, idUser, connectionType, token);
         }
 
         public async Task GetSubscriptionsListAsync(int idUser, CancellationToken token)

@@ -46,7 +46,7 @@ namespace BinanceBotInfrastructure.Services
             };
         }
         
-        public (WebSocketWrapper prices, WebSocketWrapper userData) GetConnections(int idUser) =>
+        public (WebSocketWrapper prices, WebSocketWrapper price, WebSocketWrapper userData) GetConnections(int idUser) =>
             _activeWebsockets.Get(idUser);
 
         public bool IsAlive(WebSocket webSocket) =>
@@ -55,11 +55,12 @@ namespace BinanceBotInfrastructure.Services
         public async Task<WebSocketWrapper> SendAsync(Uri endpoint, string data, int idUser, 
             WebsocketConnectionTypes streamType, CancellationToken token)
         {
-            var (prices, userData) = GetConnections(idUser);
+            var (prices, price, userData) = GetConnections(idUser);
 
             var webSocketWrapper = streamType switch
             {
                 WebsocketConnectionTypes.Prices => prices,
+                WebsocketConnectionTypes.Price => price,
                 WebsocketConnectionTypes.UserData => userData,
                 _ => throw new ArgumentOutOfRangeException(nameof(WebsocketConnectionTypes),
                     "Unknown websocket connection type in Websocket client.")
@@ -199,7 +200,7 @@ namespace BinanceBotInfrastructure.Services
 
             if (userSettings.IsTradeEnabled)
             {
-                //TODO: Обновить стоп ордер на бирже, если включена торговля
+                //TODO: Обновить стоп ордер на бирже, если включена торговля. Причем через BackgroundWorker!!! Т.к. могут долго удаляться/пересоздаваться ордера. А ту очередь убрать.
             }
 
             responseHandler?.Invoke(JsonSerializer.Serialize(new { Symbol = tradePair, Price = currentPrice },

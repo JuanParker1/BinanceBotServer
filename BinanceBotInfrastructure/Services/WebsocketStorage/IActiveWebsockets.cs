@@ -6,7 +6,7 @@ namespace BinanceBotInfrastructure.Services.WebsocketStorage
 {
     public interface IActiveWebsockets
     {
-        (WebSocketWrapper prices, WebSocketWrapper userData) Get(int idUser);
+        (WebSocketWrapper prices, WebSocketWrapper price, WebSocketWrapper userData) Get(int idUser);
         Task<bool> RemoveAsync(int idUser, CancellationToken token);
     }
 }

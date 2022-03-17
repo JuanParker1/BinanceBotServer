@@ -27,12 +27,13 @@ namespace BinanceBotWebApi.SignalR
 
         public async Task GetStatusAsync(int idUser)
         {
-            var (prices, userData) = _webSocketService.GetConnections(idUser);
+            var (prices, price, userData) = _webSocketService.GetConnections(idUser);
             await _coinService.GetSubscriptionsListAsync(idUser, CancellationToken.None);
             
             var dto = new ConnectionStatusDto
             {
                 IsPricesStreamConnected = _webSocketService.IsAlive(prices.WebSocket),
+                IsPriceStreamConnected = _webSocketService.IsAlive(price.WebSocket),
                 IsUserDataStreamConnected = _webSocketService.IsAlive(userData.WebSocket)
             };
             
