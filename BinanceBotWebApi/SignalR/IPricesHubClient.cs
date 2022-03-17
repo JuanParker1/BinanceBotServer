@@ -1,6 +1,6 @@
 ﻿namespace BinanceBotWebApi.SignalR
 {
-    public interface IPriceHubClient
+    public interface IPricesHubClient
     {
         string GetPriceAsync(string price);
         string GetPricesAsync(string price);

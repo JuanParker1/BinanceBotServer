@@ -76,7 +76,7 @@ namespace BinanceBotWebApi.Controllers
             
             async void HandleSelectedCoinPriceAsync(string price) =>
                 await _pricesHubContext.Clients.Group($"User_{authUserId}_Price").SendAsync(
-                    nameof(IPriceHubClient.GetPriceAsync),
+                    nameof(IPricesHubClient.GetPriceAsync),
                     price,
                     CancellationToken.None
                 );
@@ -108,7 +108,7 @@ namespace BinanceBotWebApi.Controllers
             
             async void HandleCoinPricesAsync(string price) =>
                 await _pricesHubContext.Clients.Group($"User_{authUserId}").SendAsync(
-                    nameof(IPriceHubClient.GetPricesAsync),
+                    nameof(IPricesHubClient.GetPricesAsync),
                     price,
                     CancellationToken.None
                 );

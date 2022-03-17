@@ -98,7 +98,7 @@ namespace BinanceBotInfrastructure.Services
         public async Task UnsubscribeCoinPriceStreamAsync(IEnumerable<string> pairs, 
             int idUser, WebsocketConnectionTypes connectionType, CancellationToken token)
         {
-            var pairsString = string.Join(",", pairs.Select(p => $"\"{p}@bookTicker\""));
+            var pairsString = string.Join(",", pairs.Select(p => $"\"{p.ToLower()}@bookTicker\""));
             var data = $"{{\"method\": \"UNSUBSCRIBE\",\"params\":[{pairsString}],\"id\": 1}}";
 
             await _webSocketService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
