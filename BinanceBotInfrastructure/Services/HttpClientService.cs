@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Threading;
 using BinanceBotApp.Data;
+using BinanceBotApp.DataInternal.Deserializers.Converters;
 using BinanceBotApp.DataInternal.Enums;
 using BinanceBotApp.Services;
 using BinanceBotInfrastructure.Utils;
@@ -43,6 +44,7 @@ namespace BinanceBotInfrastructure.Services
                 PropertyNameCaseInsensitive = true,
                 NumberHandling = JsonNumberHandling.AllowReadingFromString
             };
+            _jsonSerializerOptions.Converters.Add(new StringConverter());
         }
         
         public async Task<TResult> ProcessRequestAsync<TDto, TResult>(Uri uri,

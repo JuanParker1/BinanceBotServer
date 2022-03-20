@@ -17,7 +17,7 @@ namespace BinanceBotApp.Data
         /// <summary>
         /// Order id at exchange
         /// </summary>
-        public int OrderId { get; set; }
+        public long OrderId { get; set; }
         
         /// <summary>
         /// Client order id at exchange

@@ -13,8 +13,8 @@ namespace BinanceBotApp.DataInternal.Deserializers
         /// <summary>
         /// Order id
         /// </summary>
-        public int OrderId { get; set; }
-        public int OrderListId { get; set; }
+        public long OrderId { get; set; }
+        public long OrderListId { get; set; }
         public string ClientOrderId { get; set; }
         public long TransactTime { get; set; }
     }
