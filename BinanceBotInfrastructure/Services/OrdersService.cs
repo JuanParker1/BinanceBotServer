@@ -153,8 +153,10 @@ namespace BinanceBotInfrastructure.Services
                 token);
 
             var uri = TradeEndpoints.GetTestNewOrderEndpoint();
+            
+            FormatOrderDtoFields(newOrderDto);
 
-            var newOrderInfo = await _httpService.ProcessRequestAsync<NewOrderDto, CreatedOrderResult>(uri, 
+            var newOrderInfo = await _httpService.ProcessRequestAsync<NewOrderDto, CreatedOrderFull>(uri, 
                 newOrderDto, keys, HttpMethods.SignedPost, token);
 
             return newOrderInfo;
@@ -167,6 +169,8 @@ namespace BinanceBotInfrastructure.Services
                 token);
 
             var uri = TradeEndpoints.GetOrderEndpoint();
+            
+            FormatOrderDtoFields(newOrderDto);
 
             var newOrderInfo = await _httpService.ProcessRequestAsync<NewOrderDto, CreatedOrderResult>(uri, 
                 newOrderDto, keys, HttpMethods.SignedPost, token);
@@ -253,6 +257,13 @@ namespace BinanceBotInfrastructure.Services
                         Price = double.TryParse(exchangeOrderInfo.Price, out var p) ? p : 0.0
                     };
             });
+        }
+
+        private static void FormatOrderDtoFields(NewOrderDto newOrderDto)
+        {
+            newOrderDto.NewOrderRespType = "FULL";
+            newOrderDto.Side = newOrderDto.Side.ToUpper();
+            newOrderDto.Type = newOrderDto.Type.ToUpper();
         }
 
         private static OrderDto Convert(Order order)

@@ -26,11 +26,10 @@ namespace BinanceBotInfrastructure.Utils
                 var camelCasedKey = char.ToLower(name[0]) + name[1..];
                 var value = dto.GetType()?.GetProperty(name)?.GetValue(dto);
 
-                if (value != default && Verifier.IsNumericDefault(value))
+                if (string.IsNullOrEmpty($"{value}") || Verifier.IsNumericDefault(value))
                     continue;
-
-                if(value != default)
-                    resultDict.Add(camelCasedKey, $"{value}");
+                
+                resultDict.Add(camelCasedKey, $"{value}");
             }
             
             return resultDict;

@@ -67,7 +67,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="403"> Wrong user id </response>
         [HttpGet("{symbol}")]
         [ProducesResponseType(typeof(IEnumerable<OrderInfo>), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> GetOrdersForPairAsync([FromRoute][StringLength(20)] string pair, 
+        public async Task<IActionResult> GetOrdersForPairAsync([FromRoute][StringLength(20)] string pair, // TODO: Оставить для api, но на фронте может быть не нужно
             [FromQuery][Range(1, int.MaxValue)] int idUser, [Range(5000, int.MaxValue)] int recvWindow = 5000,  
             CancellationToken token = default)
         {
@@ -171,7 +171,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpPost("test")]
-        [ProducesResponseType(typeof(CreatedOrderResult), (int)System.Net.HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(CreatedOrderFull), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> CreateTestOrderAsync([FromBody] NewOrderDto newOrderDto, 
             CancellationToken token = default)
         {

@@ -49,10 +49,8 @@ namespace BinanceBotInfrastructure.Services
             TDto dto, (string apiKey, string secretKey) keys, HttpMethods requestType, 
             CancellationToken token) where TResult : class
         {
-            ApiKey = keys.apiKey;
-            SecretKey = keys.secretKey;
-            
             var qParams = Converter.ToDictionary(dto);
+            qParams.Remove("idUser");
 
             var responseInfo = await ProcessRequestAsync<TResult>(uri, 
                 qParams, keys, requestType, token);
