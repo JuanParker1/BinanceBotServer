@@ -48,12 +48,11 @@ namespace BinanceBotInfrastructure.Services
         }
         
         public async Task<TResult> ProcessRequestAsync<TDto, TResult>(Uri uri,
-            TDto dto, (string apiKey, string secretKey) keys, HttpMethods requestType, 
-            CancellationToken token) where TResult : class
+            TDto dto, (string apiKey, string secretKey) keys, IEnumerable<string> paramsToRemove, 
+            HttpMethods requestType, CancellationToken token) where TResult : class
         {
-            var qParams = Converter.ToDictionary(dto);
-            qParams.Remove("idUser");
-            qParams.Remove("idCreationType"); // TODO: МЕТОД ОБОБЩЕННЫЙ!!! Это тут быть не должно.
+            var qParams = Converter.ToDictionary(dto, 
+                paramsToRemove);
 
             var responseInfo = await ProcessRequestAsync<TResult>(uri, 
                 qParams, keys, requestType, token);

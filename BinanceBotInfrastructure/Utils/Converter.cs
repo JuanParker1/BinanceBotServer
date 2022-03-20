@@ -10,9 +10,10 @@ namespace BinanceBotInfrastructure.Utils
 {
     public static class Converter
     {
-        public static IDictionary<string, string> ToDictionary<T>(T dto)
+        public static IDictionary<string, string> ToDictionary<T>(T dto,
+            IEnumerable<string> paramsToRemove)
         {
-            var resultDict = new Dictionary<string, string>()
+            var resultDict = new Dictionary<string, string>
             {
                 {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}
             };
@@ -31,7 +32,10 @@ namespace BinanceBotInfrastructure.Utils
                 
                 resultDict.Add(camelCasedKey, $"{value}");
             }
-            
+
+            foreach (var removeParam in paramsToRemove)
+                resultDict.Remove(removeParam);
+
             return resultDict;
         }
         

@@ -155,9 +155,11 @@ namespace BinanceBotInfrastructure.Services
             var uri = TradeEndpoints.GetTestNewOrderEndpoint();
             
             FormatOrderDtoFields(newOrderDto);
+            
+            var paramsToRemove = new List<string> { "idUser", "idCreationType" };
 
             var newOrderInfo = await _httpService.ProcessRequestAsync<NewOrderDto, CreatedOrderFull>(uri, 
-                newOrderDto, keys, HttpMethods.SignedPost, token);
+                newOrderDto, keys, paramsToRemove, HttpMethods.SignedPost, token);
 
             return newOrderInfo;
         }
@@ -172,8 +174,10 @@ namespace BinanceBotInfrastructure.Services
             
             FormatOrderDtoFields(newOrderDto);
 
+            var paramsToRemove = new List<string> { "idUser", "idCreationType" };
+
             var newOrderInfo = await _httpService.ProcessRequestAsync<NewOrderDto, CreatedOrderFull>(uri, 
-                newOrderDto, keys, HttpMethods.SignedPost, token);
+                newOrderDto, keys, paramsToRemove, HttpMethods.SignedPost, token);
 
             var isOrderCreated = newOrderInfo.Status == "NEW" &&
                                  (!string.IsNullOrEmpty(newOrderInfo.ClientOrderId) || newOrderInfo.OrderId > 0);
