@@ -53,6 +53,7 @@ namespace BinanceBotInfrastructure.Services
         {
             var qParams = Converter.ToDictionary(dto);
             qParams.Remove("idUser");
+            qParams.Remove("idCreationType"); // TODO: МЕТОД ОБОБЩЕННЫЙ!!! Это тут быть не должно.
 
             var responseInfo = await ProcessRequestAsync<TResult>(uri, 
                 qParams, keys, requestType, token);

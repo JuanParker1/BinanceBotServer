@@ -24,7 +24,7 @@ namespace BinanceBotApp.Data
         /// Order type (LIMIT, MARKET, STOP_LOSS etc)
         /// </summary>
         public string Type { get; set; }
-        
+
         /// <summary>
         /// Order lifetime type depending on its fill (full/partial)
         /// </summary>
@@ -48,6 +48,12 @@ namespace BinanceBotApp.Data
         /// Asset price
         /// </summary>
         public double Price { get; set; }
+        
+        /// <summary>
+        /// 1 - Order was created automatically during auto trade
+        /// 2 - Order was created manually by user
+        /// </summary>
+        public int IdCreationType { get; set; }
         
         /// <summary>
         /// A unique id among open orders. Automatically generated if not sent.

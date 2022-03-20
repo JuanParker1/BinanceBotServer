@@ -172,8 +172,14 @@ namespace BinanceBotInfrastructure.Services
             
             FormatOrderDtoFields(newOrderDto);
 
-            var newOrderInfo = await _httpService.ProcessRequestAsync<NewOrderDto, CreatedOrderResult>(uri, 
+            var newOrderInfo = await _httpService.ProcessRequestAsync<NewOrderDto, CreatedOrderFull>(uri, 
                 newOrderDto, keys, HttpMethods.SignedPost, token);
+
+            var isOrderCreated = newOrderInfo.Status == "NEW" &&
+                                 (!string.IsNullOrEmpty(newOrderInfo.ClientOrderId) || newOrderInfo.OrderId > 0);
+
+            if (isOrderCreated)
+                await SaveOrderToDbAsync(newOrderDto, newOrderInfo, token);
 
             return newOrderInfo;
         }
@@ -259,6 +265,24 @@ namespace BinanceBotInfrastructure.Services
             });
         }
 
+        private async Task<int> SaveOrderToDbAsync(NewOrderDto newOrderDto,
+            CreatedOrderFull newOrderInfo, CancellationToken token)
+        {
+            var orderEntity = newOrderDto.Adapt<Order>();
+            orderEntity.Id = 0;
+            orderEntity.DateCreated = DateTime.Now;
+            orderEntity.ClientOrderId = newOrderInfo.ClientOrderId;
+            orderEntity.OrderId = newOrderInfo.OrderId;
+            orderEntity.IdSide = newOrderDto.Side.ToLower() == "buy"
+                ? 1
+                : 2;
+            orderEntity.IdType = newOrderDto.Type.ToLower() == "limit"
+                ? 1
+                : 2;
+            _db.Orders.Add(orderEntity);
+            return await _db.SaveChangesAsync(token);
+        }
+
         private static void FormatOrderDtoFields(NewOrderDto newOrderDto)
         {
             newOrderDto.NewOrderRespType = "FULL";
@@ -269,10 +293,13 @@ namespace BinanceBotInfrastructure.Services
         private static OrderDto Convert(Order order)
         {
             var dto = order.Adapt<OrderDto>();
-            dto.Side = order.IdSide == 1 ? "Покупка" : "Продажа";
+            dto.Side = order.IdSide == 1 
+                ? "Покупка" 
+                : "Продажа";
             dto.Type = order.OrderType.Caption;
-            dto.CreationType = order.IdCreationType == 1 ? "Авто" : "Вручную";
-            dto.TimeInForce = order.IdTimeInForce == 1 ? "Полный" : "Частичный";
+            dto.CreationType = order.IdCreationType == 1 
+                ? "Авто" 
+                : "Вручную";
             return dto;
         }
     }
