@@ -12,6 +12,7 @@ using BinanceBotApp.Services.BackgroundWorkers;
 using BinanceBotDb.Models;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace BinanceBotInfrastructure.Services
 {
@@ -21,14 +22,17 @@ namespace BinanceBotInfrastructure.Services
         private readonly ISettingsService _settingsService;
         private readonly IHttpClientService _httpService;
         private readonly IRefreshOrderBackgroundQueue _ordersQueue;
+        private readonly IConfiguration _configuration;
 
         public OrdersService(IBinanceBotDbContext db, ISettingsService settingsService, 
-            IHttpClientService httpService, IRefreshOrderBackgroundQueue ordersQueue)
+            IHttpClientService httpService, IRefreshOrderBackgroundQueue ordersQueue,
+            IConfiguration configuration)
         {
             _db = db;
             _settingsService = settingsService;
             _httpService = httpService;
             _ordersQueue = ordersQueue;
+            _configuration = configuration;
         }
 
         public async Task<OrderInfo> GetOrderAsync(int idUser, int idOrder, // TODO: Многие методы зачем?
@@ -185,23 +189,28 @@ namespace BinanceBotInfrastructure.Services
 
                 var isOrderCreated = newOrderInfo.Status == "NEW" &&
                                      (!string.IsNullOrEmpty(newOrderInfo.ClientOrderId) || newOrderInfo.OrderId > 0);
-
+          
                 if (isOrderCreated)
                     await SaveOrderToDbAsync(newOrderDto, newOrderInfo, token);
             });
         }
 
-        public async Task<DeletedOrder> DeleteOrderAsync(int idUser, int idOrder, string symbol, 
-            int recvWindow, CancellationToken token)
+        public async Task<DeletedOrder> DeleteOrderAsync(int idUser, long idOrder,
+            string clientOrderId, string symbol, int recvWindow, CancellationToken token)
         {
             var keys = await _settingsService.GetApiKeysAsync(idUser,
                 token);
             
             var uri = TradeEndpoints.GetOrderEndpoint();
+
+            var orderId = idOrder != default 
+                ? $"{idOrder}" 
+                : clientOrderId;
+            
             var qParams = new Dictionary<string, string>()
             {
                 {"symbol", symbol == default ? null : $"{symbol.ToUpper()}"},
-                {"orderId", idOrder == default ? null : $"{idOrder}" },
+                {"orderId", orderId },
                 {"recvWindow", recvWindow == default ? null : $"{recvWindow}" },
                 {"timestamp", $"{DateTimeOffset.Now.ToUnixTimeMilliseconds()}"}
             };
@@ -275,6 +284,8 @@ namespace BinanceBotInfrastructure.Services
         private async Task<int> SaveOrderToDbAsync(NewOrderDto newOrderDto,
             CreatedOrderFull newOrderInfo, CancellationToken token)
         {
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+            var context = DependencyInjection.MakeContext(connectionString);
             var orderEntity = newOrderDto.Adapt<Order>();
             orderEntity.Id = 0;
             orderEntity.DateCreated = DateTime.Now;
@@ -286,8 +297,8 @@ namespace BinanceBotInfrastructure.Services
             orderEntity.IdType = newOrderDto.Type.ToLower() == "limit"
                 ? 1
                 : 2;
-            _db.Orders.Add(orderEntity);
-            return await _db.SaveChangesAsync(token);
+            context.Orders.Add(orderEntity);
+            return await context.SaveChangesAsync(token);
         }
 
         private static void FormatOrderDtoFields(NewOrderDto newOrderDto)

@@ -212,44 +212,19 @@ namespace BinanceBotWebApi.Controllers
         /// Deletes requested order
         /// </summary>
         /// <param name="idUser"> Requested user id </param>
-        /// <param name="idOrder"> Requested order id </param>
+        /// <param name="idOrder"> Requested order id (first variant)</param>
+        /// <param name="clientOrderId"> Requested order id (second variant) </param>
         /// <param name="symbol"> Requested trade pair </param>
         /// <param name="recvWindow"> Request lifetime in ms </param>
         /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> Info about cancelled order </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
-        [HttpDelete("{idOrder}")]
-        [ProducesResponseType(typeof(DeletedOrder), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> DeleteOrderAsync([FromRoute][Range(1, int.MaxValue)] int idOrder, 
-            [FromQuery][Range(1, int.MaxValue)] int idUser, [StringLength(20)] string symbol, 
-            [Range(5000, int.MaxValue)] int recvWindow = 5000, CancellationToken token = default)
-        {
-            var authUserId = User.GetUserId();
-
-            if (authUserId is null || authUserId != idUser)
-                return Forbid();
-            
-            var orderInfo = await _ordersService.DeleteOrderAsync(idUser, 
-                idOrder, symbol, recvWindow, token);
-
-            return Ok(orderInfo);
-        }
-        
-        /// <summary>
-        /// Deletes all orders for requested trading pair
-        /// </summary>
-        /// <param name="idUser"> Requested user id </param>
-        /// <param name="pair"> Requested trade pair </param>
-        /// <param name="recvWindow"> Request lifetime in ms </param>
-        /// <param name="token"> Task cancellation token </param>
-        /// <returns code="200"> Info about cancelled order </returns>
-        /// <response code="400"> Error in request parameters </response>
-        /// <response code="403"> Wrong user id </response>
         [HttpDelete]
-        [ProducesResponseType(typeof(IEnumerable<DeletedOrder>), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> DeleteAllOrderForPairAsync([FromQuery][Range(1, int.MaxValue)] int idUser, 
-            [StringLength(20)] string pair, [Range(5000, int.MaxValue)] int recvWindow = 5000, 
+        [ProducesResponseType(typeof(DeletedOrder), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> DeleteOrderAsync([FromQuery][Range(1, int.MaxValue)] int idUser,
+            [Range(1, long.MaxValue)] long idOrder, [StringLength(30)] string clientOrderId,  
+            [StringLength(20)] string symbol, [Range(5000, int.MaxValue)] int recvWindow = 5000, 
             CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
@@ -257,11 +232,39 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            var orderInfo = 
-                await _ordersService.DeleteAllOrdersForPairAsync(idUser, pair, 
-                    recvWindow, token);
+            var orderInfo = await _ordersService.DeleteOrderAsync(idUser, 
+                idOrder, clientOrderId, symbol.ToUpper(), recvWindow, 
+                token);
 
             return Ok(orderInfo);
         }
+        
+        // /// <summary>
+        // /// Deletes all orders for requested trading pair
+        // /// </summary>
+        // /// <param name="idUser"> Requested user id </param>
+        // /// <param name="pair"> Requested trade pair </param>
+        // /// <param name="recvWindow"> Request lifetime in ms </param>
+        // /// <param name="token"> Task cancellation token </param>
+        // /// <returns code="200"> Info about cancelled order </returns>
+        // /// <response code="400"> Error in request parameters </response>
+        // /// <response code="403"> Wrong user id </response>
+        // [HttpDelete]
+        // [ProducesResponseType(typeof(IEnumerable<DeletedOrder>), (int)System.Net.HttpStatusCode.OK)]
+        // public async Task<IActionResult> DeleteAllOrderForPairAsync([FromQuery][Range(1, int.MaxValue)] int idUser, 
+        //     [StringLength(20)] string pair, [Range(5000, int.MaxValue)] int recvWindow = 5000, 
+        //     CancellationToken token = default)
+        // {
+        //     var authUserId = User.GetUserId();
+        //
+        //     if (authUserId is null || authUserId != idUser)
+        //         return Forbid();
+        //     
+        //     var orderInfo = 
+        //         await _ordersService.DeleteAllOrdersForPairAsync(idUser, pair, 
+        //             recvWindow, token);
+        //
+        //     return Ok(orderInfo);
+        // }
     }
 }
