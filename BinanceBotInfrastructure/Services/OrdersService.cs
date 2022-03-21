@@ -8,6 +8,7 @@ using BinanceBotApp.DataInternal.Enums;
 using BinanceBotApp.DataInternal.Endpoints;
 using BinanceBotApp.DataInternal.Deserializers;
 using BinanceBotApp.Services;
+using BinanceBotApp.Services.BackgroundWorkers;
 using BinanceBotDb.Models;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -19,13 +20,15 @@ namespace BinanceBotInfrastructure.Services
         private readonly IBinanceBotDbContext _db;
         private readonly ISettingsService _settingsService;
         private readonly IHttpClientService _httpService;
+        private readonly IRefreshOrderBackgroundQueue _ordersQueue;
 
         public OrdersService(IBinanceBotDbContext db, ISettingsService settingsService, 
-            IHttpClientService httpService)
+            IHttpClientService httpService, IRefreshOrderBackgroundQueue ordersQueue)
         {
             _db = db;
             _settingsService = settingsService;
             _httpService = httpService;
+            _ordersQueue = ordersQueue;
         }
 
         public async Task<OrderInfo> GetOrderAsync(int idUser, int idOrder, // TODO: Многие методы зачем?
@@ -164,8 +167,7 @@ namespace BinanceBotInfrastructure.Services
             return newOrderInfo;
         }
         
-        public async Task<CreatedOrderResult> CreateOrderAsync(NewOrderDto newOrderDto, 
-            CancellationToken token)
+        public async Task CreateOrderAsync(NewOrderDto newOrderDto, CancellationToken token)
         {
             var keys = await _settingsService.GetApiKeysAsync(newOrderDto.IdUser,
                 token);
@@ -173,19 +175,20 @@ namespace BinanceBotInfrastructure.Services
             var uri = TradeEndpoints.GetOrderEndpoint();
             
             FormatOrderDtoFields(newOrderDto);
+            
+            _ordersQueue.EnqueueTask(async (token) =>
+            {
+                var paramsToRemove = new List<string> { "idUser", "idCreationType" };
 
-            var paramsToRemove = new List<string> { "idUser", "idCreationType" };
+                var newOrderInfo = await _httpService.ProcessRequestAsync<NewOrderDto, CreatedOrderFull>(uri, 
+                    newOrderDto, keys, paramsToRemove, HttpMethods.SignedPost, token);
 
-            var newOrderInfo = await _httpService.ProcessRequestAsync<NewOrderDto, CreatedOrderFull>(uri, 
-                newOrderDto, keys, paramsToRemove, HttpMethods.SignedPost, token);
+                var isOrderCreated = newOrderInfo.Status == "NEW" &&
+                                     (!string.IsNullOrEmpty(newOrderInfo.ClientOrderId) || newOrderInfo.OrderId > 0);
 
-            var isOrderCreated = newOrderInfo.Status == "NEW" &&
-                                 (!string.IsNullOrEmpty(newOrderInfo.ClientOrderId) || newOrderInfo.OrderId > 0);
-
-            if (isOrderCreated)
-                await SaveOrderToDbAsync(newOrderDto, newOrderInfo, token);
-
-            return newOrderInfo;
+                if (isOrderCreated)
+                    await SaveOrderToDbAsync(newOrderDto, newOrderInfo, token);
+            });
         }
 
         public async Task<DeletedOrder> DeleteOrderAsync(int idUser, int idOrder, string symbol, 

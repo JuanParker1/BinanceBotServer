@@ -33,11 +33,13 @@ namespace BinanceBotInfrastructure
             services.AddScoped<IHttpClientService, HttpClientService>();
             
             services.AddHostedService<PricesBackgroundService>();
+            services.AddHostedService<RefreshOrderBackgroundService>();
             
             services.AddSingleton<ICacheDb, CacheDb>();
             services.AddSingleton<IActiveWebsockets, ActiveWebsockets>();
             services.AddSingleton<ICoinPricesStorage, CoinPricesStorage>();
             services.AddSingleton<IPricesBackgroundQueue, PricesBackgroundQueue>();
+            services.AddSingleton<IRefreshOrderBackgroundQueue, RefreshOrderBackgroundQueue>();
             
             services.AddTransient<IRequestTrackerService, RequestTrackerService>();
             services.AddTransient<IAccountBalanceService, AccountBalanceService>();
