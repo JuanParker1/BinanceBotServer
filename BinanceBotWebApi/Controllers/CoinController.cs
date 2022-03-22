@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using BinanceBotApp.Data;
@@ -61,13 +60,14 @@ namespace BinanceBotWebApi.Controllers
         /// </summary>
         /// <param name="idUser"> Requested user id </param>
         /// <param name="pair"> Trading pair name </param>
+        /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> Ok </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet("price/{pair}")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public IActionResult GetSingleCoinPriceStream([FromRoute][StringLength(20)] string pair, 
-            [FromQuery][Range(1, int.MaxValue)] int idUser)
+        public async Task<IActionResult> GetSingleCoinPriceStreamAsync([FromRoute][StringLength(20)] string pair, 
+            [FromQuery][Range(1, int.MaxValue)] int idUser, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
@@ -78,11 +78,11 @@ namespace BinanceBotWebApi.Controllers
                 await _pricesHubContext.Clients.Group($"User_{authUserId}_Price").SendAsync(
                     nameof(IPricesHubClient.GetPriceAsync),
                     price,
-                    CancellationToken.None
+                    token
                 );
             
-            _coinService.SubscribeSingleCoinPriceStream(pair, idUser, 
-                HandleSelectedCoinPriceAsync);
+            await _coinService.SubscribeSingleCoinPriceStreamAsync(pair, idUser, 
+                HandleSelectedCoinPriceAsync, token);
             
             return Ok();
         }
@@ -93,13 +93,14 @@ namespace BinanceBotWebApi.Controllers
         /// </summary>
         /// <param name="idUser"> Requested user id </param>
         /// <param name="pairNames"> Trading pairs names </param>
+        /// <param name="token"> Task cancellation token </param>
         /// <returns code="200"> Ok </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet("price")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)] //TODO: http://localhost:5000/api/coins/combined/info?collection=ethbtc&collection=btcusdt
-        public IActionResult GetCoinsPricesStream([FromQuery] GenericCollectionDto<string> pairNames, 
-            [Range(1, int.MaxValue)] int idUser)
+        public async Task<IActionResult> GetCoinsPricesStreamAsync([FromQuery] GenericCollectionDto<string> pairNames, 
+            [Range(1, int.MaxValue)] int idUser, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
@@ -110,11 +111,11 @@ namespace BinanceBotWebApi.Controllers
                 await _pricesHubContext.Clients.Group($"User_{authUserId}").SendAsync(
                     nameof(IPricesHubClient.GetPricesAsync),
                     price,
-                    CancellationToken.None
+                    token
                 );
             
-            _coinService.SubscribeCoinPricesStream(pairNames.Collection, idUser, 
-                HandleCoinPricesAsync);
+            await _coinService.SubscribeCoinPricesStreamAsync(pairNames.Collection, idUser, 
+                HandleCoinPricesAsync, token);
 
             return Ok();
         }

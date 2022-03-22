@@ -7,7 +7,6 @@ using BinanceBotApp.Services;
 using BinanceBotApp.DataInternal.Deserializers;
 using BinanceBotApp.DataInternal.Endpoints;
 using BinanceBotApp.DataInternal.Enums;
-using BinanceBotApp.Services.BackgroundWorkers;
 using BinanceBotInfrastructure.Services.CoinPricesStorage;
 
 namespace BinanceBotInfrastructure.Services
@@ -18,17 +17,14 @@ namespace BinanceBotInfrastructure.Services
         private readonly IHttpClientService _httpService;
         private readonly IWebSocketClientService _webSocketService;
         private readonly ICoinPricesStorage _coinPricesStorage;
-        private readonly IPricesBackgroundQueue _queue;
 
         public CoinService(ISettingsService settingsService, IHttpClientService httpService, 
-            IWebSocketClientService webSocketService, ICoinPricesStorage coinPricesStorage, 
-            IPricesBackgroundQueue queue)
+            IWebSocketClientService webSocketService, ICoinPricesStorage coinPricesStorage)
         {
             _settingsService = settingsService;
             _httpService = httpService;
             _webSocketService = webSocketService;
             _coinPricesStorage = coinPricesStorage;
-            _queue = queue;
         }
         
         public async Task<IEnumerable<string>> GetTradingPairsAsync(int idUser, 
@@ -48,10 +44,10 @@ namespace BinanceBotInfrastructure.Services
             return filtered;
         }
         
-        public void SubscribeSingleCoinPriceStream(string pair, int idUser, 
-            Action<string> responseHandler)
+        public Task SubscribeSingleCoinPriceStreamAsync(string pair, int idUser, 
+            Action<string> responseHandler, CancellationToken token)
         {
-            _queue.EnqueueTask(async (token) => // TODO: Эту очередь убрать и приделать ее к обновлению ордеров
+            return Task.Run(async () =>
             {
                 var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[\"{pair.ToLower()}@bookTicker\"],\"id\": 1}}";
 
@@ -68,13 +64,13 @@ namespace BinanceBotInfrastructure.Services
                     await _webSocketService.ListenAsync(idUser, wsClientWrapper.WebSocket, 
                         userCoinPrices, responseHandler, token);
                 }
-            });
+            }, token);
         }
 
-        public void SubscribeCoinPricesStream(IEnumerable<string> pairs, int idUser, 
-            Action<string> responseHandler)
+        public Task SubscribeCoinPricesStreamAsync(IEnumerable<string> pairs, int idUser, 
+            Action<string> responseHandler, CancellationToken token)
         {
-            _queue.EnqueueTask(async (token) =>
+            return Task.Run(async () =>
             {
                 var pairsString = string.Join(",", pairs.Select(p => $"\"{p.ToLower()}@bookTicker\""));
                 var data = $"{{\"method\": \"SUBSCRIBE\",\"params\":[{pairsString}],\"id\": 1}}";
@@ -92,7 +88,7 @@ namespace BinanceBotInfrastructure.Services
                     await _webSocketService.ListenAsync(idUser, wsClientWrapper.WebSocket, 
                         userCoinPrices, responseHandler, token);
                 }
-            });
+            }, token);
         }
 
         public async Task UnsubscribeCoinPriceStreamAsync(IEnumerable<string> pairs, 

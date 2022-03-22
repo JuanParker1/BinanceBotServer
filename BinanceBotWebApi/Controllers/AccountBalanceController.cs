@@ -88,8 +88,8 @@ namespace BinanceBotWebApi.Controllers
                     CancellationToken.None
                 );
             
-            _coinService.SubscribeCoinPricesStream(currentBalance.Select(b => $"{b.Asset}USDT"), 
-                idUser, HandleCoinPricesAsync);
+            await _coinService.SubscribeCoinPricesStreamAsync(currentBalance.Select(b => $"{b.Asset}USDT"), 
+                idUser, HandleCoinPricesAsync, token);
 
             return Ok(currentBalance);
         }
