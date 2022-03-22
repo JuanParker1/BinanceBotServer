@@ -31,6 +31,9 @@ namespace BinanceBotDb.Models
         [Column("date_closed"), Comment("Order closing date")]
         public DateTime? DateClosed { get; set; }
         
+        [Column("id_order_status"), Comment("Order status (NEW, CLOSED, FILLED, etc)")]
+        public int IdOrderStatus { get; set; }
+        
         [Column("id_side"), Comment("1 - Buy\n2 - Sell")]
         public int IdSide { get; set; }
         
@@ -56,5 +59,9 @@ namespace BinanceBotDb.Models
         [ForeignKey(nameof(IdType))]
         [InverseProperty(nameof(Models.Directories.OrderType.Orders))]
         public virtual OrderType OrderType { get; set; }
+        
+        [ForeignKey(nameof(IdOrderStatus))]
+        [InverseProperty(nameof(Models.Directories.OrderStatus.Orders))]
+        public virtual OrderStatus OrderStatus { get; set; }
     }
 }

@@ -217,6 +217,9 @@ namespace BinanceBotInfrastructure.Services
             var deletedOrderInfo = await _httpService.ProcessRequestAsync<DeletedOrder>(uri, 
                     qParams, keys, HttpMethods.SignedDelete, token);
 
+            await ModifyOrderInDbAsync(deletedOrderInfo.OrigClientOrderId, deletedOrderInfo.OrderId, 
+                token);
+
             return deletedOrderInfo;
         }
         
@@ -289,6 +292,7 @@ namespace BinanceBotInfrastructure.Services
             var orderEntity = newOrderDto.Adapt<Order>();
             orderEntity.Id = 0;
             orderEntity.DateCreated = DateTime.Now;
+            orderEntity.IdOrderStatus = 1;
             orderEntity.ClientOrderId = newOrderInfo.ClientOrderId;
             orderEntity.OrderId = newOrderInfo.OrderId;
             orderEntity.IdSide = newOrderDto.Side.ToLower() == "buy"
@@ -299,6 +303,23 @@ namespace BinanceBotInfrastructure.Services
                 : 2;
             context.Orders.Add(orderEntity);
             return await context.SaveChangesAsync(token);
+        }
+
+        private async Task<int> ModifyOrderInDbAsync(string origClientOrderId, long orderId,
+            CancellationToken token)
+        {
+            var orderEntity = await _db.Orders.FirstOrDefaultAsync(o =>
+                    o.ClientOrderId == origClientOrderId || o.OrderId == orderId,
+                token);
+
+            if (orderEntity is null)
+                return 0;
+
+            orderEntity.DateClosed = DateTime.Now;
+            orderEntity.IdOrderStatus = 2;
+
+            _db.Orders.Update(orderEntity);
+            return await _db.SaveChangesAsync(token);
         }
 
         private static void FormatOrderDtoFields(NewOrderDto newOrderDto)

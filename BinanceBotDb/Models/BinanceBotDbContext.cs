@@ -63,6 +63,16 @@ namespace BinanceBotDb.Models
                 });
             });
             
+            modelBuilder.Entity<OrderStatus>(entity =>
+            {
+                entity.HasData(new List<OrderStatus>
+                {
+                    new OrderStatus {Id = 1, Caption = "NEW"},
+                    new OrderStatus {Id = 2, Caption = "CANCELLED"},
+                    new OrderStatus {Id = 3, Caption = "FILLED"}
+                });
+            });
+            
             modelBuilder.Entity<EventTemplate>(entity =>
             {
                 entity.HasData(new List<EventTemplate>
