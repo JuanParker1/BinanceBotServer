@@ -26,7 +26,7 @@ namespace BinanceBotApp.Data
         public string Type { get; set; }
 
         /// <summary>
-        /// Order lifetime type depending on its fill (full/partial)
+        /// Order lifetime type depending on its fill (GTC, IOC, FOK)
         /// </summary>
         public string TimeInForce { get; set; }
         

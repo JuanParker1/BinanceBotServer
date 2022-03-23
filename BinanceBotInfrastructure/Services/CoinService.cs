@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BinanceBotApp.Data;
 using BinanceBotApp.Services;
 using BinanceBotApp.DataInternal.Deserializers;
 using BinanceBotApp.DataInternal.Endpoints;
 using BinanceBotApp.DataInternal.Enums;
+using BinanceBotApp.Services.BackgroundWorkers;
 using BinanceBotInfrastructure.Services.CoinPricesStorage;
 
 namespace BinanceBotInfrastructure.Services
@@ -16,19 +18,24 @@ namespace BinanceBotInfrastructure.Services
     {
         private readonly ISettingsService _settingsService;
         private readonly IHttpClientService _httpService;
+        private readonly IOrdersService _ordersService;
         private readonly IWebSocketClientService _webSocketService;
         private readonly ICoinPricesStorage _coinPricesStorage;
+        private readonly IRefreshOrderBackgroundQueue _refreshOrderQueue;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
         private const int _notifyThreshold = 20;
         private static int _counter = 0;
 
         public CoinService(ISettingsService settingsService, IHttpClientService httpService, 
-            IWebSocketClientService webSocketService, ICoinPricesStorage coinPricesStorage)
+            IOrdersService ordersService, IWebSocketClientService webSocketService, 
+            ICoinPricesStorage coinPricesStorage, IRefreshOrderBackgroundQueue refreshOrderQueue)
         {
             _settingsService = settingsService;
             _httpService = httpService;
+            _ordersService = ordersService;
             _webSocketService = webSocketService;
             _coinPricesStorage = coinPricesStorage;
+            _refreshOrderQueue = refreshOrderQueue;
             _jsonSerializerOptions = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -64,8 +71,6 @@ namespace BinanceBotInfrastructure.Services
             
                 var wsClientWrapper = await _webSocketService.SendAsync(endpoint, data, 
                     idUser, WebsocketConnectionTypes.Price, token);
-                
-                var userCoinPrices = _coinPricesStorage.Get(idUser);
 
                 if (!wsClientWrapper.IsListening)
                 {
@@ -96,8 +101,8 @@ namespace BinanceBotInfrastructure.Services
                 {
                     wsClientWrapper.IsListening = true;
                     await _webSocketService.ListenAsync(wsClientWrapper.WebSocket, 
-                        async dictionary => await HandleMultiCoinResponseAsync(idUser, responseHandler, 
-                            dictionary, userCoinPrices, token), token);
+                        async dictionary => await HandleMultiCoinResponseAsync(idUser, 
+                            responseHandler, dictionary, userCoinPrices, token), token);
                 }
             }, token);
         }
@@ -179,11 +184,42 @@ namespace BinanceBotInfrastructure.Services
 
             if (userSettings.IsTradeEnabled)
             {
-                //TODO: Обновить стоп ордер на бирже, если включена торговля. Причем через BackgroundWorker!!! Т.к. могут долго удаляться/пересоздаваться ордера. А ту очередь убрать.
+                _refreshOrderQueue.EnqueueTask(async (token) =>
+                {
+                    var orderRate = userSettings.LimitOrderRate;
+                    await RecreateOrderAsync(idUser, tradePair, currentPrice, 
+                        orderRate, token);
+                });
             }
 
             responseHandler?.Invoke(JsonSerializer.Serialize(new { Symbol = tradePair, Price = currentPrice },
                 _jsonSerializerOptions));
+        }
+
+        private async Task RecreateOrderAsync(int idUser, string tradePair, double currentPrice, 
+            int orderLimitRate, CancellationToken token)
+        {
+            var formattedTradePair = tradePair.ToUpper();
+            var deletedOrdersInfos = await _ordersService.DeleteAllOrdersForPairAsync(idUser, 
+                formattedTradePair, 10000, token);
+            var totalCoinsAmount = deletedOrdersInfos.Select(o => 
+                    double.TryParse(o.OrigQty, out var res) 
+                        ? res 
+                        : 0.0)
+                .Sum();
+            var newOrderDto = new NewOrderDto
+            {
+                IdUser = idUser,
+                Symbol = formattedTradePair,
+                Side = "BUY",
+                Type = "LIMIT",
+                TimeInForce = "GTC",
+                Quantity = totalCoinsAmount,
+                Price = currentPrice - (currentPrice / 100 * orderLimitRate),
+                IdCreationType = 1,
+                RecvWindow = 10000
+            };
+            await _ordersService.CreateOrderAsync(newOrderDto, token);
         }
 
         private static string CutTradePairEnding(string tradePair) =>
