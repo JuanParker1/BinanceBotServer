@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,6 +18,9 @@ namespace BinanceBotInfrastructure.Services
         private readonly IHttpClientService _httpService;
         private readonly IWebSocketClientService _webSocketService;
         private readonly ICoinPricesStorage _coinPricesStorage;
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
+        private const int _notifyThreshold = 20;
+        private static int _counter = 0;
 
         public CoinService(ISettingsService settingsService, IHttpClientService httpService, 
             IWebSocketClientService webSocketService, ICoinPricesStorage coinPricesStorage)
@@ -25,6 +29,11 @@ namespace BinanceBotInfrastructure.Services
             _httpService = httpService;
             _webSocketService = webSocketService;
             _coinPricesStorage = coinPricesStorage;
+            _jsonSerializerOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
         }
         
         public async Task<IEnumerable<string>> GetTradingPairsAsync(int idUser, 
@@ -61,8 +70,9 @@ namespace BinanceBotInfrastructure.Services
                 if (!wsClientWrapper.IsListening)
                 {
                     wsClientWrapper.IsListening = true;
-                    await _webSocketService.ListenAsync(idUser, wsClientWrapper.WebSocket, 
-                        userCoinPrices, responseHandler, token);
+                    await _webSocketService.ListenAsync(wsClientWrapper.WebSocket, 
+                        async dictionary => await HandleSingleCoinResponseAsync(responseHandler, 
+                            dictionary, token), token);
                 }
             }, token);
         }
@@ -85,8 +95,9 @@ namespace BinanceBotInfrastructure.Services
                 if (!wsClientWrapper.IsListening)
                 {
                     wsClientWrapper.IsListening = true;
-                    await _webSocketService.ListenAsync(idUser, wsClientWrapper.WebSocket, 
-                        userCoinPrices, responseHandler, token);
+                    await _webSocketService.ListenAsync(wsClientWrapper.WebSocket, 
+                        async dictionary => await HandleMultiCoinResponseAsync(idUser, responseHandler, 
+                            dictionary, userCoinPrices, token), token);
                 }
             }, token);
         }
@@ -107,6 +118,72 @@ namespace BinanceBotInfrastructure.Services
             
             await _webSocketService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
                 data, idUser, WebsocketConnectionTypes.Prices, token);
+        }
+
+        private async Task HandleSingleCoinResponseAsync(Action<string> responseHandler,
+            IDictionary<string, string> response, CancellationToken token)
+        {
+            if(!response.ContainsKey("s") || string.IsNullOrEmpty(response["s"]))
+                return;
+            
+            var tradePair = response["s"];
+     
+            if (!double.TryParse(response["b"], out var currentPrice))
+                return;
+            
+            responseHandler?.Invoke(JsonSerializer.Serialize(new { Symbol = tradePair, Price = currentPrice },
+                _jsonSerializerOptions));
+
+            await Task.FromResult(token); // Just because wsClient.ListenAsync() accepts Task returning response handler.
+        }
+        
+        private async Task HandleMultiCoinResponseAsync(int idUser, Action<string> responseHandler, 
+            IDictionary<string, string> response, IDictionary<string, double> highestPrices,
+            CancellationToken token)
+        {
+            if (response.ContainsKey("s") && !string.IsNullOrEmpty(response["s"]))
+            {
+                _counter++;  // Too much price data, hangs browser page. Only every {_notifyThreshold} price is sent to signalR frontend channel
+                if (_counter <= _notifyThreshold) 
+                    return;
+                _counter = 0;
+                await HandleNewCoinPriceAsync(idUser, response, highestPrices,
+                    responseHandler, token);
+            }
+
+            if(response.ContainsKey("result"))
+                responseHandler?.Invoke(JsonSerializer.Serialize(new { Result = response["result"] },
+                    _jsonSerializerOptions));
+        }
+        
+        private async Task HandleNewCoinPriceAsync(int idUser, IDictionary<string, string> response,
+            IDictionary<string, double> highestPrices, Action<string> responseHandler,
+            CancellationToken token)
+        {
+            if(!response.ContainsKey("s") || string.IsNullOrEmpty(response["s"]))
+                return;
+            
+            var tradePair = response["s"];
+     
+            if (!double.TryParse(response["b"], out var currentPrice))
+                return;
+            
+            var currentHighestPrice = highestPrices.ContainsKey(tradePair) 
+                ? highestPrices[tradePair] 
+                : 0D;
+
+            if (currentPrice > currentHighestPrice)
+                highestPrices[tradePair] = currentPrice;
+
+            var userSettings = await _settingsService.GetSettingsAsync(idUser, token);
+
+            if (userSettings.IsTradeEnabled)
+            {
+                //TODO: Обновить стоп ордер на бирже, если включена торговля. Причем через BackgroundWorker!!! Т.к. могут долго удаляться/пересоздаваться ордера. А ту очередь убрать.
+            }
+
+            responseHandler?.Invoke(JsonSerializer.Serialize(new { Symbol = tradePair, Price = currentPrice },
+                _jsonSerializerOptions));
         }
 
         private static string CutTradePairEnding(string tradePair) =>

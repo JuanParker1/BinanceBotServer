@@ -14,8 +14,8 @@ namespace BinanceBotApp.Services
         bool IsAlive(WebSocket webSocket);
         Task<WebSocketWrapper> SendAsync(Uri endpoint, string data, int idUser, 
             WebsocketConnectionTypes streamType, CancellationToken token);
-        Task ListenAsync(int idUser, ClientWebSocket webSocket, 
-            IDictionary<string, double> highestPrices, Action<string> responseHandler, 
+        Task ListenAsync(ClientWebSocket webSocket, 
+            Func<IDictionary<string, string>, Task> responseHandlerAsync, 
             CancellationToken token);
         Task<string> GetListenKey(CancellationToken token);
         Task ExtendListenKey(string listenKey, CancellationToken token);

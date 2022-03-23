@@ -22,28 +22,19 @@ namespace BinanceBotInfrastructure.Services
     public class WebSocketClientService : IWebSocketClientService
     {
         private readonly IHttpClientService _httpService;
-        private readonly ISettingsService _settingsService;
         private readonly IActiveWebsockets _activeWebsockets;
         private readonly JsonSerializerOptions _jsonDeserializerOptions;
-        private readonly JsonSerializerOptions _jsonSerializerOptions;
-        private const int _notifyThreshold = 20;
 
-        public WebSocketClientService(IHttpClientService httpService, 
-            ISettingsService settingsService, IActiveWebsockets activeWebsockets)
+        public WebSocketClientService(IHttpClientService httpService,
+            IActiveWebsockets activeWebsockets)
         {
             _httpService = httpService;
-            _settingsService = settingsService;
             _activeWebsockets = activeWebsockets;
             _jsonDeserializerOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             };
             _jsonDeserializerOptions.Converters.Add(new StringConverter());
-            _jsonSerializerOptions = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true
-            };
         }
         
         public (WebSocketWrapper prices, WebSocketWrapper price, WebSocketWrapper userData) GetConnections(int idUser) =>
@@ -81,11 +72,10 @@ namespace BinanceBotInfrastructure.Services
             return webSocketWrapper;
         }
 
-        public async Task ListenAsync(int idUser, ClientWebSocket webSocket, 
-            IDictionary<string, double> highestPrices, Action<string> responseHandler, 
+        public async Task ListenAsync(ClientWebSocket webSocket, 
+            Func<IDictionary<string, string>, Task> responseHandlerAsync, 
             CancellationToken token)
         {
-            var i = 0;
             do
             {
                 try
@@ -97,20 +87,8 @@ namespace BinanceBotInfrastructure.Services
                 
                     var response = JsonSerializer.Deserialize<IDictionary<string, string>>(responseString, 
                         _jsonDeserializerOptions) ?? new Dictionary<string, string>();
-
-                    if (response.ContainsKey("s") && !string.IsNullOrEmpty(response["s"]))
-                    {
-                        i++;
-                        if (i <= _notifyThreshold) 
-                            continue;
-                        await HandleNewCoinPriceAsync(idUser, response, highestPrices, 
-                            responseHandler, token);
-                        i = 0;
-                    }
                     
-                    if(response.ContainsKey("result"))
-                        responseHandler?.Invoke(JsonSerializer.Serialize(new { Result = response["result"] },
-                            _jsonSerializerOptions));
+                    await responseHandlerAsync.Invoke(response);
                 }
                 catch (Exception ex)
                 {
@@ -123,7 +101,7 @@ namespace BinanceBotInfrastructure.Services
             while (!token.IsCancellationRequested || webSocket.State == WebSocketState.Open);
         }
         
-        public async Task<string> GetListenKey(CancellationToken token)
+        public async Task<string> GetListenKey(CancellationToken token) // TODO: Убрать в Concept
         {
             var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
         
@@ -175,36 +153,6 @@ namespace BinanceBotInfrastructure.Services
             var response = await reader.ReadToEndAsync();
       
             return response;
-        }
-
-        private async Task HandleNewCoinPriceAsync(int idUser, IDictionary<string, string> response,
-            IDictionary<string, double> highestPrices, Action<string> responseHandler,
-            CancellationToken token)
-        {
-            if(!response.ContainsKey("s") || string.IsNullOrEmpty(response["s"]))
-                return;
-            
-            var tradePair = response["s"];
-     
-            if (!double.TryParse(response["b"], out var currentPrice))
-                return;
-            
-            var currentHighestPrice = highestPrices.ContainsKey(tradePair) 
-                ? highestPrices[tradePair] 
-                : 0D;
-
-            if (currentPrice > currentHighestPrice)
-                highestPrices[tradePair] = currentPrice;
-
-            var userSettings = await _settingsService.GetSettingsAsync(idUser, token);
-
-            if (userSettings.IsTradeEnabled)
-            {
-                //TODO: Обновить стоп ордер на бирже, если включена торговля. Причем через BackgroundWorker!!! Т.к. могут долго удаляться/пересоздаваться ордера. А ту очередь убрать.
-            }
-
-            responseHandler?.Invoke(JsonSerializer.Serialize(new { Symbol = tradePair, Price = currentPrice },
-                _jsonSerializerOptions));
         }
     }
 }
