@@ -19,6 +19,7 @@ namespace BinanceBotInfrastructure.Services
         private readonly ISettingsService _settingsService;
         private readonly IHttpClientService _httpService;
         private readonly IOrdersService _ordersService;
+        private readonly IEventService _eventService;
         private readonly IWebSocketClientService _webSocketService;
         private readonly ICoinPricesStorage _coinPricesStorage;
         private readonly IRefreshOrderBackgroundQueue _refreshOrderQueue;
@@ -27,12 +28,14 @@ namespace BinanceBotInfrastructure.Services
         private static int _counter = 0;
 
         public CoinService(ISettingsService settingsService, IHttpClientService httpService, 
-            IOrdersService ordersService, IWebSocketClientService webSocketService, 
-            ICoinPricesStorage coinPricesStorage, IRefreshOrderBackgroundQueue refreshOrderQueue)
+            IOrdersService ordersService, IEventService eventService, 
+            IWebSocketClientService webSocketService, ICoinPricesStorage coinPricesStorage, 
+            IRefreshOrderBackgroundQueue refreshOrderQueue)
         {
             _settingsService = settingsService;
             _httpService = httpService;
             _ordersService = ordersService;
+            _eventService = eventService;
             _webSocketService = webSocketService;
             _coinPricesStorage = coinPricesStorage;
             _refreshOrderQueue = refreshOrderQueue;
@@ -199,6 +202,10 @@ namespace BinanceBotInfrastructure.Services
         private async Task RecreateOrderAsync(int idUser, string tradePair, double currentPrice, 
             int orderLimitRate, CancellationToken token)
         {
+            var deletedOrderTemplate = await _eventService.CreateEventTextAsync(EventTypes.OrderCancelled,
+                new List<string> {""}, token);
+            await _eventService.CreateEventAsync(idUser, deletedOrderTemplate, token);
+            
             var formattedTradePair = tradePair.ToUpper();
             var deletedOrdersInfos = await _ordersService.DeleteAllOrdersForPairAsync(idUser, 
                 formattedTradePair, 10000, token);
