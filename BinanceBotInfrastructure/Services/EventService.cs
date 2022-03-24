@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using BinanceBotApp.Data;
+using BinanceBotApp.DataInternal.Enums;
 using BinanceBotApp.Services;
 using BinanceBotDb.Models;
 using Mapster;
@@ -43,6 +44,46 @@ namespace BinanceBotInfrastructure.Services
             
             var dtos = entities.Select(Convert);
             return dtos;
+        }
+
+        public async Task<string> CreateEventTextAsync(EventTypes eventType,
+            IEnumerable<string> eventParams, CancellationToken token)
+        {
+            var eventTemplateId = eventType switch
+            {
+                EventTypes.OrderCreated => 1,
+                EventTypes.OrderCreationError => 2,
+                EventTypes.OrderFilled => 3,
+                EventTypes.OrderCancelled => 4,
+                EventTypes.OrderCancellationError => 5,
+                EventTypes.OrderUnknownDataReceived => 6,
+                EventTypes.TradeSwitched => 7,
+                EventTypes.AllCoinsSold => 8,
+                _ => throw new ArgumentOutOfRangeException(nameof(WebsocketConnectionTypes),
+                    "Unknown Event template id requested.")
+            };
+
+            var eventTemplate = await Db.EventTemplates.FirstOrDefaultAsync(t =>
+                t.Id == eventTemplateId, token);
+
+            return eventTemplate is null 
+                ? null 
+                : string.Format(eventTemplate.Template, eventParams.ToArray());
+        }
+
+        public async Task<int> CreateEventAsync(int idUser, string eventText, 
+            CancellationToken token)
+        {
+            var eventDto = new EventDto
+            {
+                IdUser = idUser,
+                Date = DateTime.Now,
+                Text = string.IsNullOrEmpty(eventText) 
+                    ? "Unknown event template"
+                    : eventText
+            };
+
+            return await base.InsertAsync(eventDto, token);
         }
 
         public async Task<int> MarkAsReadAsync(GenericCollectionDto<int> idsDto,
