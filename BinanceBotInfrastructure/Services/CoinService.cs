@@ -202,18 +202,20 @@ namespace BinanceBotInfrastructure.Services
         private async Task RecreateOrderAsync(int idUser, string tradePair, double currentPrice, 
             int orderLimitRate, CancellationToken token)
         {
-            var deletedOrderTemplate = await _eventService.CreateEventTextAsync(EventTypes.OrderCancelled,
-                new List<string> {""}, token);
-            await _eventService.CreateEventAsync(idUser, deletedOrderTemplate, token);
-            
             var formattedTradePair = tradePair.ToUpper();
             var deletedOrdersInfos = await _ordersService.DeleteAllOrdersForPairAsync(idUser, 
                 formattedTradePair, 10000, token);
+            
             var totalCoinsAmount = deletedOrdersInfos.Select(o => 
                     double.TryParse(o.OrigQty, out var res) 
                         ? res 
                         : 0.0)
                 .Sum();
+            var newPrice = currentPrice - (currentPrice / 100 * orderLimitRate);
+            
+            await CreateEventAsync(idUser, EventTypes.OrderCancelled, 
+                tradePair, totalCoinsAmount, "рыночному", token);
+
             var newOrderDto = new NewOrderDto
             {
                 IdUser = idUser,
@@ -222,11 +224,46 @@ namespace BinanceBotInfrastructure.Services
                 Type = "LIMIT",
                 TimeInForce = "GTC",
                 Quantity = totalCoinsAmount,
-                Price = currentPrice - (currentPrice / 100 * orderLimitRate),
+                Price = newPrice,
                 IdCreationType = 1,
                 RecvWindow = 10000
             };
             await _ordersService.CreateOrderAsync(newOrderDto, token);
+            
+            await CreateEventAsync(idUser, EventTypes.OrderCreated, 
+                tradePair, totalCoinsAmount, $"{newPrice}", token);
+        }
+
+        private async Task CreateEventAsync(int idUser, EventTypes eventType, 
+            string tradePair, double totalCoinsAmount, string newPrice, 
+            CancellationToken token)
+        {
+            // newPrice param can contain either string, like "current price" or number, like "0.15".
+            // Needs additional check.
+            var isDouble = double.TryParse(newPrice, out var parsedPrice);
+
+            var priceString = isDouble 
+                ? $"{parsedPrice}" 
+                : newPrice;
+
+            var priceNumber = isDouble 
+                ? parsedPrice 
+                : 0D;
+
+            var createdOrderEventText = await _eventService.CreateEventTextAsync(eventType,
+                new List<string> 
+                {
+                    "покупку", 
+                    tradePair,
+                    $"{totalCoinsAmount}",
+                    priceString,
+                    $"{totalCoinsAmount * priceNumber}",
+                    "Автоматический",
+                    DateTime.Now.ToLongDateString()
+                    
+                }, token);
+            await _eventService.CreateEventAsync(idUser, createdOrderEventText, 
+                token);
         }
 
         private static string CutTradePairEnding(string tradePair) =>

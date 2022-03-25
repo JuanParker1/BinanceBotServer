@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BinanceBotDb.Models
 {
+    // TODO: Move all EF Core queries from services to IRepository class (Data Access Layer)
     public class BinanceBotDbContext : DbContext, IBinanceBotDbContext
     {
         public virtual DbSet<User> Users { get; set; }

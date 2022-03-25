@@ -56,7 +56,7 @@ namespace BinanceBotInfrastructure.Services
                 EventTypes.OrderFilled => 3,
                 EventTypes.OrderCancelled => 4,
                 EventTypes.OrderCancellationError => 5,
-                EventTypes.OrderUnknownDataReceived => 6,
+                EventTypes.UnknownDataReceived => 6,
                 EventTypes.TradeSwitched => 7,
                 EventTypes.AllCoinsSold => 8,
                 _ => throw new ArgumentOutOfRangeException(nameof(WebsocketConnectionTypes),

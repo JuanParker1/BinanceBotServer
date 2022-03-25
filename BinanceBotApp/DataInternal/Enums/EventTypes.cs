@@ -7,7 +7,7 @@
         OrderFilled,
         OrderCancelled,
         OrderCancellationError,
-        OrderUnknownDataReceived,
+        UnknownDataReceived,
         TradeSwitched,
         AllCoinsSold
     }

@@ -21,16 +21,18 @@ namespace BinanceBotInfrastructure.Services
         private readonly IBinanceBotDbContext _db;
         private readonly ISettingsService _settingsService;
         private readonly IHttpClientService _httpService;
+        private readonly IEventService _eventService;
         private readonly IRefreshOrderBackgroundQueue _ordersQueue;
         private readonly IConfiguration _configuration;
 
         public OrdersService(IBinanceBotDbContext db, ISettingsService settingsService, 
-            IHttpClientService httpService, IRefreshOrderBackgroundQueue ordersQueue,
-            IConfiguration configuration)
+            IHttpClientService httpService, IEventService eventService, 
+            IRefreshOrderBackgroundQueue ordersQueue, IConfiguration configuration)
         {
             _db = db;
             _settingsService = settingsService;
             _httpService = httpService;
+            _eventService = eventService;
             _ordersQueue = ordersQueue;
             _configuration = configuration;
         }
@@ -187,11 +189,17 @@ namespace BinanceBotInfrastructure.Services
                 var newOrderInfo = await _httpService.ProcessRequestAsync<NewOrderDto, CreatedOrderFull>(uri, 
                     newOrderDto, keys, paramsToRemove, HttpMethods.SignedPost, token);
 
-                var isOrderCreated = newOrderInfo.Status == "NEW" &&
-                                     (!string.IsNullOrEmpty(newOrderInfo.ClientOrderId) || newOrderInfo.OrderId > 0);
-          
-                if (isOrderCreated)
-                    await SaveOrderToDbAsync(newOrderDto, newOrderInfo, token);
+                var isOrderCreated = newOrderInfo.Status == "NEW";
+
+                if (!isOrderCreated)
+                    return;
+                
+                await SaveOrderToDbAsync(newOrderDto, 
+                    newOrderInfo, token);  
+                
+                await CreateEventAsync(newOrderDto.IdUser, EventTypes.OrderCreated, 
+                    newOrderDto.Side, newOrderDto.Symbol, newOrderDto.Quantity, 
+                    newOrderDto.Price, token);
             });
         }
 
@@ -216,9 +224,21 @@ namespace BinanceBotInfrastructure.Services
             };
             var deletedOrderInfo = await _httpService.ProcessRequestAsync<DeletedOrder>(uri, 
                     qParams, keys, HttpMethods.SignedDelete, token);
+            
+            var isOrderDeleted = deletedOrderInfo.Status == "CANCELLED";
+
+            if (!isOrderDeleted)
+                return deletedOrderInfo;
 
             await ModifyOrderInDbAsync(deletedOrderInfo.OrigClientOrderId, deletedOrderInfo.OrderId, 
                 token);
+            
+            double.TryParse(deletedOrderInfo.OrigQty, out var quantity);
+            double.TryParse(deletedOrderInfo.Price, out var price);
+
+            await CreateEventAsync(idUser, EventTypes.OrderCancelled, 
+                deletedOrderInfo.Side, deletedOrderInfo.Symbol, quantity, 
+                price, token);
 
             return deletedOrderInfo;
         }
@@ -242,6 +262,30 @@ namespace BinanceBotInfrastructure.Services
             return deletedOrdersInfo;
         }
 
+        private async Task CreateEventAsync(int idUser, EventTypes eventType, 
+            string side, string symbol, double quantity, double price, 
+            CancellationToken token)
+        {
+            var parsedSide = side.ToLower() == "buy"
+                ? "покупку"
+                : "продажу";
+            
+            var deletedOrderEventText = await _eventService.CreateEventTextAsync(eventType,
+                new List<string> 
+                {
+                    parsedSide, 
+                    symbol,
+                    $"{quantity}",
+                    $"{price}",
+                    $"{quantity * price}",
+                    "Вручную",
+                    DateTime.Now.ToLongDateString()
+                    
+                }, token);
+            await _eventService.CreateEventAsync(idUser, deletedOrderEventText, 
+                token);
+        }
+
         private async Task<OrderDto> GetLastOrderAsync(int idUser, string symbol,
             CancellationToken token)
         {
@@ -259,7 +303,8 @@ namespace BinanceBotInfrastructure.Services
         {
             return exchangeOrdersInfo.Select(exchangeOrderInfo =>
             {
-                var dbOrderInfo = dbOrdersInfo.FirstOrDefault(o => o.Symbol == exchangeOrderInfo.Symbol);
+                var dbOrderInfo = dbOrdersInfo.FirstOrDefault(o => 
+                    o.Symbol == exchangeOrderInfo.Symbol);
                 
                 return dbOrderInfo is null 
                     ? null 
