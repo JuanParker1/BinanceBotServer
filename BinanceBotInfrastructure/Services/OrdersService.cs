@@ -273,30 +273,30 @@ namespace BinanceBotInfrastructure.Services
 
                 foreach (var coinInfo in accountCoins)
                 {
-                    if (coinInfo.Asset != "USDT")
+                    if(coinInfo.Asset == "USDT")
+                        continue;
+          
+                    var formattedCoinName = $"{coinInfo.Asset.ToUpper()}USDT";
+
+                    await DeleteAllOrdersForPairAsync(idUser, formattedCoinName, 
+                        recvWindow, token);
+                
+                    var sellOrderDto = new NewOrderDto
                     {
-                        var formattedCoinName = $"{coinInfo.Asset.ToUpper()}USDT";
+                        IdUser = idUser,
+                        Symbol = formattedCoinName,
+                        Side = "SELL",
+                        Type = "MARKET",
+                        Quantity = coinInfo.Free,
+                        IdCreationType = 2,
+                        RecvWindow = recvWindow
+                    };
 
-                        await DeleteAllOrdersForPairAsync(idUser, formattedCoinName, 
-                            recvWindow, token);
-                    
-                        var sellOrderDto = new NewOrderDto
-                        {
-                            IdUser = idUser,
-                            Symbol = formattedCoinName,
-                            Side = "SELL",
-                            Type = "MARKET",
-                            Quantity = coinInfo.Free,
-                            IdCreationType = 2,
-                            RecvWindow = recvWindow
-                        };
+                    await CreateOrderAsync(sellOrderDto, token);
 
-                        await CreateOrderAsync(sellOrderDto, token);
-
-                        await _eventService.CreateOrderManagementEventAsync(idUser, EventTypes.OrderCreated, 
-                            "SELL", formattedCoinName, coinInfo.Free,
-                            "рыночному", token);
-                    }
+                    await _eventService.CreateOrderManagementEventAsync(idUser, EventTypes.OrderCreated, 
+                        "SELL", formattedCoinName, coinInfo.Free,
+                        "рыночному", token);
                 }
                 
                 var coinsSoldEventText = await _eventService.CreateEventTextAsync(EventTypes.AllCoinsSold,

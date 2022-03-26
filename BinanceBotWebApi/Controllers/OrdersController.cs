@@ -218,7 +218,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="403"> Wrong user id </response>
         [HttpPost("sellAll")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)] // TODO: Решить вопрос с ошибкой Бинанса Timestamp is out of range. Возможнор, увеличить в контроллерах дефолтный recWindow
-        public IActionResult SellAllCoins([FromQuery][Range(1, int.MaxValue)] int idUser, 
+        public IActionResult SellAllCoins([FromBody][Range(1, int.MaxValue)] int idUser, 
             [Range(5000, int.MaxValue)] int recvWindow = 5000)
         {
             var authUserId = User.GetUserId();
