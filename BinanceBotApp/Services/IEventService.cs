@@ -16,6 +16,9 @@ namespace BinanceBotApp.Services
             IEnumerable<string> eventParams, CancellationToken token);
         Task<int> CreateEventAsync(int idUser, string eventText,
             CancellationToken token);
+        Task CreateOrderManagementEventAsync(int idUser, EventTypes eventType,
+            string side, string symbol, double quantity, string price,
+            CancellationToken token);
         Task<int> MarkAsReadAsync(GenericCollectionDto<int> idsDto,
             CancellationToken token);
     }

@@ -209,6 +209,29 @@ namespace BinanceBotWebApi.Controllers
         }
         
         /// <summary>
+        /// Sell all coins at user account
+        /// </summary>
+        /// <param name="idUser"> Requested user id </param>
+        /// <param name="recvWindow"> Request lifetime in ms </param>
+        /// <returns code="200"> Info about cancelled order </returns>
+        /// <response code="400"> Error in request parameters </response>
+        /// <response code="403"> Wrong user id </response>
+        [HttpPost("sellAll")]
+        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)] // TODO: Решить вопрос с ошибкой Бинанса Timestamp is out of range. Возможнор, увеличить в контроллерах дефолтный recWindow
+        public IActionResult SellAllCoins([FromQuery][Range(1, int.MaxValue)] int idUser, 
+            [Range(5000, int.MaxValue)] int recvWindow = 5000)
+        {
+            var authUserId = User.GetUserId();
+        
+            if (authUserId is null || authUserId != idUser)
+                return Forbid();
+            
+            _ordersService.SellAllCoins(idUser, recvWindow);
+        
+            return Ok();
+        }
+        
+        /// <summary>
         /// Deletes requested order
         /// </summary>
         /// <param name="idUser"> Requested user id </param>
@@ -238,33 +261,5 @@ namespace BinanceBotWebApi.Controllers
 
             return Ok(orderInfo);
         }
-        
-        // /// <summary>
-        // /// Deletes all orders for requested trading pair
-        // /// </summary>
-        // /// <param name="idUser"> Requested user id </param>
-        // /// <param name="pair"> Requested trade pair </param>
-        // /// <param name="recvWindow"> Request lifetime in ms </param>
-        // /// <param name="token"> Task cancellation token </param>
-        // /// <returns code="200"> Info about cancelled order </returns>
-        // /// <response code="400"> Error in request parameters </response>
-        // /// <response code="403"> Wrong user id </response>
-        // [HttpDelete]
-        // [ProducesResponseType(typeof(IEnumerable<DeletedOrder>), (int)System.Net.HttpStatusCode.OK)]
-        // public async Task<IActionResult> DeleteAllOrderForPairAsync([FromQuery][Range(1, int.MaxValue)] int idUser, 
-        //     [StringLength(20)] string pair, [Range(5000, int.MaxValue)] int recvWindow = 5000, 
-        //     CancellationToken token = default)
-        // {
-        //     var authUserId = User.GetUserId();
-        //
-        //     if (authUserId is null || authUserId != idUser)
-        //         return Forbid();
-        //     
-        //     var orderInfo = 
-        //         await _ordersService.DeleteAllOrdersForPairAsync(idUser, pair, 
-        //             recvWindow, token);
-        //
-        //     return Ok(orderInfo);
-        // }
     }
 }

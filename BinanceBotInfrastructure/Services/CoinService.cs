@@ -213,7 +213,7 @@ namespace BinanceBotInfrastructure.Services
                 .Sum();
             var newPrice = currentPrice - (currentPrice / 100 * orderLimitRate);
             
-            await CreateEventAsync(idUser, EventTypes.OrderCancelled, 
+            await _eventService.CreateOrderManagementEventAsync(idUser, EventTypes.OrderCancelled, "buy",
                 tradePair, totalCoinsAmount, "рыночному", token);
 
             var newOrderDto = new NewOrderDto
@@ -230,40 +230,8 @@ namespace BinanceBotInfrastructure.Services
             };
             await _ordersService.CreateOrderAsync(newOrderDto, token);
             
-            await CreateEventAsync(idUser, EventTypes.OrderCreated, 
+            await _eventService.CreateOrderManagementEventAsync(idUser, EventTypes.OrderCreated, "buy",
                 tradePair, totalCoinsAmount, $"{newPrice}", token);
-        }
-
-        private async Task CreateEventAsync(int idUser, EventTypes eventType, 
-            string tradePair, double totalCoinsAmount, string newPrice, 
-            CancellationToken token)
-        {
-            // newPrice param can contain either string, like "current price" or number, like "0.15".
-            // Needs additional check.
-            var isDouble = double.TryParse(newPrice, out var parsedPrice);
-
-            var priceString = isDouble 
-                ? $"{parsedPrice}" 
-                : newPrice;
-
-            var priceNumber = isDouble 
-                ? parsedPrice 
-                : 0D;
-
-            var createdOrderEventText = await _eventService.CreateEventTextAsync(eventType,
-                new List<string> 
-                {
-                    "покупку", 
-                    tradePair,
-                    $"{totalCoinsAmount}",
-                    priceString,
-                    $"{totalCoinsAmount * priceNumber}",
-                    "Автоматический",
-                    DateTime.Now.ToLongDateString()
-                    
-                }, token);
-            await _eventService.CreateEventAsync(idUser, createdOrderEventText, 
-                token);
         }
 
         private static string CutTradePairEnding(string tradePair) =>

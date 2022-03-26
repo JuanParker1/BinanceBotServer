@@ -27,5 +27,6 @@ namespace BinanceBotApp.Services
             CancellationToken token);
         Task<IEnumerable<DeletedOrder>> DeleteAllOrdersForPairAsync(int idUser, 
             string symbol, int recvWindow, CancellationToken token);
+        void SellAllCoins(int idUser, int recvWindow);
     }
 }

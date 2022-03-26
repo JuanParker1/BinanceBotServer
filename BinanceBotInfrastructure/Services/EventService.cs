@@ -85,6 +85,43 @@ namespace BinanceBotInfrastructure.Services
 
             return await base.InsertAsync(eventDto, token);
         }
+        
+        public async Task CreateOrderManagementEventAsync(int idUser, EventTypes eventType,
+            string side, string symbol, double quantity, string price, 
+            CancellationToken token)
+        {
+            // newPrice param can contain either string, like "current price" or number, like "0.15".
+            // Needs additional check.
+            var isDouble = double.TryParse(price, out var parsedPrice);
+
+            var priceString = isDouble 
+                ? $"{parsedPrice}" 
+                : price;
+
+            var priceNumber = isDouble 
+                ? parsedPrice 
+                : 0D;
+            
+            var parsedSide = side.ToLower() == "buy"
+                ? "покупку"
+                : "продажу";
+            
+            var deletedOrderEventText = await CreateEventTextAsync(eventType,
+                new List<string> 
+                {
+                    parsedSide, 
+                    symbol,
+                    $"{quantity}",
+                    priceString,
+                    $"{quantity * priceNumber}",
+                    "Вручную",
+                    DateTime.Now.ToLongDateString()
+                    
+                }, token);
+            
+            await CreateEventAsync(idUser, deletedOrderEventText, 
+                token);
+        }
 
         public async Task<int> MarkAsReadAsync(GenericCollectionDto<int> idsDto,
             CancellationToken token)

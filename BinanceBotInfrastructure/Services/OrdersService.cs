@@ -22,17 +22,20 @@ namespace BinanceBotInfrastructure.Services
         private readonly ISettingsService _settingsService;
         private readonly IHttpClientService _httpService;
         private readonly IEventService _eventService;
+        private IAccountBalanceService _accountBalanceService;
         private readonly IRefreshOrderBackgroundQueue _ordersQueue;
         private readonly IConfiguration _configuration;
 
         public OrdersService(IBinanceBotDbContext db, ISettingsService settingsService, 
             IHttpClientService httpService, IEventService eventService, 
+            IAccountBalanceService accountBalanceService,
             IRefreshOrderBackgroundQueue ordersQueue, IConfiguration configuration)
         {
             _db = db;
             _settingsService = settingsService;
             _httpService = httpService;
             _eventService = eventService;
+            _accountBalanceService = accountBalanceService;
             _ordersQueue = ordersQueue;
             _configuration = configuration;
         }
@@ -197,9 +200,9 @@ namespace BinanceBotInfrastructure.Services
                 await SaveOrderToDbAsync(newOrderDto, 
                     newOrderInfo, token);  
                 
-                await CreateEventAsync(newOrderDto.IdUser, EventTypes.OrderCreated, 
+                await _eventService.CreateOrderManagementEventAsync(newOrderDto.IdUser, EventTypes.OrderCreated, 
                     newOrderDto.Side, newOrderDto.Symbol, newOrderDto.Quantity, 
-                    newOrderDto.Price, token);
+                    $"{newOrderDto.Price}", token);
             });
         }
 
@@ -234,11 +237,10 @@ namespace BinanceBotInfrastructure.Services
                 token);
             
             double.TryParse(deletedOrderInfo.OrigQty, out var quantity);
-            double.TryParse(deletedOrderInfo.Price, out var price);
 
-            await CreateEventAsync(idUser, EventTypes.OrderCancelled, 
+            await _eventService.CreateOrderManagementEventAsync(idUser, EventTypes.OrderCancelled, 
                 deletedOrderInfo.Side, deletedOrderInfo.Symbol, quantity, 
-                price, token);
+                deletedOrderInfo.Price, token);
 
             return deletedOrderInfo;
         }
@@ -262,28 +264,47 @@ namespace BinanceBotInfrastructure.Services
             return deletedOrdersInfo;
         }
 
-        private async Task CreateEventAsync(int idUser, EventTypes eventType, 
-            string side, string symbol, double quantity, double price, 
-            CancellationToken token)
+        public void SellAllCoins(int idUser, int recvWindow)
         {
-            var parsedSide = side.ToLower() == "buy"
-                ? "покупку"
-                : "продажу";
-            
-            var deletedOrderEventText = await _eventService.CreateEventTextAsync(eventType,
-                new List<string> 
+            _ordersQueue.EnqueueTask(async (token) =>
+            {
+                var accountCoins = await _accountBalanceService.GetCurrentBalanceAsync(idUser, 
+                    token);
+
+                foreach (var coinInfo in accountCoins)
                 {
-                    parsedSide, 
-                    symbol,
-                    $"{quantity}",
-                    $"{price}",
-                    $"{quantity * price}",
-                    "Вручную",
-                    DateTime.Now.ToLongDateString()
+                    if (coinInfo.Asset != "USDT")
+                    {
+                        var formattedCoinName = $"{coinInfo.Asset.ToUpper()}USDT";
+
+                        await DeleteAllOrdersForPairAsync(idUser, formattedCoinName, 
+                            recvWindow, token);
                     
-                }, token);
-            await _eventService.CreateEventAsync(idUser, deletedOrderEventText, 
-                token);
+                        var sellOrderDto = new NewOrderDto
+                        {
+                            IdUser = idUser,
+                            Symbol = formattedCoinName,
+                            Side = "SELL",
+                            Type = "MARKET",
+                            Quantity = coinInfo.Free,
+                            IdCreationType = 2,
+                            RecvWindow = recvWindow
+                        };
+
+                        await CreateOrderAsync(sellOrderDto, token);
+
+                        await _eventService.CreateOrderManagementEventAsync(idUser, EventTypes.OrderCreated, 
+                            "SELL", formattedCoinName, coinInfo.Free,
+                            "рыночному", token);
+                    }
+                }
+                
+                var coinsSoldEventText = await _eventService.CreateEventTextAsync(EventTypes.AllCoinsSold,
+                    new List<string> { DateTime.Now.ToLongDateString() }, token);
+                
+                await _eventService.CreateEventAsync(idUser, coinsSoldEventText, 
+                    token);
+            });
         }
 
         private async Task<OrderDto> GetLastOrderAsync(int idUser, string symbol,
