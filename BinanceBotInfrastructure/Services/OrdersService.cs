@@ -40,7 +40,7 @@ namespace BinanceBotInfrastructure.Services
             _configuration = configuration;
         }
 
-        public async Task<OrderInfo> GetOrderAsync(int idUser, int idOrder, // TODO: Многие методы зачем?
+        public async Task<OrderInfo> GetOrderAsync(int idUser, int idOrder,
             string symbol, int recvWindow, CancellationToken token)
         {
             var keys = await _settingsService.GetApiKeysAsync(idUser,

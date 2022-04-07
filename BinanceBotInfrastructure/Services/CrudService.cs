@@ -10,7 +10,7 @@ using Mapster;
 
 namespace BinanceBotInfrastructure.Services
 {
-    public class CrudService<TDto, TModel> : ICrudService<TDto> // TODO: Использовать везде или почти везде.
+    public class CrudService<TDto, TModel> : ICrudService<TDto>
         where TDto : BinanceBotApp.Data.IId
         where TModel : class, BinanceBotDb.Models.IId
     {
@@ -54,7 +54,7 @@ namespace BinanceBotInfrastructure.Services
                 .ToListAsync(token);
 
             container.Items = entities
-                .Select(entity => Convert(entity))
+                .Select(Convert)
                 .ToList();
 
             return container;
@@ -152,7 +152,8 @@ namespace BinanceBotInfrastructure.Services
             return Db.SaveChangesAsync(token);
         }
 
-        public virtual Task<int> DeleteRangeAsync(IEnumerable<int> ids, CancellationToken token)
+        public virtual Task<int> DeleteRangeAsync(IEnumerable<int> ids, 
+            CancellationToken token)
         {
             var entities = (from entity in DbSet
                             where ids.Contains(entity.Id)

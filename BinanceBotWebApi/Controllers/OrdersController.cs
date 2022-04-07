@@ -156,8 +156,8 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            var ordersInfo = await _ordersService.GetOrdersHistoryAsync(idUser, intervalStart, 
-                intervalEnd, token);
+            var ordersInfo = await _ordersService.GetOrdersHistoryAsync(idUser, 
+                intervalStart, intervalEnd, token);
 
             return Ok(ordersInfo);
         }
