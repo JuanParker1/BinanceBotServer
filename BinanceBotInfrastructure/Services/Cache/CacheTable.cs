@@ -66,7 +66,7 @@ namespace BinanceBotInfrastructure.Services.Cache
                 Trace.WriteLine($"{DateTime.Now:yyyy.MM.dd HH:mm:ss:fff} error in " +
                                 $"CacheTable<{_nameOfTEntity}>.Sync()");
                 Trace.WriteLine(ex.Message);
-                Trace.WriteLine(ex.StackTrace); // TODO: Разобраться, где тут TraceListener и такое же сделать в Program.cs, где .Migrate() может падать.
+                Trace.WriteLine(ex.StackTrace);
             }
             finally
             {

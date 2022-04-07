@@ -98,7 +98,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet("price")]
-        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)] //TODO: http://localhost:5000/api/coins/combined/info?collection=ethbtc&collection=btcusdt
+        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetCoinsPricesStreamAsync([FromQuery] GenericCollectionDto<string> pairNames, 
             [Range(1, int.MaxValue)] int idUser, CancellationToken token = default)
         {

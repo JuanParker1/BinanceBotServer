@@ -48,7 +48,7 @@ namespace BinanceBotWebApi.Controllers
         /// <returns code="200"> New token </returns>
         [HttpGet("refresh")]
         [ProducesResponseType(typeof(string), (int)System.Net.HttpStatusCode.OK)]
-        public ActionResult Refresh() // TODO: Добавить обновление токена
+        public ActionResult Refresh()
         {
             var newToken = _authService.Refresh(User);
             return Ok(newToken);

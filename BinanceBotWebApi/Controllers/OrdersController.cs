@@ -42,7 +42,7 @@ namespace BinanceBotWebApi.Controllers
         [ProducesResponseType(typeof(OrderInfo), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetOrderAsync([FromRoute][Range(1, int.MaxValue)] int idOrder, 
             [FromQuery][StringLength(20)] string pair, [Range(1, int.MaxValue)]int idUser, 
-            [Range(5000, int.MaxValue)]int recvWindow = 5000, CancellationToken token = default)
+            [Range(5000, int.MaxValue)]int recvWindow = 60000, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
@@ -67,8 +67,8 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="403"> Wrong user id </response>
         [HttpGet("{symbol}")]
         [ProducesResponseType(typeof(IEnumerable<OrderInfo>), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> GetOrdersForPairAsync([FromRoute][StringLength(20)] string pair, // TODO: Оставить для api, но на фронте может быть не нужно
-            [FromQuery][Range(1, int.MaxValue)] int idUser, [Range(5000, int.MaxValue)] int recvWindow = 5000,  
+        public async Task<IActionResult> GetOrdersForPairAsync([FromRoute][StringLength(20)] string pair,
+            [FromQuery][Range(1, int.MaxValue)] int idUser, [Range(60000, int.MaxValue)] int recvWindow = 60000,  
             CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
@@ -94,7 +94,7 @@ namespace BinanceBotWebApi.Controllers
         [HttpGet("active")]
         [ProducesResponseType(typeof(IEnumerable<OrderDto>), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> GetActiveOrdersAsync([FromQuery][Range(1, int.MaxValue)] int idUser,  
-            [Range(5000, int.MaxValue)] int recvWindow = 5000, CancellationToken token = default)
+            [Range(60000, int.MaxValue)] int recvWindow = 60000, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
 
@@ -217,9 +217,9 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpPost("sellAll")]
-        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)] // TODO: Решить вопрос с ошибкой Бинанса Timestamp is out of range. Возможнор, увеличить в контроллерах дефолтный recWindow
+        [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
         public IActionResult SellAllCoins([FromBody][Range(1, int.MaxValue)] int idUser, 
-            [Range(5000, int.MaxValue)] int recvWindow = 5000)
+            [Range(60000, int.MaxValue)] int recvWindow = 60000)
         {
             var authUserId = User.GetUserId();
         
@@ -247,7 +247,7 @@ namespace BinanceBotWebApi.Controllers
         [ProducesResponseType(typeof(DeletedOrder), (int)System.Net.HttpStatusCode.OK)]
         public async Task<IActionResult> DeleteOrderAsync([FromQuery][Range(1, int.MaxValue)] int idUser,
             [Range(1, long.MaxValue)] long idOrder, [StringLength(30)] string clientOrderId,  
-            [StringLength(20)] string symbol, [Range(5000, int.MaxValue)] int recvWindow = 5000, 
+            [StringLength(20)] string symbol, [Range(60000, int.MaxValue)] int recvWindow = 60000, 
             CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
