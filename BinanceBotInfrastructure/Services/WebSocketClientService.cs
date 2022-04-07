@@ -100,34 +100,6 @@ namespace BinanceBotInfrastructure.Services
             } 
             while (!token.IsCancellationRequested || webSocket.State == WebSocketState.Open);
         }
-        
-        public async Task<string> GetListenKey(CancellationToken token) // TODO: Убрать в Concept
-        {
-            var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
-        
-            var listenKey = await _httpService.ProcessRequestAsync<string>(uri,
-                null, default, HttpMethods.SignedPost, token);
-        
-            return listenKey;
-        }
-        
-        public async Task ExtendListenKey(string listenKey, CancellationToken token)
-        {
-            var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
-        
-            await _httpService.ProcessRequestAsync<string>(uri,
-                new Dictionary<string, string>(), 
-                default, HttpMethods.SignedPut, token);
-        }
-        
-        public async Task DeleteListenKey(string listenKey, CancellationToken token)
-        {
-            var uri = UserDataWebSocketEndpoints.GetListenKeyEndpoint();
-        
-            await _httpService.ProcessRequestAsync<string>(uri,
-                new Dictionary<string, string>(), 
-                default, HttpMethods.SignedDelete, token);
-        }
 
         private static async Task<string> GetResponseAsync(WebSocket webSocket, 
             CancellationToken token)

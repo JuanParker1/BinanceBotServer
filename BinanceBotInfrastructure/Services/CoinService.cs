@@ -122,8 +122,8 @@ namespace BinanceBotInfrastructure.Services
 
         public async Task GetSubscriptionsListAsync(int idUser, CancellationToken token)
         {
-            var data = $"{{\"method\": \"LIST_SUBSCRIPTIONS\",\"id\": 1}}";   // TODO: Попробовать через @ и '' обычные кавычки
-            
+            var data = "{{\"method\": \"LIST_SUBSCRIPTIONS\",\"id\": 1}}";
+
             await _webSocketService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
                 data, idUser, WebsocketConnectionTypes.Prices, token);
         }

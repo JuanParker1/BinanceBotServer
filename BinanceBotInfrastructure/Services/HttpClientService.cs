@@ -107,9 +107,7 @@ namespace BinanceBotInfrastructure.Services
                 var errorMessage = $"Http status code: {(int)message.StatusCode} \n" +
                                    $"Binance error code: {errorObj.Code} \n" +
                                    $"Binance error message: {errorObj.Msg}";
-                
-                // TODO: Записать обязательно эту ошибку в БД. Так просто они не хотят отображаться.
-                
+
                 throw new InvalidOperationException(errorMessage);
             }
 
