@@ -32,7 +32,7 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="intervalStart"> Requested interval start date </param>
         /// <param name="intervalEnd"> Requested interval end date </param>
         /// <param name="token"> Task cancellation token </param>
-        /// <returns code="200"> User's total balance change info </returns> // TODO: Вот тут точно в контроллерах косяк
+        /// <returns code="200"> User's total balance change info </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet("profitToBtc")]

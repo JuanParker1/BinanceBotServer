@@ -39,7 +39,20 @@ namespace BinanceBotDb.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>(entity => { entity.HasIndex(d => d.Login).IsUnique(); });
+            modelBuilder.Entity<User>(entity =>
+                entity.HasIndex(d => d.Login).IsUnique());
+            
+            modelBuilder.Entity<Order>(entity =>
+            {
+                entity.HasIndex(d => d.IdUser);
+                entity.HasIndex(d => d.DateClosed);
+            });
+            
+            modelBuilder.Entity<Event>(entity =>
+            {
+                entity.HasIndex(d => d.IdUser);
+                entity.HasIndex(d => d.Date);
+            });
             
             FillData(modelBuilder);
         }
