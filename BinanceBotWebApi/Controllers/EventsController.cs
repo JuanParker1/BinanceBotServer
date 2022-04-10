@@ -34,7 +34,7 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="intervalEnd"> Requested interval end date </param>
         /// <param name="isUnreadRequested"> Return only unread events (yes/no) </param>
         /// <param name="token"> Task cancellation token </param>
-        /// <returns code="200"> Pagination container with user events </returns>
+        /// <returns code="200"> Collection of user events </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet]
@@ -59,7 +59,7 @@ namespace BinanceBotWebApi.Controllers
         /// </summary>
         /// <param name="idsDto"> Events ids </param>
         /// <param name="token"> Task cancellation token </param>
-        /// <returns code="200"> Pagination container with user events </returns>
+        /// <returns code="200"> 0 - no changes. 1 - changes applied </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpPut]

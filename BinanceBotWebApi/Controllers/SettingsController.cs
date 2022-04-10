@@ -29,7 +29,7 @@ namespace BinanceBotWebApi.Controllers
         /// </summary>
         /// <param name="idUser"> User id </param>
         /// <param name="token"> Task cancellation token </param>
-        /// <returns code="200"> 0 - no changes. 1 - changes applied </returns>
+        /// <returns code="200"> User application settings </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet]

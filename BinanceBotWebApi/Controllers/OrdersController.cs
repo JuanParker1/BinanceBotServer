@@ -143,7 +143,7 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="intervalStart"> Requested interval start date </param>
         /// <param name="intervalEnd"> Requested interval end date </param>
         /// <param name="token"> Task cancellation token </param>
-        /// <returns code="200"> Info about requested orders for trading pair </returns>
+        /// <returns code="200"> Orders history for requested user in time interval </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet("history")]
@@ -180,7 +180,8 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != newOrderDto.IdUser)
                 return Forbid();
             
-            var orderInfo = await _ordersService.CreateTestOrderAsync(newOrderDto, token);
+            var orderInfo = await _ordersService.CreateTestOrderAsync(newOrderDto, 
+                token);
 
             return Ok(orderInfo);
         }
@@ -213,7 +214,7 @@ namespace BinanceBotWebApi.Controllers
         /// </summary>
         /// <param name="idUser"> Requested user id </param>
         /// <param name="recvWindow"> Request lifetime in ms </param>
-        /// <returns code="200"> Info about cancelled order </returns>
+        /// <returns code="200"> Ok </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpPost("sellAll")]

@@ -111,7 +111,7 @@ namespace BinanceBotWebApi.Controllers
         /// <param name="idUser"> User id </param>
         /// <param name="listenKey"> User listen key </param>
         /// <param name="token"> Task cancellation token </param>
-        /// <returns code="200"> User data </returns>
+        /// <returns code="200"> User exchange stream data </returns>
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
         [HttpGet("data")]
