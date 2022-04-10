@@ -13,12 +13,11 @@ namespace BinanceBotInfrastructure.Services
 {
     public class RequestTrackerService : IRequestTrackerService
     {
-        private static readonly char[] _stackTraceSeparators = "\r\n".ToCharArray();
         private static readonly int _requestObsolescenceHours = 2;
 
         private readonly CacheTable<Request> _cacheRequestLogs;
 
-        public RequestTrackerService(BinanceBotDbContext db, ICacheDb cacheDb)
+        public RequestTrackerService(IBinanceBotDbContext db, ICacheDb cacheDb)
         {
             _cacheRequestLogs = cacheDb.GetCachedTable<Request>((BinanceBotDbContext) db);
         }

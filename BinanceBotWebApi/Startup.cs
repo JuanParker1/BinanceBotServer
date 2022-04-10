@@ -50,9 +50,7 @@ namespace BinanceBotWebApi
         {
             app.UseSwagger();
             app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "BinanceBotWebApi v1");
-            });
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "BinanceBotWebApi v1"));
             
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();

@@ -1,9 +1,10 @@
 using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using BinanceBotDb.Models;
+using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using BinanceBotDb.Models;
 
 namespace BinanceBotWebApi
 {
@@ -11,6 +12,8 @@ namespace BinanceBotWebApi
     {
         public static void Main(string[] args)
         {
+            Trace.Listeners.Add(new ConsoleTraceListener());
+            
             var host = CreateHostBuilder(args).Build();
             using var scope = host.Services.CreateScope();
             var context = scope.ServiceProvider.GetService<IBinanceBotDbContext>();
