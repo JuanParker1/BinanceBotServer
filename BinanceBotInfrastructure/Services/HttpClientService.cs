@@ -47,6 +47,17 @@ namespace BinanceBotInfrastructure.Services
             _jsonSerializerOptions.Converters.Add(new StringConverter());
         }
         
+        public async Task<TResult> GetRequestAsync<TResult>(string url,
+            CancellationToken token) where TResult : class
+        {
+            var response = await _httpClient.GetAsync(url, token);   
+            
+            var responseInfo = await HandleResponseAsync<TResult>(response, 
+                token);
+
+            return responseInfo;
+        }
+        
         public async Task<TResult> ProcessRequestAsync<TDto, TResult>(Uri uri,
             TDto dto, (string apiKey, string secretKey) keys, IEnumerable<string> paramsToRemove, 
             HttpMethods requestType, CancellationToken token) where TResult : class

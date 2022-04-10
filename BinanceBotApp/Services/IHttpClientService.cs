@@ -8,6 +8,8 @@ namespace BinanceBotApp.Services
 {
     public interface IHttpClientService
     {
+        Task<TResult> GetRequestAsync<TResult>(string url,
+            CancellationToken token = default) where TResult : class;
         Task<TResult> ProcessRequestAsync<TDto, TResult>(Uri uri, TDto dto, 
             (string apiKey, string secretKey) keys, IEnumerable<string> paramsToRemove, 
             HttpMethods requestType, CancellationToken token) where TResult : class;

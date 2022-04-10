@@ -24,7 +24,7 @@ namespace BinanceBotWebApi.Controllers
         {
             _analyticsService = analyticsService;
         }
-        
+
         /// <summary>
         /// Gets balance change data
         /// </summary>
@@ -35,9 +35,9 @@ namespace BinanceBotWebApi.Controllers
         /// <returns code="200"> User's total balance change info </returns> // TODO: Вот тут точно в контроллерах косяк
         /// <response code="400"> Error in request parameters </response>
         /// <response code="403"> Wrong user id </response>
-        [HttpGet("balanceChange")]
-        [ProducesResponseType(typeof(BalanceChangeDto), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> GetBalanceChangeAsync([Range(1, int.MaxValue)] int idUser, 
+        [HttpGet("profitToBtc")]
+        [ProducesResponseType(typeof(ProfitToBtcDto), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> GetProfitToBtcAsync([Range(1, int.MaxValue)] int idUser, 
             DateTime intervalStart, DateTime intervalEnd, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
@@ -45,10 +45,10 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
             
-            // var historyDtos = await _balanceService.GetAllAsync(idUser, 
-            //     intervalStart, intervalEnd, token);
+            var profitToBtcDtos = await _analyticsService.GetProfitToBtcAsync(idUser, 
+                intervalStart, intervalEnd, token);
 
-            return Ok();
+            return Ok(profitToBtcDtos);
         }
     }
 }
