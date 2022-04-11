@@ -9,5 +9,7 @@ namespace BinanceBotApp.Services
     {
         Task<ProfitToBtcDto> GetProfitToBtcAsync(int idUser, DateTime intervalStart,
             DateTime intervalEnd, CancellationToken token);
+        Task<TradeTypesStatsDto> GetTradeTypesStatsAsync(int idUser, DateTime intervalStart,
+            DateTime intervalEnd, CancellationToken token);
     }
 }

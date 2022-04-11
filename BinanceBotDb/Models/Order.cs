@@ -37,7 +37,7 @@ namespace BinanceBotDb.Models
         [Column("id_side"), Comment("1 - Buy\n2 - Sell")]
         public int IdSide { get; set; }
         
-        [Column("id_type"), Comment("1 - Limit\n2 - Market")]
+        [Column("id_type"), Comment("LIMIT, MARKET, STOP_LOSS etc")]
         public int IdType { get; set; }
         
         [Column("time_in_force"), Comment("GTC, IOC, FOK")]

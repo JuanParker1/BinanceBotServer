@@ -59,12 +59,38 @@ namespace BinanceBotInfrastructure.Services
 
             return resultDto;
         }
+
+        public async Task<TradeTypesStatsDto> GetTradeTypesStatsAsync(int idUser, DateTime intervalStart,
+            DateTime intervalEnd, CancellationToken token)
+        {
+            var tradeTypesInfo = await (from o in _db.Orders
+                                where o.IdUser == idUser &&
+                                      o.DateClosed != null &&
+                                      o.DateClosed > intervalStart &&
+                                      o.DateClosed < intervalEnd
+                                group o by o.DateClosed.Value.Date into g
+                                select new TradeTypesStatsDto
+                                {
+                                    // Auto trade by third-party signals is not realized yet, but will be created in future
+                                    SignalOrdersRate = 0,
+                                    StopOrdersRate = Math.Round((double)g.Where(o => o.IdCreationType == 1)
+                                        .Count() / g.Count()),
+                                    ManualOrdersRate = Math.Round((double)g.Where(o => o.IdCreationType == 2)
+                                        .Count() / g.Count()),
+                                    SignalsProfit = 0,
+                                    StopOrdersProfit = Math.Round(g.Where(o => o.IdCreationType == 1)
+                                        .Select(o => o.Quantity * o.Price).Sum()),
+                                    ManualOrdersProfit = Math.Round(g.Where(o => o.IdCreationType == 2)
+                                        .Select(o => o.Quantity * o.Price).Sum()),
+                                }).FirstOrDefaultAsync(token);
+
+            return tradeTypesInfo;
+        }
         
         private async Task<IEnumerable<ProfitToBtcHistoryDto>> GetBtcPriceHistoryAsync(int intervalDays,
             CancellationToken token)
         {
-            var btcPriceRequestUrl =
-                $"https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USDT&limit={intervalDays}";
+            var btcPriceRequestUrl = _httpService.GetCoinPriceApiUrl(intervalDays);
 
             var btcPriceHistory = await _httpService.GetRequestAsync<PriceApiResponse>(btcPriceRequestUrl,
                 token);
