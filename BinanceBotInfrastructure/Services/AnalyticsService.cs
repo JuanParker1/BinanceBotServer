@@ -7,6 +7,7 @@ using BinanceBotApp.Data.Analytics;
 using BinanceBotApp.DataInternal.Deserializers;
 using BinanceBotApp.Services;
 using BinanceBotDb.Models;
+using BinanceBotInfrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace BinanceBotInfrastructure.Services
@@ -68,7 +69,7 @@ namespace BinanceBotInfrastructure.Services
                                       o.DateClosed != null &&
                                       o.DateClosed > intervalStart &&
                                       o.DateClosed < intervalEnd
-                                group o by o.DateClosed.Value.Date into g
+                                group o by o.IdUser into g
                                 select new TradeTypesStatsDto
                                 {
                                     // Auto trade by third-party signals is not realized yet, but will be created in future
@@ -86,6 +87,29 @@ namespace BinanceBotInfrastructure.Services
 
             return tradeTypesInfo;
         }
+
+        public async Task<IEnumerable<ProfitDetailsDto>> GetProfitDetailsAsync(int idUser, 
+            DateTime intervalStart, DateTime intervalEnd, CancellationToken token)
+        {
+            var profitDetailsInfo = await (from o in _db.Orders
+                where o.IdUser == idUser &&
+                      o.DateClosed != null &&
+                      o.DateClosed > intervalStart &&
+                      o.DateClosed < intervalEnd
+                group o by o.DateClosed.Value.Date into g
+                select new ProfitDetailsDto
+                {
+                    Date = g.Key,
+                    // Auto trade by third-party signals is not realized yet, but will be created in future
+                    SignalOrdersProfit = 0,
+                    StopOrdersProfit = Math.Round(g.Where(o => o.IdCreationType == 1)
+                        .Select(o => o.Quantity * o.Price).Sum()),
+                    ManualOrdersProfit = Math.Round(g.Where(o => o.IdCreationType == 2)
+                        .Select(o => o.Quantity * o.Price).Sum()),
+                }).ToListAsync(token);
+
+            return profitDetailsInfo;
+        }
         
         private async Task<IEnumerable<ProfitToBtcHistoryDto>> GetBtcPriceHistoryAsync(int intervalDays,
             CancellationToken token)
@@ -98,7 +122,7 @@ namespace BinanceBotInfrastructure.Services
             return btcPriceHistory.Data.Data.Select(h => 
                 new ProfitToBtcHistoryDto
                 {
-                    Date = new DateTime(h.Time),
+                    Date = DateTime.Now.FromUnixTimeSeconds(h.Time),
                     BtcPrice = h.High,
                     Profit = 0
                 }

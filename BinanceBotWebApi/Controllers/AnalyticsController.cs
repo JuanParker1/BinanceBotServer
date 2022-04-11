@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -75,6 +76,32 @@ namespace BinanceBotWebApi.Controllers
                 intervalStart, intervalEnd, token);
 
             return Ok(tradeTypesStatsDtos);
+        }
+        
+        /// <summary>
+        /// Gets detailed info for profit and order types for every requested interval
+        /// </summary>
+        /// <param name="idUser"> User id </param>
+        /// <param name="intervalStart"> Requested interval start date </param>
+        /// <param name="intervalEnd"> Requested interval end date </param>
+        /// <param name="token"> Task cancellation token </param>
+        /// <returns code="200"> Detailed info for profit and order types for every requested interval </returns>
+        /// <response code="400"> Error in request parameters </response>
+        /// <response code="403"> Wrong user id </response>
+        [HttpGet("profitDetails")]
+        [ProducesResponseType(typeof(IEnumerable<ProfitDetailsDto>), (int)System.Net.HttpStatusCode.OK)]
+        public async Task<IActionResult> GetProfitDetailsAsync([Range(1, int.MaxValue)] int idUser, 
+            DateTime intervalStart, DateTime intervalEnd, CancellationToken token = default)
+        {
+            var authUserId = User.GetUserId();
+
+            if (authUserId is null || authUserId != idUser)
+                return Forbid();
+            
+            var profitDetailsDtos = await _analyticsService.GetProfitDetailsAsync(idUser, 
+                intervalStart, intervalEnd, token);
+
+            return Ok(profitDetailsDtos);
         }
     }
 }
