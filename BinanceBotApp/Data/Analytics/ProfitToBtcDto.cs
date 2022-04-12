@@ -45,6 +45,6 @@ namespace BinanceBotApp.Data.Analytics
         /// <summary>
         /// Trade profit to BTC price history
         /// </summary>
-        public IEnumerable<ProfitToBtcHistoryDto> ProfitToBtcHistory { get; set; }
+        public IEnumerable<ProfitToBtcHistoryDto> Data { get; set; }
     }
 }

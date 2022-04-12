@@ -3,7 +3,7 @@
 // All code that can be used later is stored here
 public class Concept
 {
-    // WebSocket listen key is necessary to listen Binance streams, but all works fine without it,
+    // WebSocket listen key is used to Listen User data streams.
     
     // public async Task<string> GetListenKey(CancellationToken token)
     // {

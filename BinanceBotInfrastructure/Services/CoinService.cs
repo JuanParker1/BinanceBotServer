@@ -1,6 +1,7 @@
 using System;
 using System.Text.Json;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -172,8 +173,9 @@ namespace BinanceBotInfrastructure.Services
                 return;
             
             var tradePair = response["s"];
-     
-            if (!double.TryParse(response["b"], out var currentPrice))
+       
+            if (!double.TryParse(response["b"], NumberStyles.Float, 
+                    CultureInfo.InvariantCulture, out var currentPrice))
                 return;
             
             var currentHighestPrice = highestPrices.ContainsKey(tradePair) 
