@@ -123,7 +123,7 @@ namespace BinanceBotInfrastructure.Services
 
         public async Task GetSubscriptionsListAsync(int idUser, CancellationToken token)
         {
-            var data = "{{\"method\": \"LIST_SUBSCRIPTIONS\",\"id\": 1}}";
+            var data = "{\"method\": \"LIST_SUBSCRIPTIONS\",\"id\": 1}";
 
             await _webSocketService.SendAsync(TradeWebSocketEndpoints.GetMainWebSocketEndpoint(),
                 data, idUser, WebsocketConnectionTypes.Prices, token);
@@ -137,7 +137,8 @@ namespace BinanceBotInfrastructure.Services
             
             var tradePair = response["s"];
      
-            if (!double.TryParse(response["b"], out var currentPrice))
+            if (!double.TryParse(response["b"], NumberStyles.Float, 
+                    CultureInfo.InvariantCulture, out var currentPrice))
                 return;
             
             responseHandler?.Invoke(JsonSerializer.Serialize(new { Symbol = tradePair, Price = currentPrice },

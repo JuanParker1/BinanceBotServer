@@ -7,7 +7,6 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
-using BinanceBotApp.DataInternal.Endpoints;
 using BinanceBotApp.DataInternal.Deserializers.Converters;
 using BinanceBotApp.DataInternal;
 using BinanceBotApp.Services;
@@ -87,7 +86,6 @@ namespace BinanceBotInfrastructure.Services
                 
                     var response = JsonSerializer.Deserialize<IDictionary<string, string>>(responseString, 
                         _jsonDeserializerOptions) ?? new Dictionary<string, string>();
-                    
                     await responseHandlerAsync.Invoke(response);
                 }
                 catch (Exception ex)
