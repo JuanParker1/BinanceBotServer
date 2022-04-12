@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using BinanceBotApp.DataInternal.Deserializers;
 using BinanceBotApp.Services;
 using BinanceBotApp.Services.BackgroundWorkers;
 using BinanceBotDb.Models;
+using BinanceBotInfrastructure.Extensions;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -319,34 +321,64 @@ namespace BinanceBotInfrastructure.Services
             return lastOrder is null ? null : Convert(lastOrder);
         }
 
-        private static IEnumerable<OrderDto> MixOrdersInfo(IEnumerable<OrderInfo> exchangeOrdersInfo,
+        private IEnumerable<OrderDto> MixOrdersInfo(IEnumerable<OrderInfo> exchangeOrdersInfo,
             IEnumerable<Order> dbOrdersInfo, int idUser)
         {
             return exchangeOrdersInfo.Select(exchangeOrderInfo =>
             {
                 var dbOrderInfo = dbOrdersInfo.FirstOrDefault(o => 
-                    o.Symbol == exchangeOrderInfo.Symbol);
+                    o.OrderId == exchangeOrderInfo.OrderId);
                 
-                return dbOrderInfo is null 
-                    ? null 
-                    : new OrderDto
+                // When order was created directly at exchange, not from bot
+                if (dbOrderInfo is null)
+                {
+                    var idOrderType = exchangeOrderInfo.Type.ToUpper() == "LIMIT" ? 1 : 2;
+                    
+                    dbOrderInfo = new Order
                     {
-                        Id = dbOrderInfo.Id,
-                        IdUser = idUser,
-                        OrderId = exchangeOrderInfo.OrderId,
                         ClientOrderId = exchangeOrderInfo.ClientOrderId,
+                        OrderId = exchangeOrderInfo.OrderId,
+                        IdUser = idUser,
                         Symbol = exchangeOrderInfo.Symbol,
-                        Side = dbOrderInfo.IdSide == 1 ? "Покупка" : "Продажа",
-                        Type = dbOrderInfo.OrderType.Caption,
-                        Status = exchangeOrderInfo.Status,
+                        DateCreated = DateTime.Now.FromUnixTimeSeconds(exchangeOrderInfo.Time / 1000),
+                        DateClosed = null,
+                        IdOrderStatus = 1,
+                        IdSide = exchangeOrderInfo.Side.ToUpper() == "BUY" ? 1 : 2,
+                        IdType = idOrderType,
+                        OrderType = _db.OrderTypes.FirstOrDefault(t => t.Id == idOrderType),
                         TimeInForce = exchangeOrderInfo.TimeInForce,
-                        Quantity = double.TryParse(exchangeOrderInfo.OrigQty, out var q) ? q : 0.0,
+                        Quantity = double.Parse(exchangeOrderInfo.OrigQty, CultureInfo.InvariantCulture),
                         QuoteOrderQty = exchangeOrderInfo.OrigQuoteOrderQty,
-                        DateCreated = dbOrderInfo.DateCreated,
-                        DateClosed = dbOrderInfo.DateClosed,
-                        CreationType = dbOrderInfo.IdCreationType == 1 ? "Авто" : "Вручную",
-                        Price = double.TryParse(exchangeOrderInfo.Price, out var p) ? p : 0.0
+                        Price = double.Parse(exchangeOrderInfo.Price, CultureInfo.InvariantCulture),
+                        IdCreationType = 2
                     };
+
+                    _db.Orders.Add(dbOrderInfo);
+                    _db.SaveChanges();
+                }
+                
+                var dto = new OrderDto
+                {
+                    Id = dbOrderInfo.Id,
+                    IdUser = idUser,
+                    OrderId = exchangeOrderInfo.OrderId,
+                    ClientOrderId = exchangeOrderInfo.ClientOrderId,
+                    Symbol = exchangeOrderInfo.Symbol,
+                    Side = dbOrderInfo.IdSide == 1 ? "Покупка" : "Продажа",
+                    Type = dbOrderInfo.OrderType.Caption,
+                    Status = exchangeOrderInfo.Status,
+                    TimeInForce = exchangeOrderInfo.TimeInForce,
+                    Quantity = double.TryParse(exchangeOrderInfo.OrigQty, NumberStyles.Float, 
+                        CultureInfo.InvariantCulture,  out var q) ? q : 0.0,
+                    QuoteOrderQty = exchangeOrderInfo.OrigQuoteOrderQty,
+                    DateCreated = dbOrderInfo.DateCreated,
+                    DateClosed = dbOrderInfo.DateClosed,
+                    CreationType = dbOrderInfo.IdCreationType == 1 ? "Авто" : "Вручную",
+                    Price = double.TryParse(exchangeOrderInfo.Price, NumberStyles.Float, 
+                        CultureInfo.InvariantCulture,  out var p) ? p : 0.0
+                };
+
+                return dto;
             });
         }
 
