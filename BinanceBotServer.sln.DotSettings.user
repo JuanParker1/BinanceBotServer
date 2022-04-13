@@ -1,4 +1,27 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=_002Fhome_002Fcult_002Fx_002Dfiles_002FProjects_002FBinanceAPI_002ENET_002FBinanceAPI_002ENET_002FBinanceAPI_002Fbin_002FDebug_002Fnet5_002E0_002FBinanceAPI_002Edll/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=_002Fhome_002Fcult_002Fx_002Dfiles_002FProjects_002FBinanceBotWebApi_002FBinanceBotWebApi_002FBinanceBotInfrastructure_002FLibraries_002FBinanceApi_002FBinanceAPI_002Edll/@EntryIndexedValue">True</s:Boolean>
-	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7B708E71_002DF2B7_002D45F8_002D84A1_002D0927243B0292_002Fd_003AServices_002Ff_003ATradeService_002Ecs/@EntryIndexedValue">ForceIncluded</s:String></wpf:ResourceDictionary>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7B708E71_002DF2B7_002D45F8_002D84A1_002D0927243B0292_002Fd_003AServices_002Ff_003ATradeService_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=af4b7a0d_002Dd6fd_002D47b7_002Db3f1_002Da24f5a72b775/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="It_should_return_403_in_get_deposit_history_if_wrong_user_id #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::B1C5BC2C-A836-48D9-98D6-32A30388B562::net6.0::BinanceBotWebApi.Tests.ControllersTests.AccountBalanceControllerTests.It_should_return_403_in_get_deposit_history_if_wrong_user_id&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::B1C5BC2C-A836-48D9-98D6-32A30388B562::net6.0::BinanceBotWebApi.Tests.ControllersTests.AccountBalanceControllerTests.It_should_return_403_in_get_current_balance_if_wrong_user_id&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::B1C5BC2C-A836-48D9-98D6-32A30388B562::net6.0::BinanceBotWebApi.Tests.ControllersTests.AccountBalanceControllerTests.It_should_return_403_in_get_total_balance_if_wrong_user_id&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::B1C5BC2C-A836-48D9-98D6-32A30388B562::net6.0::BinanceBotWebApi.Tests.ControllersTests.AccountBalanceControllerTests.It_should_return_ok_result_if_dtos_is_empty&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::B1C5BC2C-A836-48D9-98D6-32A30388B562::net6.0::BinanceBotWebApi.Tests.ControllersTests.AccountBalanceControllerTests.It_should_return_204_in_get_deposit_history_if_dtos_is_null&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::B1C5BC2C-A836-48D9-98D6-32A30388B562::net6.0::BinanceBotWebApi.Tests.ControllersTests.AccountBalanceControllerTests.It_should_return_ok_result_in_get_deposit_history_if_dtos_is_empty&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::B1C5BC2C-A836-48D9-98D6-32A30388B562::net6.0::BinanceBotWebApi.Tests.ControllersTests.AccountBalanceControllerTests.It_should_return_204_in_get_current_balance_if_dtos_is_null&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::B1C5BC2C-A836-48D9-98D6-32A30388B562::net6.0::BinanceBotWebApi.Tests.ControllersTests.AccountBalanceControllerTests.It_should_return_ok_result_in_get_current_balance_if_dtos_is_not_null&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::B1C5BC2C-A836-48D9-98D6-32A30388B562::net6.0::BinanceBotWebApi.Tests.ControllersTests.AccountBalanceControllerTests.It_should_return_ok_result_in_get_deposit_history_if_dtos_is_not_null&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::B1C5BC2C-A836-48D9-98D6-32A30388B562::net6.0::BinanceBotWebApi.Tests.ControllersTests.AccountBalanceControllerTests.It_should_return_204_in_get_total_balance_if_dtos_is_null&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::B1C5BC2C-A836-48D9-98D6-32A30388B562::net6.0::BinanceBotWebApi.Tests.ControllersTests.AccountBalanceControllerTests.It_should_return_ok_result_in_get_total_balance_if_dtos_is_not_null&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=b7cb3e28_002D4048_002D468f_002Db837_002D79e5e47ed3aa/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="It_should_return_403_in_get_deposit_history_if_wrong_user_id" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::B1C5BC2C-A836-48D9-98D6-32A30388B562::net6.0::BinanceBotWebApi.Tests.ControllersTests.AccountBalanceControllerTests.It_should_return_403_in_get_deposit_history_if_wrong_user_id&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::B1C5BC2C-A836-48D9-98D6-32A30388B562::net6.0::BinanceBotWebApi.Tests.ControllersTests.AccountBalanceControllerTests.It_should_return_403_in_get_current_balance_if_wrong_user_id&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::B1C5BC2C-A836-48D9-98D6-32A30388B562::net6.0::BinanceBotWebApi.Tests.ControllersTests.AccountBalanceControllerTests.It_should_return_403_in_get_total_balance_if_wrong_user_id&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::B1C5BC2C-A836-48D9-98D6-32A30388B562::net6.0::BinanceBotWebApi.Tests.ControllersTests.AccountBalanceControllerTests.It_should_return_204_if_dtos_is_empty&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

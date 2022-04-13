@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BinanceBotInfrastructure", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevDemoOperations", "DevDemoOperations\DevDemoOperations.csproj", "{A659BE02-2925-4CA4-A747-E520739FFE71}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BinanceBotWebApi.Tests", "BinanceBotWebApi.Tests\BinanceBotWebApi.Tests.csproj", "{B1C5BC2C-A836-48D9-98D6-32A30388B562}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{A659BE02-2925-4CA4-A747-E520739FFE71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A659BE02-2925-4CA4-A747-E520739FFE71}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A659BE02-2925-4CA4-A747-E520739FFE71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1C5BC2C-A836-48D9-98D6-32A30388B562}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1C5BC2C-A836-48D9-98D6-32A30388B562}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1C5BC2C-A836-48D9-98D6-32A30388B562}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1C5BC2C-A836-48D9-98D6-32A30388B562}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
