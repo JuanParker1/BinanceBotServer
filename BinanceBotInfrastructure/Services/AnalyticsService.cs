@@ -102,9 +102,9 @@ namespace BinanceBotInfrastructure.Services
                     Date = g.Key,
                     // Auto trade by third-party signals is not realized yet, but will be created in future
                     SignalOrdersProfit = 0,
-                    StopOrdersProfit = Math.Round(g.Where(o => o.IdCreationType == 1)
+                    StopOrdersProfit = Math.Round(g.Where(o => o.IdCreationType == 1 && o.IdOrderStatus != 1)
                         .Select(o => o.Quantity * o.Price).Sum()),
-                    ManualOrdersProfit = Math.Round(g.Where(o => o.IdCreationType == 2)
+                    ManualOrdersProfit = Math.Round(g.Where(o => o.IdCreationType == 2 && o.IdOrderStatus != 1)
                         .Select(o => o.Quantity * o.Price).Sum()),
                 }).ToListAsync(token);
 
@@ -114,6 +114,9 @@ namespace BinanceBotInfrastructure.Services
         private async Task<IEnumerable<ProfitToBtcHistoryDto>> GetBtcPriceHistoryAsync(int intervalDays,
             CancellationToken token)
         {
+            if (intervalDays < 1)
+                intervalDays = 1;
+            
             var btcPriceRequestUrl = _httpService.GetCoinPriceApiUrl(intervalDays);
 
             var btcPriceHistory = await _httpService.GetRequestAsync<PriceApiResponse>(btcPriceRequestUrl,
@@ -141,9 +144,9 @@ namespace BinanceBotInfrastructure.Services
                                 select new
                                 {
                                     Date = g.Key,
-                                    Spent = g.Where(o => o.IdSide == 1)
+                                    Spent = g.Where(o => o.IdSide == 1 && o.IdOrderStatus != 1)
                                         .Select(o => o.Quantity * o.Price).Sum(),
-                                    Received = g.Where(o => o.IdSide == 2)
+                                    Received = g.Where(o => o.IdSide == 2 && o.IdOrderStatus != 1)
                                         .Select(o => o.Quantity * o.Price).Sum(),
                                 }).ToListAsync(token);
 
@@ -152,29 +155,28 @@ namespace BinanceBotInfrastructure.Services
             return result;
         }
 
-        private async Task<ProfitToBtcDto> GetOrdersSummaryAsync(int idUser, 
-            DateTime intervalStart, DateTime intervalEnd, CancellationToken token)
+        private async Task<ProfitToBtcDto> GetOrdersSummaryAsync(int idUser, DateTime intervalStart, 
+            DateTime intervalEnd, CancellationToken token)
         {
-            var ordersInfo = await (from o in _db.Orders
-                            where o.IdUser == idUser &&
-                            o.DateClosed > intervalStart &&
-                            o.DateClosed < intervalEnd
-                            group o by o.IdUser
-                            into g
-                            select new ProfitToBtcDto
-                            {
-                                TotalOrdersOpened = g.Count(),
-                                TotalOrdersClosed = g.Count(o => o.DateClosed != null),
-                                TotalOrdersCancelled = g.Count(o => o.IdOrderStatus == 2),
-                                AverageOrderLifeTimeMinutes = g.Select(o => 
-                                    (o.DateClosed - o.DateCreated).Value.Minutes).Sum() / g.Count()
-                            }).FirstOrDefaultAsync(token);
+            var orders = await (from o in _db.Orders
+                        where o.IdUser == idUser &&
+                              o.DateClosed != null &&
+                              o.DateClosed > intervalStart &&
+                              o.DateClosed < intervalEnd
+                        select o)
+                        .ToListAsync(token);
             
-            if(ordersInfo is not null)
-                return ordersInfo;
-
             var result = new ProfitToBtcDto();
-            result.Data = new List<ProfitToBtcHistoryDto>();
+
+            if (orders is null)
+                return result;
+
+            result.TotalOrdersOpened = orders.Count();
+            result.TotalOrdersClosed = orders.Count(o => o.DateClosed != null);
+            result.TotalOrdersCancelled = orders.Count(o => o.IdOrderStatus == 2);
+            result.AverageOrderLifeTimeMinutes = orders.Select(o =>
+                (o.DateClosed - o.DateCreated).Value.TotalMinutes).Sum();
+
             return result;
         }
     }
