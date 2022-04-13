@@ -46,10 +46,7 @@ namespace BinanceBotInfrastructure.Services
             };
             _jsonSerializerOptions.Converters.Add(new StringConverter());
         }
-        
-        public string GetCoinPriceApiUrl(int intervalDays) =>
-            $"https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USDT&limit={intervalDays}";
-        
+
         public async Task<TResult> GetRequestAsync<TResult>(string url,
             CancellationToken token) where TResult : class
         {

@@ -8,7 +8,6 @@ namespace BinanceBotApp.Services
 {
     public interface IHttpClientService
     {
-        string GetCoinPriceApiUrl(int intervalDays);
         Task<TResult> GetRequestAsync<TResult>(string url,
             CancellationToken token = default) where TResult : class;
         Task<TResult> ProcessRequestAsync<TDto, TResult>(Uri uri, TDto dto, 

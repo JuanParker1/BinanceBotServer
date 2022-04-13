@@ -4,10 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using BinanceBotApp.Data.Analytics;
-using BinanceBotApp.DataInternal.Deserializers;
 using BinanceBotApp.Services;
 using BinanceBotDb.Models;
-using BinanceBotInfrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace BinanceBotInfrastructure.Services
@@ -15,13 +13,13 @@ namespace BinanceBotInfrastructure.Services
     public class AnalyticsService : IAnalyticsService
     {
         private readonly IBinanceBotDbContext _db;
-        private readonly IHttpClientService _httpService;
+        private readonly ICryptoInfoService _cryptoInfoService;
 
         public AnalyticsService(IBinanceBotDbContext db,
-            IHttpClientService httpService)
+            ICryptoInfoService cryptoInfoService)
         {
             _db = db;
-            _httpService = httpService;
+            _cryptoInfoService = cryptoInfoService;
         }
 
         public async Task<ProfitToBtcDto> GetProfitToBtcAsync(int idUser, DateTime intervalStart, 
@@ -36,7 +34,8 @@ namespace BinanceBotInfrastructure.Services
             if (intervalEnd != default)
                 end = intervalEnd;
 
-            var btcPriceHistory = await GetBtcPriceHistoryAsync((end - start).Days, token);
+            var btcPriceHistory = await _cryptoInfoService.GetPriceHistoryAsync("BTC", 
+                intervalStart, intervalEnd, token);
 
             var ordersProfitHistory = await GetProfitHistoryAsync(idUser, start, end, token);
 
@@ -109,27 +108,6 @@ namespace BinanceBotInfrastructure.Services
                 }).ToListAsync(token);
 
             return profitDetailsInfo;
-        }
-        
-        private async Task<IEnumerable<ProfitToBtcHistoryDto>> GetBtcPriceHistoryAsync(int intervalDays,
-            CancellationToken token)
-        {
-            if (intervalDays < 1)
-                intervalDays = 1;
-            
-            var btcPriceRequestUrl = _httpService.GetCoinPriceApiUrl(intervalDays);
-
-            var btcPriceHistory = await _httpService.GetRequestAsync<PriceApiResponse>(btcPriceRequestUrl,
-                token);
-
-            return btcPriceHistory.Data.Data.Select(h => 
-                new ProfitToBtcHistoryDto
-                {
-                    Date = DateTime.Now.FromUnixTimeSeconds(h.Time),
-                    BtcPrice = h.High,
-                    Profit = 0
-                }
-            );
         }
 
         private async Task<IEnumerable<(DateTime Date, double Profit)>> GetProfitHistoryAsync(int idUser, 
