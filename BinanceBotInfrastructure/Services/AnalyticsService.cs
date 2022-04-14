@@ -69,7 +69,7 @@ namespace BinanceBotInfrastructure.Services
                                        o.DateClosed > intervalStart &&
                                        o.DateClosed < intervalEnd
                                  group o by o.IdUser into g
-                                 select new TradeTypesStatsDto
+                                 select new
                                  {
                                      // Auto trade by third-party signals is not realized yet, but will be created in future
                                      SignalOrdersRate = 0,
@@ -77,14 +77,29 @@ namespace BinanceBotInfrastructure.Services
                                          .Count() / g.Count()) * 100,
                                      ManualOrdersRate = Math.Round((double)g.Where(o => o.IdCreationType == 2)
                                          .Count() / g.Count()) * 100,
-                                     SignalsProfit = 0,
-                                     StopOrdersProfit = Math.Round(g.Where(o => o.IdCreationType == 1)
-                                         .Select(o => o.Quantity * o.Price).Sum()),
-                                     ManualOrdersProfit = Math.Round(g.Where(o => o.IdCreationType == 2)
-                                         .Select(o => o.Quantity * o.Price).Sum()),
+                                     SignalOrdersProfit = 0,
+                                     StopOrdersSpent = g.Where(o => o.IdCreationType == 1 && o.IdSide == 1 && o.IdOrderStatus != 1)
+                                         .Select(o => o.Quantity * o.Price).Sum(),
+                                     StopOrdersReceived = g.Where(o => o.IdCreationType == 1 && o.IdSide == 2 && o.IdOrderStatus != 1) 
+                                         .Select(o => o.Quantity * o.Price).Sum(),
+                                     ManualOrdersSpent = g.Where(o => o.IdCreationType == 2 && o.IdSide == 1 && o.IdOrderStatus != 1)
+                                         .Select(o => o.Quantity * o.Price).Sum(),
+                                     ManualOrdersReceived = g.Where(o => o.IdCreationType == 2 && o.IdSide == 1 && o.IdOrderStatus != 1)
+                                         .Select(o => o.Quantity * o.Price).Sum(),
                                  }).FirstOrDefaultAsync(token);
+
+            if (tradeTypesInfo is null)
+                return null;
             
-            return tradeTypesInfo;
+            var resultDto = new TradeTypesStatsDto();
+            resultDto.SignalOrdersRate = tradeTypesInfo.SignalOrdersRate;
+            resultDto.StopOrdersRate = tradeTypesInfo.StopOrdersRate;
+            resultDto.ManualOrdersRate = tradeTypesInfo.ManualOrdersRate;
+            resultDto.SignalOrdersProfit = tradeTypesInfo.SignalOrdersProfit;
+            resultDto.StopOrdersProfit = tradeTypesInfo.StopOrdersReceived - tradeTypesInfo.StopOrdersSpent;
+            resultDto.ManualOrdersProfit = tradeTypesInfo.ManualOrdersReceived - tradeTypesInfo.ManualOrdersSpent;
+            
+            return resultDto;
         }
 
         public async Task<IEnumerable<ProfitDetailsDto>> GetProfitDetailsAsync(int idUser, 

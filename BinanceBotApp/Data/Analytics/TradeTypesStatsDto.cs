@@ -23,7 +23,7 @@
         /// <summary>
         /// Rate of profit from orders by third-party signals
         /// </summary>
-        public double SignalsProfit { get; set; }
+        public double SignalOrdersProfit { get; set; }
         
         /// <summary>
         /// Rate of profit from orders, closed by auto created stop_loss order
