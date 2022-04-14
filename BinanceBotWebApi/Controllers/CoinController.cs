@@ -156,7 +156,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="403"> Wrong user id </response>
         [HttpDelete("prices")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> UnsubscribeCoinPriceStreamAsync([FromQuery] GenericCollectionDto<string> pairNames, 
+        public async Task<IActionResult> UnsubscribeCoinPricesStreamAsync([FromQuery] GenericCollectionDto<string> pairNames, 
             [FromQuery][Range(1, int.MaxValue)] int idUser, CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
