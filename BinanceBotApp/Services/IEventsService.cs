@@ -7,7 +7,7 @@ using BinanceBotApp.DataInternal.Enums;
 
 namespace BinanceBotApp.Services
 {
-    public interface IEventService
+    public interface IEventsService
     {
         Task<IEnumerable<EventDto>> GetAllAsync(int idUser, 
             bool isUnreadRequested, DateTime intervalStart, DateTime intervalEnd, 

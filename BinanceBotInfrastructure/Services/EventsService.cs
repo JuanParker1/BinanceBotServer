@@ -12,9 +12,9 @@ using Mapster;
 
 namespace BinanceBotInfrastructure.Services
 {
-    public class EventService : CrudService<EventDto, Event>, IEventService
+    public class EventsService : CrudService<EventDto, Event>, IEventsService
     {
-        public EventService(IBinanceBotDbContext db) : base(db) { }
+        public EventsService(IBinanceBotDbContext db) : base(db) { }
         
         public async Task<IEnumerable<EventDto>> GetAllAsync(int idUser, 
             bool isUnreadRequested, DateTime intervalStart, DateTime intervalEnd, 

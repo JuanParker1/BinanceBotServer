@@ -19,11 +19,11 @@ namespace BinanceBotWebApi.Controllers
     [Authorize]
     public class EventsController : ControllerBase
     {
-        private readonly IEventService _eventService;
+        private readonly IEventsService _eventsService;
 
-        public EventsController(IEventService eventService)
+        public EventsController(IEventsService eventsService)
         {
-            _eventService = eventService;
+            _eventsService = eventsService;
         }
         
         /// <summary>
@@ -48,7 +48,7 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
 
-            var eventDtos = await _eventService.GetAllAsync(idUser, 
+            var eventDtos = await _eventsService.GetAllAsync(idUser, 
                 isUnreadRequested, intervalStart, intervalEnd, token);
 
             return Ok(eventDtos);
@@ -72,7 +72,7 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idsDto.IdUser)
                 return Forbid();
 
-            var result = await _eventService.MarkAsReadAsync(idsDto, 
+            var result = await _eventsService.MarkAsReadAsync(idsDto, 
                 token);
 
             return Ok(result);

@@ -20,7 +20,7 @@ namespace BinanceBotInfrastructure.Services
         private readonly ISettingsService _settingsService;
         private readonly IHttpClientService _httpService;
         private readonly IOrdersService _ordersService;
-        private readonly IEventService _eventService;
+        private readonly IEventsService _eventsService;
         private readonly IWebSocketClientService _webSocketService;
         private readonly ICoinPricesStorage _coinPricesStorage;
         private readonly IRefreshOrderBackgroundQueue _refreshOrderQueue;
@@ -29,14 +29,14 @@ namespace BinanceBotInfrastructure.Services
         private static int _counter = 0;
 
         public CoinService(ISettingsService settingsService, IHttpClientService httpService, 
-            IOrdersService ordersService, IEventService eventService, 
+            IOrdersService ordersService, IEventsService eventsService, 
             IWebSocketClientService webSocketService, ICoinPricesStorage coinPricesStorage, 
             IRefreshOrderBackgroundQueue refreshOrderQueue)
         {
             _settingsService = settingsService;
             _httpService = httpService;
             _ordersService = ordersService;
-            _eventService = eventService;
+            _eventsService = eventsService;
             _webSocketService = webSocketService;
             _coinPricesStorage = coinPricesStorage;
             _refreshOrderQueue = refreshOrderQueue;
@@ -216,7 +216,7 @@ namespace BinanceBotInfrastructure.Services
                 .Sum();
             var newPrice = currentPrice - (currentPrice / 100 * orderLimitRate);
             
-            await _eventService.CreateOrderManagementEventAsync(idUser, EventTypes.OrderCancelled, "buy",
+            await _eventsService.CreateOrderManagementEventAsync(idUser, EventTypes.OrderCancelled, "buy",
                 tradePair, totalCoinsAmount, "рыночному", token);
 
             var newOrderDto = new NewOrderDto
@@ -233,7 +233,7 @@ namespace BinanceBotInfrastructure.Services
             };
             await _ordersService.CreateOrderAsync(newOrderDto, token);
             
-            await _eventService.CreateOrderManagementEventAsync(idUser, EventTypes.OrderCreated, "buy",
+            await _eventsService.CreateOrderManagementEventAsync(idUser, EventTypes.OrderCreated, "buy",
                 tradePair, totalCoinsAmount, $"{newPrice}", token);
         }
 

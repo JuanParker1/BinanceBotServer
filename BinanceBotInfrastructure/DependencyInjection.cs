@@ -49,7 +49,7 @@ namespace BinanceBotInfrastructure
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IWebSocketClientService, WebSocketClientService>();
             services.AddTransient<IAccountBalanceService, AccountBalanceService>();
-            services.AddTransient<IEventService, EventService>();
+            services.AddTransient<IEventsService, EventsService>();
             services.AddTransient<ICryptoInfoService, MinApiCryptoCompareService>();
 
             return services;
