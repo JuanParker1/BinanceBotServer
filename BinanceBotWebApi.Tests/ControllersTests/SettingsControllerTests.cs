@@ -71,7 +71,7 @@ public class SettingsControllerTests
     }
     
     [Fact]
-    public void It_should_return_ok_result_in_switch_trade_if_dtos_is_not_null()
+    public void It_should_return_ok_result_in_switch_trade()
     {
         _settingsService.Setup(s => s.SwitchTradeAsync(It.IsAny<SwitchTradeDto>(), 
                 CancellationToken.None).Result)
@@ -85,7 +85,7 @@ public class SettingsControllerTests
     }
     
     [Fact]
-    public void It_should_return_ok_result_with_correct_value_in_switch_trade_if_dtos_is_null()
+    public void It_should_return_ok_result_with_correct_value_in_switch_trade()
     {
         _settingsService.Setup(s => s.SwitchTradeAsync(It.IsAny<SwitchTradeDto>(), 
                 CancellationToken.None).Result)
@@ -109,7 +109,7 @@ public class SettingsControllerTests
     }
     
     [Fact]
-    public void It_should_return_ok_result_in_save_trade_mode_if_dtos_is_not_null()
+    public void It_should_return_ok_result_in_save_trade_mode()
     {
         _settingsService.Setup(s => s.SaveTradeModeAsync(It.IsAny<TradeModeDto>(), 
                 CancellationToken.None).Result)
@@ -123,7 +123,7 @@ public class SettingsControllerTests
     }
     
     [Fact]
-    public void It_should_return_ok_result_with_correct_value_in_save_trade_mode_if_dtos_is_null()
+    public void It_should_return_ok_result_with_correct_value_in_save_trade_mode()
     {
         _settingsService.Setup(s => s.SaveTradeModeAsync(It.IsAny<TradeModeDto>(), 
                 CancellationToken.None).Result)

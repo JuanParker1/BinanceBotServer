@@ -11,6 +11,7 @@ public static class ControllerExtentions
         var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
         {
             new Claim("Id", "1"),
+            new Claim(ClaimsIdentity.DefaultRoleClaimType, "Administrator"),
         }, "mock"));
     
         controller.ControllerContext = new ControllerContext()
