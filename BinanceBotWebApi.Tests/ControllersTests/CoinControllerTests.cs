@@ -60,9 +60,10 @@ public class CoinControllerTests
             .Returns(Task.FromResult<IEnumerable<string>>(null));
 
         var result = _controller.GetTradingPairsAsync(1).Result;
-        var okResult = result as OkObjectResult;
+        var okObjectResult = result as OkObjectResult;
     
-        Assert.Null(okResult?.Value);
+        Assert.NotNull(okObjectResult);
+        Assert.Null(okObjectResult?.Value);
     }
     
     [Fact]

@@ -59,9 +59,10 @@ public class AnalyticsControllerTests
 
         var result = _controller.GetProfitToBtcAsync(1, DateTime.Now, 
             DateTime.Now).Result;
-        var notFoundResult = result as OkObjectResult;
+        var okObjectResult = result as OkObjectResult;
     
-        Assert.Null(notFoundResult?.Value);
+        Assert.NotNull(okObjectResult);
+        Assert.Null(okObjectResult?.Value);
     }
     
     [Fact]
@@ -98,9 +99,10 @@ public class AnalyticsControllerTests
 
         var result = _controller.GetProfitToBtcAsync(1, DateTime.Now, 
             DateTime.Now).Result;
-        var notFoundResult = result as OkObjectResult;
+        var okObjectResult = result as OkObjectResult;
     
-        Assert.Null(notFoundResult?.Value);
+        Assert.NotNull(okObjectResult);
+        Assert.Null(okObjectResult?.Value);
     }
     
     [Fact]
@@ -137,8 +139,9 @@ public class AnalyticsControllerTests
 
         var result = _controller.GetProfitToBtcAsync(1, DateTime.Now, 
             DateTime.Now).Result;
-        var notFoundResult = result as OkObjectResult;
+        var okObjectResult = result as OkObjectResult;
     
-        Assert.Null(notFoundResult?.Value);
+        Assert.NotNull(okObjectResult);
+        Assert.Null(okObjectResult?.Value);
     }
 }

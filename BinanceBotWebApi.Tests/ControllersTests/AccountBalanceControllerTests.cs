@@ -65,9 +65,10 @@ public class AccountBalanceControllerTests
 
         var result = _controller.GetDepositHistoryAsync(1, DateTime.Now, 
             DateTime.Now).Result;
-        var notFoundResult = result as OkObjectResult;
+        var okObjectResult = result as OkObjectResult;
     
-        Assert.Null(notFoundResult?.Value);
+        Assert.NotNull(okObjectResult);
+        Assert.Null(okObjectResult?.Value);
     }
     
     [Fact]
@@ -103,9 +104,10 @@ public class AccountBalanceControllerTests
 
         var result = _controller.GetCurrentBalanceAsync(1)
             .Result;
-        var notFoundResult = result as OkObjectResult;
+        var okObjectResult = result as OkObjectResult;
     
-        Assert.Null(notFoundResult?.Value);
+        Assert.NotNull(okObjectResult);
+        Assert.Null(okObjectResult?.Value);
     }
     
     [Fact]
@@ -141,8 +143,9 @@ public class AccountBalanceControllerTests
 
         var result = _controller.GetTotalBalanceAsync(1)
             .Result;
-        var notFoundResult = result as OkObjectResult;
+        var okObjectResult = result as OkObjectResult;
     
-        Assert.Null(notFoundResult?.Value);
+        Assert.NotNull(okObjectResult);
+        Assert.Null(okObjectResult?.Value);
     }
 }
