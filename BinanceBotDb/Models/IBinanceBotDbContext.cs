@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace BinanceBotDb.Models
         DbSet<TradeMode> TradeModes { get; set; }
         DatabaseFacade Database { get; }
         int SaveChanges();
+        void Dispose();
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
         DbSet<TEntity> Set<TEntity>(string name) where TEntity : class;
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
