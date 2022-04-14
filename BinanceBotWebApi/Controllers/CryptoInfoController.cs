@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using BinanceBotApp.DataInternal.Deserializers;
+using BinanceBotApp.Data.Analytics;
 using BinanceBotApp.Services;
 using BinanceBotInfrastructure.Extensions;
 
@@ -37,7 +38,7 @@ public class CryptoInfoController : ControllerBase
     /// <response code="400"> Error in request parameters </response>
     /// <response code="403"> Wrong user id </response>
     [HttpGet("priceHistory")]
-    [ProducesResponseType(typeof(OrderInfo), (int)System.Net.HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(IEnumerable<ProfitToBtcHistoryDto>), (int)System.Net.HttpStatusCode.OK)]
     public async Task<IActionResult> GetBtcPriceHistoryAsync([Range(1, int.MaxValue)]int idUser, 
         [MaxLength(5)]string symbol, DateTime intervalStart, DateTime intervalEnd, 
         CancellationToken token = default)
