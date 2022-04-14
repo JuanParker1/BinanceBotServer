@@ -42,7 +42,8 @@ namespace BinanceBotWebApi.Controllers
             if (authUserId is null || authUserId != idUser)
                 return Forbid();
 
-            var settingsDto = await _settingsService.GetSettingsAsync(idUser, token);
+            var settingsDto = await _settingsService.GetSettingsAsync(idUser, 
+                token);
 
             return Ok(settingsDto);
         }
@@ -57,7 +58,7 @@ namespace BinanceBotWebApi.Controllers
         /// <response code="403"> Wrong user id </response>
         [HttpPost("switchTrade")]
         [ProducesResponseType(typeof(int), (int)System.Net.HttpStatusCode.OK)]
-        public async Task<IActionResult> EnableTradeAsync([FromBody] SwitchTradeDto switchTradeDto, 
+        public async Task<IActionResult> SwitchTradeAsync([FromBody] SwitchTradeDto switchTradeDto, 
             CancellationToken token = default)
         {
             var authUserId = User.GetUserId();
