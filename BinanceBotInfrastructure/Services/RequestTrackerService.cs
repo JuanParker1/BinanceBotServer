@@ -36,14 +36,15 @@ namespace BinanceBotInfrastructure.Services
             return requestDtos;
         }
 
-        public async Task RegisterRequestAsync(RequestDto requestDto, 
+        public async Task<int> RegisterRequestAsync(RequestDto requestDto, 
             CancellationToken token = default)
         {
             if (!await IsNewRequestAsync(requestDto, token))
-                return;
+                return -1;
             
             var request = requestDto.Adapt<Request>();
-            await _cacheRequestLogs.InsertAsync(request, token);
+            var newRequest = await _cacheRequestLogs.InsertAsync(request, token);
+            return newRequest?.Id ?? 0;
         }
 
         private async Task<bool> IsNewRequestAsync(RequestDto requestDto,

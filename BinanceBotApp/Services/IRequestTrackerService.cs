@@ -10,7 +10,7 @@ namespace BinanceBotApp.Services
     {
         Task<IEnumerable<RequestDto>> GetUserRequestsAsync(int idUser,
             int take, CancellationToken token = default);
-        Task RegisterRequestAsync(RequestDto requestDto, 
+        Task<int> RegisterRequestAsync(RequestDto requestDto, 
             CancellationToken token = default);
     }
 }
