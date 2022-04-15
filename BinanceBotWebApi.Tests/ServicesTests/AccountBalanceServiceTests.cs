@@ -35,12 +35,20 @@ public class AccountBalanceServiceTests
             .Options;
         _db = new BinanceBotDbContext(options);
 
-        _db.BalanceChanges.AddRange(new List<BalanceChange>
+        var entities = new List<BalanceChange>
         {
             new() {Id = 1, IdUser = 1, Date = new DateTime(2022, 03, 10), IdDirection = 1, Amount = 10},
             new() {Id = 2, IdUser = 1, Date = new DateTime(2022, 04, 12), IdDirection = 2, Amount = 1},
             new() {Id = 3, IdUser = 2, Date = new DateTime(2022, 04, 12), IdDirection = 2, Amount = 100}
-        });
+        };
+
+        if (_db.BalanceChanges.Any())
+        {
+            _db.BalanceChanges.RemoveRange(entities);
+            _db.SaveChanges();
+        }
+
+        _db.BalanceChanges.AddRange(entities);
         _db.SaveChanges();
 
         _service = new AccountBalanceService(_db, _settingsService.Object, 
@@ -53,7 +61,7 @@ public class AccountBalanceServiceTests
     }
 
     [Fact]
-    public async void It_should_return_two_entites_for_user_id_in_get_all()
+    public async void It_should_return_two_entities_for_user_id_in_get_all()
     {
         var entites = await _service.GetAllAsync(1,
             DateTime.MinValue, DateTime.MaxValue, 
