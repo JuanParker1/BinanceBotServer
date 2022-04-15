@@ -35,7 +35,7 @@ public class AccountBalanceServiceTests
             .Options;
         _db = new BinanceBotDbContext(options);
 
-        var entities = new List<BalanceChange>
+        var balanceChanges = new List<BalanceChange>
         {
             new() {Id = 1, IdUser = 1, Date = new DateTime(2022, 03, 10), IdDirection = 1, Amount = 10},
             new() {Id = 2, IdUser = 1, Date = new DateTime(2022, 04, 12), IdDirection = 2, Amount = 1},
@@ -44,11 +44,11 @@ public class AccountBalanceServiceTests
 
         if (_db.BalanceChanges.Any())
         {
-            _db.BalanceChanges.RemoveRange(entities);
+            _db.BalanceChanges.RemoveRange(balanceChanges);
             _db.SaveChanges();
         }
 
-        _db.BalanceChanges.AddRange(entities);
+        _db.BalanceChanges.AddRange(balanceChanges);
         _db.SaveChanges();
 
         _service = new AccountBalanceService(_db, _settingsService.Object, 
