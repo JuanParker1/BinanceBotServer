@@ -1,9 +1,9 @@
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BinanceBotDb.Models.Directories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace BinanceBotDb.Models
@@ -23,6 +23,7 @@ namespace BinanceBotDb.Models
         DatabaseFacade Database { get; }
         int SaveChanges();
         void Dispose();
+        ChangeTracker ChangeTracker { get; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
         DbSet<TEntity> Set<TEntity>(string name) where TEntity : class;
         DbSet<TEntity> Set<TEntity>() where TEntity : class;

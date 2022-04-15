@@ -20,14 +20,12 @@ namespace BinanceBotInfrastructure.Services
     /// </summary>
     public class WebSocketClientService : IWebSocketClientService
     {
-        private readonly IHttpClientService _httpService;
         private readonly IActiveWebsockets _activeWebsockets;
         private readonly JsonSerializerOptions _jsonDeserializerOptions;
 
         public WebSocketClientService(IHttpClientService httpService,
             IActiveWebsockets activeWebsockets)
         {
-            _httpService = httpService;
             _activeWebsockets = activeWebsockets;
             _jsonDeserializerOptions = new JsonSerializerOptions
             {

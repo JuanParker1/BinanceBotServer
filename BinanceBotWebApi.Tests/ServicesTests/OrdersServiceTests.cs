@@ -24,7 +24,7 @@ public class OrdersServiceTests
     private readonly Mock<IAccountBalanceService> _accountBalanceService;
     private readonly Mock<IRefreshOrderBackgroundQueue> _ordersQueue;
     private readonly Mock<IConfiguration> _configuration;
-    private readonly BinanceBotDbContext _db;
+    private readonly IBinanceBotDbContext _db;
     private readonly OrdersService _service;
 
     public OrdersServiceTests()
