@@ -153,7 +153,6 @@ namespace BinanceBotInfrastructure.Services
         {
             var orders = await (from o in _db.Orders
                         where o.IdUser == idUser &&
-                              o.DateClosed != null &&
                               o.DateClosed > intervalStart &&
                               o.DateClosed < intervalEnd
                         select o)
