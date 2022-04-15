@@ -60,7 +60,7 @@ public class OrdersServiceTests
             });
 
         var options = new DbContextOptionsBuilder<BinanceBotDbContext>()
-            .UseInMemoryDatabase(databaseName: "BinanceBotTests")
+            .UseInMemoryDatabase(databaseName: "OrdersTests")
             .Options;
         _db = new BinanceBotDbContext(options);
         

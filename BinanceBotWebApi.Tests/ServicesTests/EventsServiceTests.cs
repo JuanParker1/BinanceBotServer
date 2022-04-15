@@ -18,7 +18,7 @@ public class EventsServiceTests
     public EventsServiceTests()
     {
         var options = new DbContextOptionsBuilder<BinanceBotDbContext>()
-            .UseInMemoryDatabase(databaseName: "BinanceBotTests")
+            .UseInMemoryDatabase(databaseName: "EventsTests")
             .Options;
         _db = new BinanceBotDbContext(options);
 

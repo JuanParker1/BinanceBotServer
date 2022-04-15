@@ -31,7 +31,7 @@ public class AccountBalanceServiceTests
             .Returns(("", ""));
         
         var options = new DbContextOptionsBuilder<BinanceBotDbContext>()
-            .UseInMemoryDatabase(databaseName: "BinanceBotTests")
+            .UseInMemoryDatabase(databaseName: "AccountBalanceTests")
             .Options;
         _db = new BinanceBotDbContext(options);
 

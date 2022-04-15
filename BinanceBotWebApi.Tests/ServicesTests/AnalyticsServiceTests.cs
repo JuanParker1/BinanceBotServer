@@ -32,7 +32,7 @@ public class AnalyticsServiceTests
             });
         
         var options = new DbContextOptionsBuilder<BinanceBotDbContext>()
-            .UseInMemoryDatabase(databaseName: "BinanceBotTests")
+            .UseInMemoryDatabase(databaseName: "AnalyticsTests")
             .Options;
         _db = new BinanceBotDbContext(options);
 

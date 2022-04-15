@@ -26,7 +26,7 @@ public class CrudServiceTests
     public CrudServiceTests()
     {
         var options = new DbContextOptionsBuilder<BinanceBotDbContext>()
-            .UseInMemoryDatabase(databaseName: "BinanceBotTests")
+            .UseInMemoryDatabase(databaseName: "CrudServiceTests")
             .Options;
         _db = new BinanceBotDbContext(options);
         
