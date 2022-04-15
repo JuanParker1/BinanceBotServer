@@ -365,7 +365,7 @@ namespace BinanceBotInfrastructure.Services
                     ClientOrderId = exchangeOrderInfo.ClientOrderId,
                     Symbol = exchangeOrderInfo.Symbol,
                     Side = dbOrderInfo.IdSide == 1 ? "Покупка" : "Продажа",
-                    Type = dbOrderInfo.OrderType.Caption,
+                    Type = dbOrderInfo.OrderType?.Caption,
                     Status = exchangeOrderInfo.Status,
                     TimeInForce = exchangeOrderInfo.TimeInForce,
                     Quantity = double.TryParse(exchangeOrderInfo.OrigQty, NumberStyles.Float, 

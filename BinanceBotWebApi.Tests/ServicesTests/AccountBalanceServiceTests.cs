@@ -44,7 +44,7 @@ public class AccountBalanceServiceTests
 
         if (_db.BalanceChanges.Any())
         {
-            _db.BalanceChanges.RemoveRange(balanceChanges);
+            _db.BalanceChanges.RemoveRange(_db.BalanceChanges.Where(b => b.Id > 0));
             _db.SaveChanges();
         }
 
@@ -61,7 +61,7 @@ public class AccountBalanceServiceTests
     }
 
     [Fact]
-    public async void It_should_return_two_entities_for_user_id_in_get_all()
+    public async void It_should_return_two_entities_in_get_all()
     {
         var entites = await _service.GetAllAsync(1,
             DateTime.MinValue, DateTime.MaxValue, 

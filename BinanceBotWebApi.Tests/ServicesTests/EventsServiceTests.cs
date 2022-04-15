@@ -10,12 +10,12 @@ using Xunit;
 
 namespace BinanceBotWebApi.Tests.ServicesTests;
 
-public class EventServiceTests
+public class EventsServiceTests
 {
     private readonly IBinanceBotDbContext _db;
     private readonly EventsService _service;
     
-    public EventServiceTests()
+    public EventsServiceTests()
     {
         var options = new DbContextOptionsBuilder<BinanceBotDbContext>()
             .UseInMemoryDatabase(databaseName: "BinanceBotTests")
@@ -51,7 +51,7 @@ public class EventServiceTests
         _service = new EventsService(_db);
     }
 
-    ~EventServiceTests()
+    ~EventsServiceTests()
     {
         _db.Dispose();
     }
