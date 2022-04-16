@@ -98,6 +98,9 @@ namespace BinanceBotInfrastructure.Services
             
             var exchangeOrdersInfo = await _httpService.ProcessRequestAsync<IEnumerable<OrderInfo>>(uri, 
                 qParams, keys, HttpMethods.SignedGet, token);
+
+            if (exchangeOrdersInfo is null)
+                return null;
             
             var dbOrdersInfo = await (from order in _db.Orders.Include(o => o.OrderType)
                 where order.IdUser == idUser &&
@@ -194,6 +197,9 @@ namespace BinanceBotInfrastructure.Services
                 var newOrderInfo = await _httpService.ProcessRequestAsync<NewOrderDto, CreatedOrderFull>(uri, 
                     newOrderDto, keys, paramsToRemove, HttpMethods.SignedPost, token);
 
+                if (newOrderInfo is null)
+                    return;
+                
                 var isOrderCreated = newOrderInfo.Status == "NEW";
 
                 if (!isOrderCreated)
@@ -229,6 +235,9 @@ namespace BinanceBotInfrastructure.Services
             };
             var deletedOrderInfo = await _httpService.ProcessRequestAsync<DeletedOrder>(uri, 
                     qParams, keys, HttpMethods.SignedDelete, token);
+
+            if (deletedOrderInfo is null)
+                return null;
             
             var isOrderDeleted = deletedOrderInfo.Status == "CANCELLED";
 

@@ -2,6 +2,7 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -78,6 +79,9 @@ namespace BinanceBotInfrastructure.Services
         {
             ApiKey = keys.apiKey;
             SecretKey = keys.secretKey;
+     
+            if (string.IsNullOrEmpty(keys.apiKey) || string.IsNullOrEmpty(keys.secretKey))
+                return null;
             
             Func<Uri, IDictionary<string, string>, CancellationToken, 
                 Task<HttpResponseMessage>> requestDelegate =
@@ -118,7 +122,8 @@ namespace BinanceBotInfrastructure.Services
                 var errorMessage = $"Http status code: {(int)message.StatusCode} \n" +
                                    $"Binance error code: {errorObj.Code} \n" +
                                    $"Binance error message: {errorObj.Msg}";
-
+                
+                Trace.TraceError(errorMessage);
                 throw new InvalidOperationException(errorMessage);
             }
 

@@ -79,7 +79,7 @@ namespace BinanceBotInfrastructure.Services
                 await _httpService.ProcessRequestAsync<AccountBalanceInfo>(uri, 
                     qParams, apiKeys, HttpMethods.SignedGet, token);
 
-            var currentBalance = allCoins.Balances?.Where(c => 
+            var currentBalance = allCoins?.Balances?.Where(c => 
                 c.Free > 0 || c.Locked > 0);
             
             return currentBalance; 

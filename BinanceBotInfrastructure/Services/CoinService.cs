@@ -58,7 +58,7 @@ namespace BinanceBotInfrastructure.Services
                 await _httpService.ProcessRequestAsync<IEnumerable<CoinPrice>>(uri, 
                     new Dictionary<string, string>(), keys,HttpMethods.Get, token);
             
-            var filtered =  coinPricesInfo.Select(c => CutTradePairEnding(c.Symbol))
+            var filtered =  coinPricesInfo?.Select(c => CutTradePairEnding(c.Symbol))
                 .Distinct();
             
             return filtered;
