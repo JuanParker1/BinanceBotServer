@@ -17,12 +17,8 @@ namespace BinanceBotApp.DataValidators
                 .WithMessage("Логин не может содержать пробелы.");
             RuleFor(x => x.Name).Length(0, 21)
                 .WithMessage("Допустимая длина имени пользователя от 1 до 20 символов");
-            RuleFor(x => x.Name).Matches("^\\S+$")
-                .WithMessage("Имя не может содержать пробелы.");
             RuleFor(x => x.Surname).Length(0, 21)
                 .WithMessage("Допустимая длина фамилии пользователя от 1 до 20 символов");
-            RuleFor(x => x.Surname).Matches("^\\S+$")
-                .WithMessage("Фамилия не может содержать пробелы.");
             RuleFor(x => x.Email).Length(0, 251)
                 .WithMessage("Допустимая длина email от 1 до 250 символов");
             RuleFor(x => x.Email).Matches("^[^\\s+$]([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$")
