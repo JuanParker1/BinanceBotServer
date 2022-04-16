@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Net.Http;
@@ -30,7 +31,7 @@ namespace BinanceBotInfrastructure.Utils
                 if (string.IsNullOrEmpty($"{value}") || Verifier.IsNumericDefault(value))
                     continue;
                 
-                resultDict.Add(camelCasedKey, $"{value}");
+                resultDict.Add(camelCasedKey, Convert.ToString(value, CultureInfo.InvariantCulture));
             }
 
             foreach (var removeParam in paramsToRemove)
